@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T18:08:14.148510+09:00",
+  "generated_at": "2026-07-26T18:32:52.233399+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -129,7 +129,24 @@
     ]
   },
   "news": {
-    "현대건설": [],
+    "현대건설": [
+      {
+        "title": "대우·현산 웃고 현대·GS·DL 울고…원가율이 가른 건설사 2분기 실적",
+        "press": "머니투데이",
+        "time": "2026.07.23 16:45",
+        "url": "https://n.news.naver.com/mnews/article/008/0005390096",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      }
+    ],
     "건설업": [
       {
         "title": "대미 원전 투자 1호 가시화…현대건설·삼성물산 원전사업 날개 달까",
@@ -242,9 +259,73 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "지역별 최고가 단지 보니…10곳 중 4곳은 ‘도시정비 수주 TOP5’ 외 2개 언론사 보도",
+        "press": "한국경제",
+        "time": "2026.07.24 16:49",
+        "url": "https://n.news.naver.com/mnews/article/015/0005313541",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "도시정비 수주 TOP5",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "지역 대장 단지 10곳 중 4곳, 도시정비 수주 '빅5'가 지었다",
+        "press": "이데일리",
+        "time": "2026.07.24 11:09",
+        "url": "https://n.news.naver.com/mnews/article/018/0006336107",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "도시정비 수주 빅5",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "지역 최고가 아파트 45%, 정비사업 수주 '빅5' 시공",
+        "press": "뉴시스",
+        "time": "2026.07.24 10:40",
+        "url": "https://n.news.naver.com/mnews/article/003/0014085861",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "도시정비 수주 빅5",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
       }
     ],
     "원자력": [
+      {
+        "title": "대미 원전 투자 1호 가시화…현대건설·삼성물산 원전사업 날개 달까",
+        "press": "더구루",
+        "time": "18시간 전",
+        "url": "https://www.theguru.co.kr/news/article.html?no=104811",
+        "domain": "건설업",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "현대건설·삼성물산",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
       {
         "title": "美·사우디, 민간 원자력 협정 체결…우라늄 농축 가능성 열어",
         "press": "뉴시스",
@@ -353,6 +434,22 @@
         "importance": "High",
         "relevance": "high",
         "summary_kr": "웨스팅하우스가 보그틀 4호기를 미국 내 AP1000 표준 참조 발전소로 지정하는 설계통제문서(DCD) 개정판 20을 미 원자력규제위원회(NRC)에 제출했다. 이는 미국 내 AP1000 대량 배치를 위한 인허가 절차 간소화와 공급 가속화를 목표로 한다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Westinghouse eVinci™ Microreactor Selected for Malmstrom Air Force Base",
+        "press": "Westinghouse",
+        "time": "2026.04.23 15:36",
+        "url": "https://info.westinghousenuclear.com/news/westinghouse-evinci-microreactor-selected-for-malmstrom-air-force-base",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "Westinghouse",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "웨스팅하우스의 소형 마이크로리액터 eVinci가 미 공군 맬름스트롬 공군기지에 배치될 기술로 선정됐다. 이는 미 공군과 국방혁신단이 추진하는 시설용 첨단원자력 프로그램의 일환이다.",
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": true
