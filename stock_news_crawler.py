@@ -312,6 +312,67 @@ def _freeze_time(time_text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# 2c. 전역 중복 제거 — data/seen_urls.json (실행 간 이미 결과에 포함된 기사 추적)
+# ---------------------------------------------------------------------------
+# crawl_category()는 실행할 때마다 소스를 처음부터 다시 조회한다(이건 막을 수
+# 없다 — 네이버/RSS 어느 쪽도 "이후 새 글만" API를 제공하지 않는다). 문제는
+# 그렇게 다시 조회된 기사 중 "직전 실행에서 이미 결과에 포함됐던 기사"까지
+# 매번 다시 LLM으로 재태깅하고 다시 결과에 올렸다는 점이다. 이 기록 파일에
+# "지금까지 한 번이라도 어떤 카테고리 결과에든 포함됐던 기사"의 URL(없으면
+# 정규화된 제목)을 누적해두고, LLM 태깅 전에 걸러내 재조회 자체는 그대로 두되
+# 재태깅·재노출만 막는다.
+
+_SEEN_URLS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "seen_urls.json")
+_SEEN_URLS_RETENTION_DAYS = 90
+
+
+def _normalize_title_key(title: str) -> str:
+    """URL이 없는 기사를 위한 폴백 키. dedup_within_source가 붙이는
+    "외 N개 언론사 보도" 접미사는 실행마다 N이 달라질 수 있어 제거하고,
+    공백/대소문자 차이도 무시한다."""
+    t = re.sub(r"\s*외\s*\d+개\s*언론사\s*보도\s*$", "", title or "")
+    return re.sub(r"\s+", "", t).lower()
+
+
+def _seen_key(article: dict) -> str:
+    url = (article.get("url") or "").strip()
+    if url:
+        return url
+    return "title:" + _normalize_title_key(article.get("title", ""))
+
+
+def _load_seen_urls() -> dict:
+    """{key: 최초로 본 시각(isoformat)} 형태. 파일이 없거나 손상됐으면 빈 dict."""
+    if not os.path.exists(_SEEN_URLS_PATH):
+        return {}
+    try:
+        with open(_SEEN_URLS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def _save_seen_urls(seen: dict) -> None:
+    """저장 시마다 90일 지난 항목은 함께 정리해, 별도 정리 단계 없이도
+    파일이 무한정 커지지 않게 한다."""
+    os.makedirs(os.path.dirname(_SEEN_URLS_PATH), exist_ok=True)
+    cutoff = (datetime.now() - timedelta(days=_SEEN_URLS_RETENTION_DAYS)).isoformat()
+    pruned = {k: v for k, v in seen.items() if v >= cutoff}
+    with open(_SEEN_URLS_PATH, "w", encoding="utf-8") as f:
+        json.dump(pruned, f, ensure_ascii=False, indent=2)
+
+
+def _filter_unseen(articles: list[dict], seen: dict) -> list[dict]:
+    return [a for a in articles if _seen_key(a) not in seen]
+
+
+def _mark_seen(articles: list[dict], seen: dict) -> None:
+    now_iso = datetime.now().isoformat()
+    for a in articles:
+        seen[_seen_key(a)] = now_iso
+
+
+# ---------------------------------------------------------------------------
 # 2b. 해외 소스 — 원자력 카테고리 전용 (RSS 우선, 일부는 HTML 스크래핑)
 # ---------------------------------------------------------------------------
 
@@ -733,6 +794,16 @@ def _crawl_category_impl(
 
     all_articles = main_merged + supp_merged
 
+    # 전역 중복 제거: 직전 실행들에서 이미 결과에 포함됐던 기사는 LLM 태깅 전에
+    # 걸러낸다 (재조회 자체는 막을 수 없지만, 재태깅·재노출은 막는다).
+    seen_urls = _load_seen_urls()
+    before_seen_filter = len(all_articles)
+    all_articles = _filter_unseen(all_articles, seen_urls)
+    print(
+        f"[{category_name}] 후보 {before_seen_filter}건 중 이미 본 기사 "
+        f"{before_seen_filter - len(all_articles)}건 제외, {len(all_articles)}건 신규 태깅 예정"
+    )
+
     # LLM 태깅 (domain/scope/subject/entity/importance/relevance)
     client = anthropic.Anthropic()
     all_articles = tag_articles_with_llm(all_articles, category_name, client)
@@ -755,6 +826,13 @@ def _crawl_category_impl(
 
     included = sort_articles(included)
     final_articles = included[:max_articles]
+
+    # 이번 실행 결과에 포함된 기사는 앞으로의 실행에서 "이미 본 기사"로
+    # 취급되도록 기록한다 (같은 스크립트 실행 안에서 여러 카테고리가 순서대로
+    # crawl_category()를 호출하면, 뒤에 도는 카테고리는 앞선 카테고리가 방금
+    # 기록한 것까지 자연히 반영해서 본다).
+    _mark_seen(final_articles, seen_urls)
+    _save_seen_urls(seen_urls)
 
     return (
         [_to_output_article(a, category_name) for a in final_articles],

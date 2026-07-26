@@ -2,10 +2,18 @@
 일일 아카이브 생성 스크립트
 
 fetch_market_indicators() + crawl_category() 5개 카테고리를 실행해
-archive/{YYYY-MM-DD}.json 으로 저장한다. 30일 지난 파일은 자동 삭제한다.
+archive/{YYYY-MM-DD}_{AM|PM}.json 으로 저장한다 (하루 2회 실행 = 세션 2개).
+07:30 KST 실행은 AM, 15:00 KST 실행은 PM 세션 파일에 각각 저장되며, 같은
+세션이 재실행(재시도/수동 재실행)되면 기존 세션 파일에 새로 발견된 기사만
+누적 병합한다. 30일 지난 파일은 자동 삭제한다.
 
-archive/index.json 에는 날짜별 요약(총 기사수, High 건수)을 유지해서
-HTML의 날짜 드롭다운이 파일 목록을 매번 추측/탐색하지 않도록 한다.
+기사 자체의 중복은 stock_news_crawler.py의 data/seen_urls.json이 실행
+경계를 넘어 전역으로 걸러내므로(직전 실행에서 이미 결과에 포함됐던 기사는
+다음 실행에서 재태깅/재노출되지 않음), 세션 파일을 나누는 이유는 순수하게
+"이 기사를 아침에 처음 봤는지 오후에 처음 봤는지" 구분을 위한 것이다.
+
+archive/index.json 에는 날짜별(AM+PM 합산) 요약(총 기사수, High 건수)을
+유지해서 HTML의 날짜 드롭다운이 파일 목록을 매번 추측/탐색하지 않도록 한다.
 
 cidx2(건설공사비지수)는 월 1회만 갱신되는 지표라 매일 새로 조회하지 않는다.
 archive/cidx2_cache.json 에 "이번 달에 이미 조회했는지"를 기록해두고,
@@ -61,6 +69,15 @@ NUCLEAR_MIGRATE_KEYWORDS = [
 
 def _ensure_archive_dir():
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
+
+
+def _session_label(now: datetime) -> str:
+    """07:30/15:00 KST 스케줄을 정오 기준으로 나눠 AM/PM 세션명을 정한다."""
+    return "AM" if now.hour < 12 else "PM"
+
+
+def _session_archive_path(date_str: str, session: str) -> str:
+    return os.path.join(ARCHIVE_DIR, f"{date_str}_{session}.json")
 
 
 def _load_json(path, default):
@@ -273,14 +290,19 @@ def _merge_category_articles(existing: list, new: list) -> list:
 
 
 def merge_with_existing_archive(archive_path: str, day_payload: dict) -> dict:
-    """같은 날짜의 아카이브가 이미 존재하면(하루 2회 실행 중 두 번째 실행)
-    뉴스는 기존 목록에 새 기사를 누적 병합하고, 시황 지표는 최신 값으로
-    덮어쓴다(지표는 스냅샷이라 누적할 대상이 아니다)."""
+    """같은 세션(AM 또는 PM) 파일이 이미 존재하면(재시도/수동 재실행 등으로
+    같은 세션이 두 번 이상 돌 때) 뉴스는 기존 목록에 새 기사를 누적 병합하고,
+    시황 지표는 최신 값으로 덮어쓴다(지표는 스냅샷이라 누적할 대상이 아니다).
+
+    data/seen_urls.json이 이미 실행 경계를 넘어 기사 중복 자체를 막아주므로,
+    이 병합은 어디까지나 "같은 세션이 재실행됐을 때 이전 결과를 통째로
+    덮어쓰지 않기 위한" 안전장치다.
+    """
     existing = _load_json(archive_path, None)
     if not existing or not existing.get("news"):
         return day_payload
 
-    print("[뉴스] 당일 기존 아카이브 발견 — 누적 병합")
+    print("[뉴스] 같은 세션의 기존 아카이브 발견 — 누적 병합")
     merged_news = {}
     for name, new_articles in day_payload["news"].items():
         existing_articles = existing["news"].get(name, [])
@@ -293,21 +315,47 @@ def merge_with_existing_archive(archive_path: str, day_payload: dict) -> dict:
     return day_payload
 
 
-def update_index(day_payload: dict):
-    index = _load_json(INDEX_PATH, [])
-    index = [entry for entry in index if entry["date"] != day_payload["date"]]
+def _load_day_sessions(date_str: str) -> list:
+    """해당 날짜의 AM/PM 세션 파일 중 실제로 존재하는 것만 로드해서 반환한다."""
+    sessions = []
+    for session in ["AM", "PM"]:
+        data = _load_json(_session_archive_path(date_str, session), None)
+        if data:
+            sessions.append(data)
+    return sessions
 
-    all_articles = [a for articles in day_payload["news"].values() for a in articles]
+
+def update_index(date_str: str):
+    """해당 날짜의 AM+PM 세션을 합산해 index.json에 날짜당 한 항목만 유지한다.
+
+    세션 파일을 나눠 저장해도 사용자에게는 "오늘 브리핑" 하나로 보여주는 게
+    자연스러우므로(HTML도 AM+PM을 합쳐서 렌더링한다), 인덱스도 세션이 아니라
+    날짜 단위로 집계한다.
+    """
+    sessions = _load_day_sessions(date_str)
+    if not sessions:
+        return
+
+    combined_news: dict = {}
+    for day in sessions:
+        for name, articles in day.get("news", {}).items():
+            combined_news.setdefault(name, []).extend(articles)
+    for name, articles in combined_news.items():
+        combined_news[name] = sort_articles(articles)
+
+    all_articles = [a for articles in combined_news.values() for a in articles]
     total = len(all_articles)
     high_count = sum(1 for a in all_articles if a.get("importance") == "High")
     top_titles = [
         articles[0]["title"]
-        for articles in day_payload["news"].values()
+        for articles in combined_news.values()
         if articles
     ]
 
+    index = _load_json(INDEX_PATH, [])
+    index = [entry for entry in index if entry["date"] != date_str]
     index.append({
-        "date": day_payload["date"],
+        "date": date_str,
         "total": total,
         "high": high_count,
         "top_titles": top_titles[:2],
@@ -321,7 +369,10 @@ def prune_old_archives(now: datetime):
     for filename in os.listdir(ARCHIVE_DIR):
         if not filename.endswith(".json"):
             continue
-        date_part = filename[:-5]
+        stem = filename[:-5]
+        # "YYYY-MM-DD_AM"/"YYYY-MM-DD_PM" 형식에서 날짜 부분만 뗀다. 예전
+        # "YYYY-MM-DD.json"(세션 구분 없던 파일)도 그대로 지원한다.
+        date_part = stem[:-3] if stem.endswith(("_AM", "_PM")) else stem
         # index.json, cidx2_cache.json 등 날짜 형식이 아닌 파일은 건너뜀
         if len(date_part) != 10 or date_part.count("-") != 2:
             continue
@@ -347,14 +398,19 @@ def main():
     else:
         print("[설정] config.json 없음 — 하드코딩 기본값 사용")
 
-    day_payload = build_day_payload(now, admin_config)
+    session = _session_label(now)
+    print(f"[세션] {session} ({now.strftime('%H:%M')} KST)")
 
-    archive_path = os.path.join(ARCHIVE_DIR, f"{day_payload['date']}.json")
+    day_payload = build_day_payload(now, admin_config)
+    day_payload["session"] = session
+
+    date_str = day_payload["date"]
+    archive_path = _session_archive_path(date_str, session)
     day_payload = merge_with_existing_archive(archive_path, day_payload)
     _save_json(archive_path, day_payload)
     print(f"저장 완료: {archive_path}")
 
-    update_index(day_payload)
+    update_index(date_str)
     print(f"인덱스 갱신 완료: {INDEX_PATH}")
 
     prune_old_archives(now)

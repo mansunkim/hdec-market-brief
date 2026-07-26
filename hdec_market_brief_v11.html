@@ -563,19 +563,47 @@ async function loadIndex(){
   LATEST = dateKeys[0];
 }
 
+// 시간 문자열이 없는 기사(일부 해외 소스)는 가장 오래된 것으로 취급해 맨
+// 뒤로 밀리게 한다. time은 "YYYY.MM.DD HH:MM" 절대시각으로 고정되어 있어
+// 문자열 비교만으로도 날짜순 정렬이 성립한다.
+function timeSortKey(time){
+  return time || "0000.00.00 00:00";
+}
+function mergeArticleLists(lists){
+  const merged = [].concat(...lists);
+  merged.sort((a, b) => timeSortKey(b.time).localeCompare(timeSortKey(a.time)));
+  return merged;
+}
+
+// archive는 하루 2회 실행(AM/PM)마다 별도 파일로 저장되지만("어제 저녁~오늘
+// 새벽" 기사는 자연스럽게 오늘 AM에 포함됨), 사용자에게는 "오늘 브리핑"
+// 하나로 합쳐서 보여준다. 지표/코멘트는 더 최신 세션 값(PM이 있으면 PM)을
+// 쓰고, 뉴스는 두 세션을 합쳐 다시 최신순 정렬한다.
 async function loadDay(dateKey){
   if(tickerByDate[dateKey]) return; // 이미 로드됨
-  const res = await fetch(`archive/${dateKey}.json`);
-  const day = await res.json();
 
-  tickerByDate[dateKey] = day.indicators;
-  historyByDate[dateKey] = day.indicator_history || {};
-  indicatorMetaByDate[dateKey] = day.indicator_meta || {};
-  dailyCommentByDate[dateKey] = day.daily_comment || "";
+  const fetchSession = async (session) => {
+    try{
+      const res = await fetch(`archive/${dateKey}_${session}.json`);
+      return res.ok ? await res.json() : null;
+    }catch(e){
+      return null;
+    }
+  };
+  const [amDay, pmDay] = await Promise.all([fetchSession("AM"), fetchSession("PM")]);
+  const sessions = [amDay, pmDay].filter(Boolean);
+  if(sessions.length === 0) return; // 두 세션 다 없음(데이터 없는 날짜)
+
+  const latest = pmDay || amDay;
+  tickerByDate[dateKey] = latest.indicators;
+  historyByDate[dateKey] = latest.indicator_history || {};
+  indicatorMetaByDate[dateKey] = latest.indicator_meta || {};
+  dailyCommentByDate[dateKey] = latest.daily_comment || "";
 
   const news = {};
   for(const cat of categories){
-    news[cat.name] = (day.news[cat.name] || []).map(normalizeArticle);
+    const lists = sessions.map(day => (day.news[cat.name] || []).map(normalizeArticle));
+    news[cat.name] = mergeArticleLists(lists);
   }
   newsByDate[dateKey] = news;
 }
