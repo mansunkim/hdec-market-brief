@@ -501,10 +501,14 @@ function renderArticle(a){
     a.entity ? `<span class="tag entity">${a.entity}</span>` : "",
     a.verify ? `<span class="tag verify">확인필요</span>` : ""
   ].join("");
+  const summaryLine = a.summary_kr
+    ? `<div class="art-summary-kr" style="color:var(--ink-faint);font-size:0.9em;margin-top:2px;">${a.summary_kr}</div>`
+    : "";
   return `<div class="article">
     <span class="flag ${a.importance}">${a.importance.toUpperCase()}</span>
     <div class="art-body">
       <a href="${a.url}" target="_blank">${a.title}</a>
+      ${summaryLine}
       <div class="tags">${tags}</div>
     </div>
     <div class="meta-right">

@@ -19,11 +19,14 @@
       내려오는 네이버의 기본 정렬 순서를 그대로 신뢰합니다.
 """
 
+import html
 import json
 import os
 import re
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from difflib import SequenceMatcher
+from email.utils import parsedate_to_datetime
 from urllib.parse import quote
 
 import anthropic
@@ -245,6 +248,126 @@ def is_published_today(time_text: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# 2b. 해외 소스 — 원자력 카테고리 전용 (RSS 우선, 일부는 HTML 스크래핑)
+# ---------------------------------------------------------------------------
+
+# press 표시명 -> RSS 피드 URL. Reuters는 공개 RSS를 찾지 못해 목록에서 제외했다
+# (네이버뉴스 검색 결과로 노출되는 Reuters 기사만 화이트리스트를 통해 포함된다).
+_FOREIGN_RSS_SOURCES = {
+    "World Nuclear News": "https://www.world-nuclear-news.org/rss",
+    "DOE": "https://www.energy.gov/rss.xml",
+    "NRC": "https://www.nrc.gov/public-involve/rss?feed=news",
+    "Utility Dive": "https://www.utilitydive.com/feeds/news/",
+    "POWER Magazine": "https://www.powermag.com/feed/",
+    "Holtec": "https://holtecinternational.com/feed/",
+    "Westinghouse": "https://info.westinghousenuclear.com/news/rss.xml",
+    "Fermi America": "https://fermiamerica.com/feed/",
+}
+
+# 기업이 직접 발행하는 보도자료 소스. 홍보성일 수 있어 항상 Tier2 + verify_needed로
+# 처리한다 (tag_articles_with_llm 이후 _crawl_category_impl에서 무조건 적용하는 규칙).
+_COMPANY_PR_PRESS_NAMES = {"Holtec", "Westinghouse", "TerraPower", "Fermi America"}
+
+
+def _strip_html(text: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", text or "")
+    text = html.unescape(text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _format_rss_time(pub_date: str) -> str:
+    """RSS pubDate(RFC 822)를 메인소스와 동일한 "YYYY.MM.DD HH:MM" 형식으로 변환한다.
+    (is_published_today/formatDisplayTime이 별도 처리 없이 그대로 인식하도록 하기 위함)
+    파싱에 실패하면 빈 문자열을 반환한다."""
+    if not pub_date:
+        return ""
+    try:
+        dt = parsedate_to_datetime(pub_date)
+        return dt.strftime("%Y.%m.%d %H:%M")
+    except (TypeError, ValueError):
+        return ""
+
+
+def _parse_rss(xml_text: str, press_name: str, max_items: int = 15) -> list[dict]:
+    articles = []
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return articles
+    for item in root.findall(".//item")[:max_items]:
+        title_el = item.find("title")
+        link_el = item.find("link")
+        date_el = item.find("pubDate")
+        desc_el = item.find("description")
+        title = html.unescape((title_el.text or "").strip()) if title_el is not None else ""
+        link = (link_el.text or "").strip() if link_el is not None else ""
+        pub_date = (date_el.text or "").strip() if date_el is not None else ""
+        description = _strip_html(desc_el.text or "")[:400] if desc_el is not None else ""
+        if not title or not link:
+            continue
+        articles.append({
+            "title": title,
+            "press": press_name,
+            "time": _format_rss_time(pub_date),
+            "url": link,
+            "source": "supplementary",
+            "source_tier": None,
+            "description": description,
+        })
+    return articles
+
+
+def fetch_foreign_sources() -> list[dict]:
+    """원자력 카테고리 전용 해외 소스를 수집한다.
+
+    - RSS는 Playwright로 페이지를 열어 response.text()로 받는다. NRC처럼 urllib
+      요청은 403으로 차단하지만 실제 브라우저 요청은 통과시키는 사이트가 있어,
+      전 소스에 동일한 방식(실제 브라우저)을 써서 일관되게 처리한다.
+    - TerraPower는 공개 RSS가 없어 뉴스 목록 페이지를 직접 스크래핑한다.
+    """
+    articles = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(user_agent=USER_AGENT)
+
+        for press_name, url in _FOREIGN_RSS_SOURCES.items():
+            try:
+                resp = page.goto(url, wait_until="domcontentloaded", timeout=20000)
+                xml_text = resp.text() if resp else ""
+                articles.extend(_parse_rss(xml_text, press_name))
+            except Exception:
+                continue  # 개별 소스 실패는 건너뛰고 계속 진행
+
+        try:
+            page.goto("https://www.terrapower.com/news", wait_until="networkidle", timeout=20000)
+            seen_urls: set[str] = set()
+            for link_el in page.query_selector_all("a"):
+                title = (link_el.inner_text() or "").strip()
+                if len(title) < 15:
+                    continue
+                href = link_el.evaluate("e => e.href")
+                if not href or href in seen_urls:
+                    continue
+                seen_urls.add(href)
+                articles.append({
+                    "title": title,
+                    "press": "TerraPower",
+                    "time": "",
+                    "url": href,
+                    "source": "supplementary",
+                    "source_tier": None,
+                    "description": "",
+                })
+                if len(seen_urls) >= 20:
+                    break
+        except Exception:
+            pass
+
+        browser.close()
+    return articles
+
+
+# ---------------------------------------------------------------------------
 # 3. 1차 필터 (포함/제외 키워드)
 # ---------------------------------------------------------------------------
 
@@ -255,10 +378,10 @@ def apply_keyword_filter(
 ) -> list[dict]:
     result = []
     for a in articles:
-        title = a["title"]
-        if any(kw in title for kw in exclude_keywords):
+        title = a["title"].lower()
+        if any(kw.lower() in title for kw in exclude_keywords):
             continue
-        if include_keywords and not any(kw in title for kw in include_keywords):
+        if include_keywords and not any(kw.lower() in title for kw in include_keywords):
             continue
         result.append(a)
     return result
@@ -355,8 +478,11 @@ _TAG_SCHEMA = {
                     "entity": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                     "importance": {"type": "string", "enum": ["High", "Normal"]},
                     "relevance": {"type": "string", "enum": ["high", "low"]},
+                    "summary_kr": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                 },
-                "required": ["index", "scope", "subject", "entity", "importance", "relevance"],
+                "required": [
+                    "index", "scope", "subject", "entity", "importance", "relevance", "summary_kr",
+                ],
                 "additionalProperties": False,
             },
         }
@@ -375,10 +501,16 @@ def tag_articles_with_llm(
     if not articles:
         return articles
 
-    numbered = "\n".join(
-        f"{i}. [{a['press']}] {a['title']}" for i, a in enumerate(articles)
-    )
-    prompt = f"""다음은 "{domain}" 관련 뉴스 기사 제목 목록이다. 각 기사를 아래 기준으로 분류하라.
+    def _prompt_line(i: int, a: dict) -> str:
+        line = f"{i}. [{a['press']}] {a['title']}"
+        desc = a.get("description")
+        if desc:
+            line += f"\n   설명: {desc}"
+        return line
+
+    numbered = "\n".join(_prompt_line(i, a) for i, a in enumerate(articles))
+    prompt = f"""다음은 "{domain}" 관련 뉴스 기사 목록이다. 일부 기사는 제목 아래에 원문 설명(설명:)이
+함께 제공된다. 각 기사를 아래 기준으로 분류하라.
 
 - scope: 기사 내용이 국내 사업/이슈면 "국내", 해외 사업/이슈면 "해외"
 - subject: 기사의 주체가 {domain} 자사 관련이면 "자사", 경쟁사 관련이면 "경쟁사",
@@ -387,8 +519,13 @@ def tag_articles_with_llm(
 - importance: 수주, 계약, 공시 관련 내용을 포함하면 "High", 그 외는 "Normal"
 - relevance: 기사의 실질적 가치를 "high" 또는 "low"로 판단
   - "low": 단순 홍보/이벤트/사내소식/동정성 기사, 보도자료를 사실상 그대로 옮긴 기사,
-    회사명이 스치듯 한 번만 언급되고 핵심 내용이 아닌 경우
+    회사명이 스치듯 한 번만 언급되고 핵심 내용이 아닌 경우, Holtec/Westinghouse/Fermi/
+    TerraPower 등 기업의 단순 채용공고·컨퍼런스 참가 소식처럼 현대건설 프로젝트와
+    직접적 연관이 없는 기사
   - "high": 사업/실적/계약/정책/시장에 실질적 영향이 있는 내용
+- summary_kr: 기사 제목이 영어로 작성된 경우에만 작성한다. 제목과 설명(있는 경우)에 담긴
+  핵심 사실(주체/행위/시점/숫자)을 바탕으로 한국어 문장을 새로 구성해 2~3문장으로 요약한다.
+  원문을 그대로 번역하거나 원문 문장 구조를 그대로 따라가지 않는다. 제목이 한글이면 null로 둔다.
 
 기사 목록:
 {numbered}
@@ -417,6 +554,7 @@ def tag_articles_with_llm(
         a["entity"] = tag.get("entity")
         a["importance"] = tag.get("importance", "Normal")
         a["relevance"] = tag.get("relevance", "high")
+        a["summary_kr"] = tag.get("summary_kr")
     return articles
 
 
@@ -452,6 +590,7 @@ def _to_output_article(a: dict, category_name: str) -> dict:
         "entity": a.get("entity"),
         "importance": a.get("importance"),
         "relevance": a.get("relevance"),
+        "summary_kr": a.get("summary_kr"),
         "source": a.get("source"),
         # 메인소스(공식 종목뉴스 피드)는 항상 Tier 1로 간주.
         # 보조소스는 화이트리스트 등급(tier1/tier2)을 그대로 반영.
@@ -469,10 +608,13 @@ def _crawl_category_impl(
     tier1_whitelist: list[str],
     tier2_whitelist: list[str],
     max_articles: int = 7,
+    foreign_sources: bool = False,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category() / crawl_category_debug()의 공통 구현.
 
     (최종 포함된 기사, relevance="low"로 제외된 기사) 튜플을 반환한다.
+    foreign_sources=True면 fetch_foreign_sources()(원자력 전용 해외 RSS/스크래핑)
+    결과를 보조소스에 합쳐 동일한 필터링/태깅 파이프라인을 태운다.
     """
 
     # main_source_url 예: "https://finance.naver.com/item/news_news.naver?code=000720"
@@ -481,6 +623,8 @@ def _crawl_category_impl(
 
     main_raw = fetch_main_source(stock_code, pages=2)
     supp_raw = fetch_supplementary_source(supplementary_query)
+    if foreign_sources:
+        supp_raw = supp_raw + fetch_foreign_sources()
 
     # 1차 필터 (포함/제외 키워드). relevance가 2차 필터 역할을 하므로
     # exclude_keywords는 명백한 노이즈(스포츠단, 광고성 문구 등) 정도만 최소로 둔다.
@@ -507,13 +651,17 @@ def _crawl_category_impl(
     included = [a for a in all_articles if a.get("relevance", "high") != "low"]
     excluded_low_relevance = [a for a in all_articles if a.get("relevance", "high") == "low"]
 
-    # Tier2 매체 + 제목에 "단독" 포함 → importance Normal 강등 + verify_needed 플래그
+    # verify_needed 플래그: ① Tier2 매체 + 제목에 "단독" 포함 → importance Normal 강등,
+    # ② 기업이 직접 발행한 보도자료(Holtec/Westinghouse/TerraPower/Fermi America)는
+    #    홍보성 가능성이 있어 무조건 verify_needed (importance는 그대로 둔다)
     for a in included:
+        verify_needed = False
         if a.get("source_tier") == "tier2" and "단독" in a["title"]:
             a["importance"] = "Normal"
-            a["verify_needed"] = True
-        else:
-            a.setdefault("verify_needed", False)
+            verify_needed = True
+        if a.get("press") in _COMPANY_PR_PRESS_NAMES:
+            verify_needed = True
+        a["verify_needed"] = verify_needed
 
     included = sort_articles(included)
     final_articles = included[:max_articles]
@@ -533,12 +681,13 @@ def crawl_category(
     tier1_whitelist: list[str],
     tier2_whitelist: list[str],
     max_articles: int = 7,
+    foreign_sources: bool = False,
 ) -> list[dict]:
     """카테고리별 종목뉴스를 크롤링/필터링/태깅해 최종 기사 리스트를 반환한다."""
     included, _ = _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles,
+        max_articles, foreign_sources,
     )
     return included
 
@@ -552,6 +701,7 @@ def crawl_category_debug(
     tier1_whitelist: list[str],
     tier2_whitelist: list[str],
     max_articles: int = 7,
+    foreign_sources: bool = False,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category()와 동일하지만 relevance="low"로 제외된 기사도 함께 반환한다.
 
@@ -560,7 +710,7 @@ def crawl_category_debug(
     return _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles,
+        max_articles, foreign_sources,
     )
 
 
@@ -606,16 +756,25 @@ CATEGORY_CONFIGS = [
         include_keywords=[
             "SMR", "원전 수주", "원전 수출", "AP1000", "우라늄", "한수원", "웨스팅하우스",
             "FRMI", "CCJ", "CEG", "OKLO", "두산에너빌리티", "한전기술",
+            # 해외 소스(RSS) 영문 기사용 키워드
+            "Holtec", "Palisades", "Westinghouse", "Fermi", "Fermi America", "Matador",
+            "TerraPower", "Natrium", "Kozloduy", "Bulgaria nuclear", "NRC license", "DOE nuclear",
         ],
         exclude_keywords=["탈원전 찬반", "사설"],
         # 원자력 전문지(에너지신문/전기신문/World Nuclear News)는 실제 네이버뉴스
         # 검색 결과에 거의 노출되지 않아, 실제로 등장하는 주요 경제지를 추가했다.
+        # World Nuclear News/Reuters/DOE/NRC는 fetch_foreign_sources()로도 직접 수집된다.
         tier1_whitelist=[
             "에너지신문", "전기신문", "World Nuclear News",
             "연합뉴스", "매일경제", "헤럴드경제", "서울경제", "뉴시스",
+            "Reuters", "DOE", "NRC",
         ],
-        tier2_whitelist=["조선비즈", "Reuters", "뉴스1", "파이낸셜뉴스", "머니투데이", "이데일리"],
+        tier2_whitelist=[
+            "조선비즈", "뉴스1", "파이낸셜뉴스", "머니투데이", "이데일리",
+            "Utility Dive", "POWER Magazine", "Holtec", "Westinghouse", "TerraPower", "Fermi America",
+        ],
         max_articles=7,
+        foreign_sources=True,
     ),
     dict(
         category_name="도시정비",
