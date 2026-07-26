@@ -73,33 +73,53 @@ _FDR_TICKERS = {
 }
 
 
-def _fetch_fdr_field(key: str) -> list:
-    symbol, decimals = _FDR_TICKERS[key]
-    start = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+# 히스토리 조회 기간. 하루 지표 흐름 카드 호버 차트에 "최근 1개월(약 22거래일)"을
+# 보여주려면 주말/휴일을 감안해 넉넉히 40일치를 받아온 뒤 최근 거래일만 자른다.
+_HISTORY_LOOKBACK_DAYS = 40
+_HISTORY_TRADING_DAYS = 22
+
+
+def _history_from_points(points: list, decimals: int, trading_days: int = _HISTORY_TRADING_DAYS) -> list:
+    tail = points[-trading_days:]
+    return [[d, round(v, decimals)] for d, v in tail]
+
+
+def _snapshot_from_points(points: list, decimals: int) -> list:
+    latest_close = points[-1][1]
+    prev_close = points[-2][1]
+    change_ratio = (latest_close - prev_close) / prev_close
+    return [_fmt_number(latest_close, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
+
+
+def _fdr_close_points(symbol: str, key: str) -> list:
+    start = (datetime.datetime.now() - datetime.timedelta(days=_HISTORY_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
     df = fdr.DataReader(symbol, start)
     if df.empty or len(df) < 2:
         raise RuntimeError(f"{key}({symbol}): FDR에서 충분한 데이터를 받지 못했습니다")
-
-    # 'Change' 컬럼은 KRX 소스 티커에만 있고 Yahoo 소스 티커(나스닥/다우/S&P500/NLR/URA)에는
-    # 없으므로, 모든 필드에 대해 종가 기준으로 직접 등락률을 계산해 일관되게 처리한다.
-    latest_close = float(df.iloc[-1]["Close"])
-    prev_close = float(df.iloc[-2]["Close"])
-    change_ratio = (latest_close - prev_close) / prev_close
-    value_str = _fmt_number(latest_close, decimals)
-    return [value_str, _fmt_pct(change_ratio), _direction(change_ratio)]
+    return [(idx.strftime("%Y-%m-%d"), float(v)) for idx, v in df["Close"].items()]
 
 
-def _fetch_fx() -> list:
-    df = fdr.DataReader("USD/KRW", (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y-%m-%d"))
-    if df.empty or len(df) < 2:
-        raise RuntimeError("fx(USD/KRW): FDR에서 충분한 데이터를 받지 못했습니다")
+def _fetch_fdr_full(key: str) -> tuple:
+    """(스냅샷, 히스토리)를 한 번의 조회로 함께 만든다.
 
-    latest_close = float(df.iloc[-1]["Close"])
-    prev_close = float(df.iloc[-2]["Close"])
+    'Change' 컬럼은 KRX 소스 티커에만 있고 Yahoo 소스 티커에는 없으므로,
+    모든 필드에 대해 종가 기준으로 직접 등락률을 계산해 일관되게 처리한다.
+    """
+    symbol, decimals = _FDR_TICKERS[key]
+    points = _fdr_close_points(symbol, key)
+    return _snapshot_from_points(points, decimals), _history_from_points(points, decimals)
+
+
+def _fetch_fx_full() -> tuple:
+    points = _fdr_close_points("USD/KRW", "fx(USD/KRW)")
+    latest_close = points[-1][1]
+    prev_close = points[-2][1]
     diff = latest_close - prev_close
     # 환율은 등락률(%)이 아니라 등락폭(원)을 그대로 표기하는 관례를 따른다.
     diff_str = f"{diff:+.1f}" if diff != 0 else "0.0"
-    return [_fmt_number(latest_close, 1), diff_str, _direction(diff)]
+    snapshot = [_fmt_number(latest_close, 1), diff_str, _direction(diff)]
+    history = _history_from_points(points, 1)
+    return snapshot, history
 
 
 # ---------------------------------------------------------------------------
@@ -124,37 +144,51 @@ _YAHOO_TICKERS = {
 }
 
 
-def _fetch_yahoo_field(key: str) -> list:
-    ticker, decimals = _YAHOO_TICKERS[key]
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(ticker)}"
+def _yahoo_close_points(ticker: str, key: str) -> list:
+    # range=1mo&interval=1d로 받으면 meta.previousClose가 응답에서 빠지는 경우가 있어
+    # (검증됨), 스냅샷/히스토리 모두 종가 배열의 마지막 값들에서 직접 계산한다.
+    url = (
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(ticker)}"
+        f"?range=1mo&interval=1d"
+    )
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         data = json.load(resp)
 
-    meta = data["chart"]["result"][0]["meta"]
-    price = meta["regularMarketPrice"]
-    prev_close = meta["previousClose"]
-    change_ratio = (price - prev_close) / prev_close
-    return [_fmt_number(price, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
+    result = data["chart"]["result"][0]
+    timestamps = result["timestamp"]
+    closes = result["indicators"]["quote"][0]["close"]
+    points = [
+        (datetime.datetime.utcfromtimestamp(t).strftime("%Y-%m-%d"), float(c))
+        for t, c in zip(timestamps, closes)
+        if c is not None
+    ]
+    if len(points) < 2:
+        raise RuntimeError(f"{key}({ticker}): Yahoo에서 충분한 데이터를 받지 못했습니다")
+    return points
+
+
+def _fetch_yahoo_full(key: str) -> tuple:
+    ticker, decimals = _YAHOO_TICKERS[key]
+    points = _yahoo_close_points(ticker, key)
+    return _snapshot_from_points(points, decimals), _history_from_points(points, decimals)
 
 
 # ---------------------------------------------------------------------------
 # cidx1 — KOSPI 건설업 지수 (pykrx, 티커 1018, KRX 로그인 필요)
 # ---------------------------------------------------------------------------
 
-def _fetch_cidx1() -> list:
+def _fetch_cidx1_full() -> tuple:
     from pykrx import stock
 
     end = datetime.datetime.now().strftime("%Y%m%d")
-    start = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y%m%d")
+    start = (datetime.datetime.now() - datetime.timedelta(days=_HISTORY_LOOKBACK_DAYS)).strftime("%Y%m%d")
     df = stock.get_index_ohlcv(start, end, "1018")
     if df is None or df.empty or len(df) < 2:
         raise RuntimeError("cidx1(1018): pykrx에서 충분한 데이터를 받지 못했습니다 (KRX_ID/KRX_PW 확인 필요)")
 
-    latest_close = float(df.iloc[-1]["종가"])
-    prev_close = float(df.iloc[-2]["종가"])
-    change_ratio = (latest_close - prev_close) / prev_close
-    return [_fmt_number(latest_close, 2), _fmt_pct(change_ratio), _direction(change_ratio)]
+    points = [(idx.strftime("%Y-%m-%d"), float(v)) for idx, v in df["종가"].items()]
+    return _snapshot_from_points(points, 2), _history_from_points(points, 2)
 
 
 # ---------------------------------------------------------------------------
@@ -175,26 +209,53 @@ _PYKRX_STOCK_TICKERS = {
 }
 
 
-def _fetch_pykrx_stock_field(key: str) -> list:
+def _fetch_pykrx_stock_full(key: str) -> tuple:
     from pykrx import stock
 
     code, decimals = _PYKRX_STOCK_TICKERS[key]
     end = datetime.datetime.now().strftime("%Y%m%d")
-    start = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y%m%d")
+    start = (datetime.datetime.now() - datetime.timedelta(days=_HISTORY_LOOKBACK_DAYS)).strftime("%Y%m%d")
     df = stock.get_market_ohlcv(start, end, code)
     if df is None or df.empty:
         raise RuntimeError(f"{key}({code}): pykrx에서 데이터를 받지 못했습니다 (KRX_ID/KRX_PW 확인 필요)")
 
     latest = df.iloc[-1]
     close = float(latest["종가"])
-    # get_market_ohlcv는 등락률(%) 컬럼을 직접 제공하므로 전일 종가로 재계산하지 않는다.
+    # get_market_ohlcv는 등락률(%) 컬럼을 직접 제공하므로 스냅샷은 전일 종가로 재계산하지
+    # 않고 그대로 쓴다. 히스토리는 종가 시계열을 그대로 뽑는다.
     change_ratio = float(latest["등락률"]) / 100
-    return [_fmt_number(close, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
+    snapshot = [_fmt_number(close, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
+    points = [(idx.strftime("%Y-%m-%d"), float(v)) for idx, v in df["종가"].items()]
+    history = _history_from_points(points, decimals)
+    return snapshot, history
 
 
 # ---------------------------------------------------------------------------
 # 일간 지표 통합
 # ---------------------------------------------------------------------------
+
+def fetch_market_indicators_full() -> tuple:
+    """일간 시황 지표의 스냅샷과 히스토리를 함께 수집한다.
+
+    (snapshot, history) 튜플을 반환한다.
+    - snapshot: {key: [값, 등락률, 방향]} — 기존 fetch_market_indicators()와 동일한 모양
+    - history: {key: [[날짜, 값], ...]} — 최근 약 1개월(22거래일)치 시계열
+      (지표 카드 호버 시 보여줄 차트용. cidx2는 별도로 월간 캐시에서 처리한다)
+
+    스냅샷/히스토리를 따로 조회하면 소스별 API를 두 번씩 호출하게 되므로,
+    각 필드마다 한 번만 조회해서 두 결과를 함께 뽑아낸다.
+    """
+    snapshot, history = {}, {}
+    for key in _FDR_TICKERS:
+        snapshot[key], history[key] = _fetch_fdr_full(key)
+    for key in _YAHOO_TICKERS:
+        snapshot[key], history[key] = _fetch_yahoo_full(key)
+    for key in _PYKRX_STOCK_TICKERS:
+        snapshot[key], history[key] = _fetch_pykrx_stock_full(key)
+    snapshot["fx"], history["fx"] = _fetch_fx_full()
+    snapshot["cidx1"], history["cidx1"] = _fetch_cidx1_full()
+    return snapshot, history
+
 
 def fetch_market_indicators() -> dict:
     """일간 시황 지표를 수집해 {key: [값, 등락률, 방향]} 형태로 반환한다.
@@ -202,17 +263,14 @@ def fetch_market_indicators() -> dict:
     kospi, kosdaq, nasdaq, dow, sp500, hdec, cidx1, smr, tiger_nuke, nlr, ura, fx, wti,
     daewoo_enc, gs_enc, dl_enc, samsung_ena, hdc_idc, doosan_enerbility, kepco_eng,
     frmi, ccj, ceg, oklo
+
+    (하위 호환용 — 히스토리도 필요하면 fetch_market_indicators_full()을 직접 쓸 것.
+    이 함수는 내부적으로 동일하게 조회하고 히스토리를 버릴 뿐이라, 스냅샷과 히스토리가
+    둘 다 필요한 경우 이 함수 대신 fetch_market_indicators_full()을 써야 API를
+    중복 호출하지 않는다.)
     """
-    result = {}
-    for key in _FDR_TICKERS:
-        result[key] = _fetch_fdr_field(key)
-    for key in _YAHOO_TICKERS:
-        result[key] = _fetch_yahoo_field(key)
-    for key in _PYKRX_STOCK_TICKERS:
-        result[key] = _fetch_pykrx_stock_field(key)
-    result["fx"] = _fetch_fx()
-    result["cidx1"] = _fetch_cidx1()
-    return result
+    snapshot, _ = fetch_market_indicators_full()
+    return snapshot
 
 
 # ---------------------------------------------------------------------------
@@ -223,12 +281,12 @@ _KOSIS_ORG_ID = "397"
 _KOSIS_TBL_ID = "DT_39701_A003"
 
 
-def fetch_construction_cost_index(api_key: str) -> list:
+def fetch_construction_cost_index_full(api_key: str, months: int = 13) -> tuple:
     """건설공사비지수(월간, 2020=100)를 KOSIS Open API에서 조회한다.
 
-    매일 호출하는 지표가 아니므로 fetch_market_indicators()에는 포함하지 않는다
-    (generate_daily_archive.py가 월 1회만 새로 조회하고 캐시를 재사용한다).
-    다른 일간 지표와 동일하게 [값, 등락률, 방향] 형태로 반환해 "시장지표" 그리드에
+    (snapshot, history) 튜플을 반환한다. months=13이면 전월대비 계산에 필요한 여유분을
+    포함해 최근 13개월치를 받아오고, 히스토리는 그중 최근 12개월(1년치)을 오름차순으로 담는다.
+    다른 일간 지표와 동일하게 스냅샷은 [값, 등락률, 방향] 형태로 "시장지표" 그리드에
     카드로 그대로 렌더링할 수 있게 하되, 월간 지표라는 성격을 드러내기 위해
     등락률은 전일대비가 아니라 전월말대비로 계산하고, 값 옆에 기준월을 주석으로 덧붙인다.
     """
@@ -240,7 +298,7 @@ def fetch_construction_cost_index(api_key: str) -> list:
         "format": "json",
         "jsonVD": "Y",
         "prdSe": "M",
-        "newEstPrdCnt": "3",
+        "newEstPrdCnt": str(months),
         "orgId": _KOSIS_ORG_ID,
         "tblId": _KOSIS_TBL_ID,
     }
@@ -280,7 +338,21 @@ def fetch_construction_cost_index(api_key: str) -> list:
         f'<span style="font-size:9.5px;font-weight:500;color:var(--ink-faint);margin-left:4px;">'
         f"※{period_label}기준</span>"
     )
-    return [value_html, chg_str, direction]
+    snapshot = [value_html, chg_str, direction]
+
+    # 히스토리는 최근 12개월치를 오름차순("YYYY-MM" 라벨)으로 담는다.
+    history_rows = sorted(construction_rows, key=lambda r: r["PRD_DE"])[-12:]
+    history = [
+        [f"{r['PRD_DE'][:4]}-{r['PRD_DE'][4:]}", round(float(r["DT"]), 2)]
+        for r in history_rows
+    ]
+    return snapshot, history
+
+
+def fetch_construction_cost_index(api_key: str) -> list:
+    """(하위 호환용) 스냅샷만 필요할 때 사용. fetch_construction_cost_index_full() 참고."""
+    snapshot, _ = fetch_construction_cost_index_full(api_key, months=3)
+    return snapshot
 
 
 # ---------------------------------------------------------------------------

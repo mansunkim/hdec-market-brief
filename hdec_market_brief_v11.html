@@ -152,6 +152,17 @@
   .ind-label{ font-size:10.5px; color:var(--ink-soft); font-weight:600; }
   .ind-value{ font-family:var(--num); font-size:15px; font-weight:700; color:var(--ink); margin-top:6px; font-variant-numeric: tabular-nums; letter-spacing:-0.01em; }
   .ind-chg{ display:inline-flex; align-items:center; gap:3px; font-family:var(--num); font-size:10.5px; font-weight:700; margin-top:5px; }
+
+  /* 지표 카드 호버 시 뜨는 미니 차트 툴팁 */
+  .indicator-tooltip{
+    position:fixed; z-index:200; display:none;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    box-shadow: var(--shadow-pop); padding:10px 12px; pointer-events:none;
+  }
+  .indicator-tooltip.show{ display:block; }
+  .spark-title{ font-size:10.5px; font-weight:700; color:var(--ink-soft); margin-bottom:6px; white-space:nowrap; }
+  .spark-range{ display:flex; justify-content:space-between; gap:10px; font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-top:4px; }
+  .spark-empty{ font-size:11px; color:var(--ink-faint); padding:4px 0; white-space:nowrap; }
   .ind-chg.rise{ color:var(--rise); }
   .ind-chg.fall{ color:var(--fall); }
   .ind-chg.flat{ color:var(--flat); }
@@ -346,6 +357,8 @@ let currentDate = null;
 // dateKey -> 각 데이터. loadDay()가 채운다.
 const tickerByDate = {};
 const newsByDate = {};
+// dateKey -> {key: [[날짜,값], ...]}. 지표 카드 호버 차트용.
+const historyByDate = {};
 
 /* ---------- 데이터 로딩 ---------- */
 
@@ -380,6 +393,7 @@ async function loadDay(dateKey){
   const day = await res.json();
 
   tickerByDate[dateKey] = day.indicators;
+  historyByDate[dateKey] = day.indicator_history || {};
 
   const news = {};
   for(const cat of categories){
@@ -416,7 +430,7 @@ function renderIndicators(dateKey){
     const cards = group.fields.map(key=>{
       const [value, chg, dir] = data[key];
       const arrow = dir==="rise" ? "▲" : dir==="fall" ? "▼" : "―";
-      return `<div class="indicator-card">
+      return `<div class="indicator-card" data-key="${key}">
         <div class="ind-label">${fieldMeta[key].label}</div>
         <div class="ind-value">${value}</div>
         <div class="ind-chg ${dir}">${arrow} ${chg}</div>
@@ -427,6 +441,69 @@ function renderIndicators(dateKey){
       <div class="ind-grid">${cards}</div>
     </div>`;
   }).join("");
+}
+
+/* ---------- 지표 카드 호버 미니 차트 ---------- */
+// cidx2(건설공사비지수)만 월간 지표라 1년치, 나머지는 일간 지표라 1개월치를 보여준다.
+function buildTooltipContent(key, history){
+  const label = fieldMeta[key] ? fieldMeta[key].label : key;
+  const period = key === "cidx2" ? "최근 1년" : "최근 1개월";
+  if(!history || history.length < 2){
+    return `<div class="spark-title">${label} · ${period}</div><div class="spark-empty">차트 데이터 없음</div>`;
+  }
+  const values = history.map(h => h[1]);
+  const min = Math.min(...values), max = Math.max(...values);
+  const w = 220, h = 56, pad = 4;
+  const range = (max - min) || 1;
+  const stepX = (w - pad * 2) / (values.length - 1);
+  const points = values.map((v, i) => {
+    const x = pad + i * stepX;
+    const y = pad + (1 - (v - min) / range) * (h - pad * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const color = values[values.length - 1] >= values[0] ? "var(--rise)" : "var(--fall)";
+  const first = history[0][0], last = history[history.length - 1][0];
+  return `
+    <div class="spark-title">${label} · ${period}</div>
+    <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+      <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+    <div class="spark-range"><span>${first}</span><span>${last}</span></div>
+  `;
+}
+
+function positionIndicatorTooltip(tip, card){
+  const rect = card.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
+  let left = rect.left + rect.width / 2 - tipRect.width / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
+  let top = rect.top - tipRect.height - 10;
+  if(top < 8) top = rect.bottom + 10;
+  tip.style.left = `${left}px`;
+  tip.style.top = `${top}px`;
+}
+
+function initIndicatorTooltip(){
+  const tip = document.createElement("div");
+  tip.id = "indicator-tooltip";
+  tip.className = "indicator-tooltip";
+  document.body.appendChild(tip);
+
+  const root = document.getElementById("indicator-root");
+  root.addEventListener("mouseover", (e)=>{
+    const card = e.target.closest(".indicator-card");
+    if(!card || card.contains(e.relatedTarget)) return;
+    const key = card.dataset.key;
+    const history = (historyByDate[currentDate] || {})[key];
+    tip.innerHTML = buildTooltipContent(key, history);
+    tip.classList.add("show");
+    positionIndicatorTooltip(tip, card);
+  });
+  root.addEventListener("mouseout", (e)=>{
+    const card = e.target.closest(".indicator-card");
+    if(!card || card.contains(e.relatedTarget)) return;
+    tip.classList.remove("show");
+  });
 }
 
 /* ---------- 카테고리 세그먼트 탭 ---------- */
@@ -588,6 +665,7 @@ async function init(){
   renderCategories(currentDate);
   renderDateDropdown();
   initDateSelector();
+  initIndicatorTooltip();
 }
 init();
 </script>

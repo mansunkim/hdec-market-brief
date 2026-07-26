@@ -26,7 +26,7 @@ import os
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from market_indicators import fetch_construction_cost_index, fetch_market_indicators
+from market_indicators import fetch_construction_cost_index_full, fetch_market_indicators_full
 from stock_news_crawler import CATEGORY_CONFIGS, crawl_category, dedup_cross_source, sort_articles
 
 KST = ZoneInfo("Asia/Seoul")
@@ -68,20 +68,23 @@ def _save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def get_cidx2_monthly(now: datetime) -> list:
-    """이번 달에 이미 조회한 값이 있으면 캐시를 재사용하고, 없으면 KOSIS API로 새로 조회한다."""
+def get_cidx2_monthly_full(now: datetime) -> tuple:
+    """이번 달에 이미 조회한 값이 있으면 캐시를 재사용하고, 없으면 KOSIS API로 새로 조회한다.
+
+    (스냅샷, 1년치 히스토리) 튜플을 반환한다.
+    """
     current_month = now.strftime("%Y-%m")
     cache = _load_json(CIDX2_CACHE_PATH, None)
-    if cache and cache.get("fetched_month") == current_month:
-        return cache["data"]
+    if cache and cache.get("fetched_month") == current_month and "history" in cache:
+        return cache["data"], cache["history"]
 
     kosis_key = os.environ.get("KOSIS_API_KEY")
     if not kosis_key:
         raise RuntimeError("KOSIS_API_KEY 환경변수가 설정되지 않았습니다 (cidx2 조회 불가)")
 
-    data = fetch_construction_cost_index(kosis_key)
-    _save_json(CIDX2_CACHE_PATH, {"fetched_month": current_month, "data": data})
-    return data
+    data, history = fetch_construction_cost_index_full(kosis_key)
+    _save_json(CIDX2_CACHE_PATH, {"fetched_month": current_month, "data": data, "history": history})
+    return data, history
 
 
 def crawl_all_categories() -> dict:
@@ -139,12 +142,15 @@ def crawl_all_categories() -> dict:
 
 def build_day_payload(now: datetime) -> dict:
     print("[시황] 일간 지표 수집 중...")
-    indicators = fetch_market_indicators()
+    indicators, indicator_history = fetch_market_indicators_full()
 
     print("[시황] 건설공사비지수(월간) 확인 중...")
     # cidx2도 다른 지표와 동일한 [값, 등락률, 방향] 형태이므로 그대로 indicators에 합쳐서
-    # HTML의 "시장지표" 그리드에 카드로 함께 렌더링되게 한다.
-    indicators["cidx2"] = get_cidx2_monthly(now)
+    # HTML의 "시장지표" 그리드에 카드로 함께 렌더링되게 한다. 히스토리는 다른 지표(최근
+    # 1개월)와 달리 월간 지표 특성상 최근 1년치로 별도 관리한다.
+    cidx2_snapshot, cidx2_history = get_cidx2_monthly_full(now)
+    indicators["cidx2"] = cidx2_snapshot
+    indicator_history["cidx2"] = cidx2_history
 
     news = crawl_all_categories()
 
@@ -152,6 +158,7 @@ def build_day_payload(now: datetime) -> dict:
         "date": now.strftime("%Y-%m-%d"),
         "generated_at": now.isoformat(),
         "indicators": indicators,
+        "indicator_history": indicator_history,
         "news": news,
     }
 
