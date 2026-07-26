@@ -286,7 +286,7 @@
 
     <div class="hero-light">
       <div class="stat-eyebrow">현대건설</div>
-      <div class="stat-big"><span class="num" id="hdec-value">106,200</span><span class="unit">KRW</span></div>
+      <div class="stat-big" data-key="hdec"><span class="num" id="hdec-value">106,200</span><span class="unit">KRW</span></div>
       <div class="stat-chg" id="hdec-chg"></div>
       <hr class="stat-divider">
       <div class="stat-secondary-row" id="hero-secondary"></div>
@@ -415,8 +415,8 @@ function renderHeroStat(dateKey){
   const [kVal, kChg, kDir] = data.kospi;
   const [cVal, cChg, cDir] = data.cidx1;
   document.getElementById("hero-secondary").innerHTML = `
-    <div class="stat-secondary-item"><div class="v">${kVal}</div><div class="l">코스피 (${kChg})</div></div>
-    <div class="stat-secondary-item"><div class="v">${cVal}</div><div class="l">건설지수 (${cChg})</div></div>
+    <div class="stat-secondary-item" data-key="kospi"><div class="v">${kVal}</div><div class="l">코스피 (${kChg})</div></div>
+    <div class="stat-secondary-item" data-key="cidx1"><div class="v">${cVal}</div><div class="l">건설지수 (${cChg})</div></div>
   `;
 
   document.getElementById("hero-footer").textContent = `기준 · 07:30 KST 종가`;
@@ -483,16 +483,10 @@ function positionIndicatorTooltip(tip, card){
   tip.style.top = `${top}px`;
 }
 
-function initIndicatorTooltip(){
-  const tip = document.createElement("div");
-  tip.id = "indicator-tooltip";
-  tip.className = "indicator-tooltip";
-  document.body.appendChild(tip);
-
-  const root = document.getElementById("indicator-root");
+function attachIndicatorTooltip(root, tip){
   root.addEventListener("mouseover", (e)=>{
-    const card = e.target.closest(".indicator-card");
-    if(!card || card.contains(e.relatedTarget)) return;
+    const card = e.target.closest("[data-key]");
+    if(!card || !root.contains(card) || card.contains(e.relatedTarget)) return;
     const key = card.dataset.key;
     const history = (historyByDate[currentDate] || {})[key];
     tip.innerHTML = buildTooltipContent(key, history);
@@ -500,10 +494,21 @@ function initIndicatorTooltip(){
     positionIndicatorTooltip(tip, card);
   });
   root.addEventListener("mouseout", (e)=>{
-    const card = e.target.closest(".indicator-card");
-    if(!card || card.contains(e.relatedTarget)) return;
+    const card = e.target.closest("[data-key]");
+    if(!card || !root.contains(card) || card.contains(e.relatedTarget)) return;
     tip.classList.remove("show");
   });
+}
+
+function initIndicatorTooltip(){
+  const tip = document.createElement("div");
+  tip.id = "indicator-tooltip";
+  tip.className = "indicator-tooltip";
+  document.body.appendChild(tip);
+
+  // 지표 그리드 카드 + 상단 히어로 스탯(현대건설/코스피/건설지수) 둘 다에 적용한다.
+  attachIndicatorTooltip(document.getElementById("indicator-root"), tip);
+  attachIndicatorTooltip(document.querySelector(".hero-light"), tip);
 }
 
 /* ---------- 카테고리 세그먼트 탭 ---------- */
