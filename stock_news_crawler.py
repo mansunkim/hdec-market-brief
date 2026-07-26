@@ -15,8 +15,9 @@
     - 네이버 금융/검색 페이지의 HTML 구조는 예고 없이 바뀔 수 있습니다.
       셀렉터가 깨지면 fetch_main_source / fetch_supplementary_source 의
       CSS 셀렉터를 실제 페이지 구조에 맞춰 조정해야 합니다.
-    - "최신순" 정렬은 별도 날짜 파싱 없이, 크롤링 시 이미 최신순으로
-      내려오는 네이버의 기본 정렬 순서를 그대로 신뢰합니다.
+    - "최신순" 정렬은 sort_articles()/_parse_article_datetime()이 상대/절대
+      시각 표기를 모두 datetime으로 변환해 처리합니다 (여러 소스가 섞여도
+      실제 발행시각 기준으로 정렬됨).
 """
 
 import html
@@ -24,7 +25,7 @@ import json
 import os
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 from email.utils import parsedate_to_datetime
 from urllib.parse import quote
@@ -245,6 +246,49 @@ def is_published_today(time_text: str) -> bool:
             return False
 
     return False
+
+
+def _parse_article_datetime(time_text: str) -> datetime:
+    """기사 시각 문자열(상대/절대 표기 모두)을 정렬 가능한 datetime으로 변환한다.
+
+    메인소스("2026.07.26 16:49"), 네이버뉴스 검색의 상대시각("3시간 전", "어제",
+    "2일 전"), 해외 RSS를 메인소스 형식으로 맞춘 값을 모두 처리한다. 형식을
+    알 수 없거나(예: 날짜 정보가 없는 일부 해외 소스) 비어 있으면 정렬 시 맨
+    뒤로 밀리도록 datetime.min을 반환한다.
+    """
+    text = (time_text or "").strip()
+    if not text:
+        return datetime.min
+
+    now = datetime.now()
+
+    m = re.search(r"(\d+)\s*분\s*전$", text)
+    if m:
+        return now - timedelta(minutes=int(m.group(1)))
+
+    m = re.search(r"(\d+)\s*시간\s*전$", text)
+    if m:
+        return now - timedelta(hours=int(m.group(1)))
+
+    if text.startswith("어제"):
+        return now - timedelta(days=1)
+
+    m = re.search(r"(\d+)\s*일\s*전$", text)
+    if m:
+        return now - timedelta(days=int(m.group(1)))
+
+    # 절대시각: "2026.07.26" 또는 "2026.07.26 16:49" 형태
+    m = re.match(r"(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})(?:\s+(\d{1,2}):(\d{2}))?", text)
+    if m:
+        try:
+            year, month, day = int(m.group(1)), int(m.group(2)), int(m.group(3))
+            hour = int(m.group(4)) if m.group(4) else 0
+            minute = int(m.group(5)) if m.group(5) else 0
+            return datetime(year, month, day, hour, minute)
+        except ValueError:
+            return datetime.min
+
+    return datetime.min
 
 
 # ---------------------------------------------------------------------------
@@ -592,19 +636,15 @@ def tag_articles_with_llm(
 # ---------------------------------------------------------------------------
 
 def sort_articles(articles: list[dict]) -> list[dict]:
-    """importance High 우선 → 오늘 발행 기사 우선 순으로 정렬한다.
+    """발행시각 기준 최신순(내림차순)으로 정렬한다.
 
-    stable sort이므로 동일 키 그룹 내에서는 입력 순서(대개 최신순)가 보존된다.
+    _parse_article_datetime()으로 상대/절대 시각 표기를 모두 실제 datetime으로
+    바꿔 비교하므로, 메인소스/보조소스/해외 RSS 등 서로 다른 소스가 섞여도
+    실제 최신순으로 정렬된다. 시각을 알 수 없는 기사는 맨 뒤로 밀린다.
     generate_daily_archive.py의 오케스트레이션 단계(카테고리 간 기사 이관·병합)에서도
     재사용한다.
     """
-    return sorted(
-        articles,
-        key=lambda a: (
-            0 if a.get("importance") == "High" else 1,
-            0 if is_published_today(a.get("time", "")) else 1,
-        ),
-    )
+    return sorted(articles, key=lambda a: _parse_article_datetime(a.get("time", "")), reverse=True)
 
 
 def _to_output_article(a: dict, category_name: str) -> dict:
