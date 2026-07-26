@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T21:24:57.766541+09:00",
+  "generated_at": "2026-07-26T22:13:15.528792+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -2509,6 +2509,22 @@
         "verify_needed": false
       },
       {
+        "title": "美·사우디, 민간 원자력 협정 체결…우라늄 농축 가능성 열어",
+        "press": "뉴시스",
+        "time": "2026.07.23 13:14",
+        "url": "https://www.newsis.com/view/NISX20260723_0003719510",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "미국·사우디",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
         "title": "Nuclearelectrica's proposal to review SMR options rejected by ministry",
         "press": "World Nuclear News",
         "time": "2026.07.23 12:59",
@@ -2639,6 +2655,22 @@
         "verify_needed": false
       },
       {
+        "title": "강남구, 일원한솔 재건축추진위 10일만에 승인…처리기간 대폭 단축",
+        "press": "연합뉴스",
+        "time": "2026.07.24 13:15",
+        "url": "https://www.yna.co.kr/view/AKR20260724014800004?input=1195m",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "일원한솔 재건축추진위",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
         "title": "강남구, 재건축 추진위 승인 기간 30일에서 10일로 단축 외 2개 언론사 보도",
         "press": "머니투데이",
         "time": "2026.07.24 12:16",
@@ -2686,6 +2718,22 @@
         "summary_kr": "뉴욕 증시가 유가 하락에도 불구하고 반도체주 매도세로 인해 혼조세로 마감했다. 국제 유가 하락이 증시에 긍정적 영향을 주지 못하며 주요 지수가 엇갈린 흐름을 보였다.",
         "source": "supplementary",
         "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "코스피-코스닥 급락 마감",
+        "press": "뉴스핌",
+        "time": "2026.07.24 13:15",
+        "url": "https://www.newspim.com/news/view/20260724001003",
+        "domain": "자본시장",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "코스피,코스닥",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
         "verify_needed": false
       },
       {
