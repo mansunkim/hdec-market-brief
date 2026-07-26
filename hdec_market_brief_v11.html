@@ -315,6 +315,8 @@
 
 const indicatorGroups = [
   {label:"해외증시", fields:["kosdaq","dow","sp500"]},
+  {label:"동종사", fields:["daewoo_enc","gs_enc","dl_enc","samsung_ena","hdc_idc"]},
+  {label:"원자력 관련주", fields:["doosan_enerbility","kepco_eng","frmi","ccj","ceg","oklo"]},
   {label:"지수", fields:["smr","tiger_nuke","nlr","ura"]},
   {label:"시장지표", fields:["fx","wti","cidx2"]}
 ];
@@ -322,6 +324,8 @@ const indicatorGroups = [
 const fieldMeta = {
   kospi:{label:"코스피"}, kosdaq:{label:"코스닥"}, nasdaq:{label:"나스닥"}, dow:{label:"다우존스"}, sp500:{label:"S&P500"},
   hdec:{label:"현대건설"}, cidx1:{label:"건설지수"},
+  daewoo_enc:{label:"대우건설"}, gs_enc:{label:"GS건설"}, dl_enc:{label:"DL이앤씨"}, samsung_ena:{label:"삼성E&A"}, hdc_idc:{label:"HDC현대산업개발"},
+  doosan_enerbility:{label:"두산에너빌리티"}, kepco_eng:{label:"한전기술"}, frmi:{label:"FRMI"}, ccj:{label:"CCJ"}, ceg:{label:"CEG"}, oklo:{label:"OKLO"},
   smr:{label:"SOL 한국원자력SMR지수"}, tiger_nuke:{label:"TIGER 코리아원자력"}, nlr:{label:"VanEck Uranium and Nuclear ETF(NLR)"}, ura:{label:"Global X Uranium ETF(URA)"},
   fx:{label:"원/달러 환율"}, wti:{label:"WTI 원유"}, cidx2:{label:"건설공사비지수"}
 };
