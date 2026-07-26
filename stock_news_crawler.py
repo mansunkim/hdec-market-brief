@@ -533,7 +533,10 @@ def tag_articles_with_llm(
 
     response = client.messages.create(
         model="claude-sonnet-5",
-        max_tokens=4096,
+        # summary_kr(영문 기사 국문 요약) 추가 이후 원자력 카테고리처럼 기사 수가
+        # 많고 영문 비중이 높은 경우 4096으로는 응답이 중간에 잘려 JSON 파싱이
+        # 실패했다 (Unterminated string). 여유 있게 상향한다.
+        max_tokens=16000,
         thinking={"type": "disabled"},
         output_config={
             "effort": "low",
