@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T20:41:57.082729+09:00",
+  "generated_at": "2026-07-26T20:54:43.911211+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -28,29 +28,29 @@
       "fall"
     ],
     "nasdaq": [
-      "25,137.69",
-      "-2.15%",
+      "24,975.82",
+      "-0.64%",
       "fall"
     ],
     "dow": [
-      "51,711.65",
-      "-0.97%",
-      "fall"
+      "51,947.25",
+      "+0.46%",
+      "rise"
     ],
     "sp500": [
-      "7,408.30",
-      "-1.21%",
-      "fall"
+      "7,411.98",
+      "+0.05%",
+      "rise"
     ],
     "nlr": [
-      "111.41",
-      "+0.02%",
-      "rise"
+      "108.10",
+      "-2.97%",
+      "fall"
     ],
     "ura": [
-      "41.13",
-      "+0.39%",
-      "rise"
+      "39.89",
+      "-3.01%",
+      "fall"
     ],
     "wti": [
       "89.31",
@@ -58,23 +58,23 @@
       "fall"
     ],
     "frmi": [
-      "6.32",
-      "-3.95%",
-      "fall"
+      "7.40",
+      "+17.09%",
+      "rise"
     ],
     "ccj": [
-      "89.33",
-      "-1.15%",
+      "87.86",
+      "-1.65%",
       "fall"
     ],
     "ceg": [
-      "275.60",
-      "+0.25%",
-      "rise"
+      "274.35",
+      "-0.45%",
+      "fall"
     ],
     "oklo": [
-      "44.00",
-      "-1.12%",
+      "40.25",
+      "-8.52%",
       "fall"
     ],
     "daewoo_enc": [
@@ -659,6 +659,10 @@
       [
         "2026-07-23",
         25137.69
+      ],
+      [
+        "2026-07-24",
+        24975.82
       ]
     ],
     "dow": [
@@ -741,6 +745,10 @@
       [
         "2026-07-23",
         51711.65
+      ],
+      [
+        "2026-07-24",
+        51947.25
       ]
     ],
     "sp500": [
@@ -823,6 +831,10 @@
       [
         "2026-07-23",
         7408.3
+      ],
+      [
+        "2026-07-24",
+        7411.98
       ]
     ],
     "nlr": [
@@ -905,6 +917,10 @@
       [
         "2026-07-23",
         111.41
+      ],
+      [
+        "2026-07-24",
+        108.1
       ]
     ],
     "ura": [
@@ -987,6 +1003,10 @@
       [
         "2026-07-23",
         41.13
+      ],
+      [
+        "2026-07-24",
+        39.89
       ]
     ],
     "wti": [
@@ -1151,6 +1171,10 @@
       [
         "2026-07-23",
         6.32
+      ],
+      [
+        "2026-07-24",
+        7.4
       ]
     ],
     "ccj": [
@@ -1233,6 +1257,10 @@
       [
         "2026-07-23",
         89.33
+      ],
+      [
+        "2026-07-24",
+        87.86
       ]
     ],
     "ceg": [
@@ -1315,6 +1343,10 @@
       [
         "2026-07-23",
         275.6
+      ],
+      [
+        "2026-07-24",
+        274.35
       ]
     ],
     "oklo": [
@@ -1397,6 +1429,10 @@
       [
         "2026-07-23",
         44.0
+      ],
+      [
+        "2026-07-24",
+        40.25
       ]
     ],
     "daewoo_enc": [
@@ -2580,6 +2616,70 @@
         "importance": "High",
         "relevance": "high",
         "summary_kr": "페르미 아메리카가 프로젝트 마타도어에 대한 최종 청정대기 허가를 승인받아 사업을 계속 추진한다고 밝혔다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Fermi America Deepens Strategic Partnership with Hyundai E&C to Lead the Return of Large-Scale Nuclear Construction in the U.S. with Project Matador",
+        "press": "Fermi America",
+        "time": "2026.02.12 18:38",
+        "url": "https://fermiamerica.com/fermi-america-deepens-strategic-partnership-with-hyundai-ec-to-lead-the-return-of-large-scale-nuclear-construction-in-the-u-s-with-project-matador/",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "페르미 아메리카가 현대건설과의 전략적 파트너십을 강화하며 프로젝트 매타도어를 통해 미국 내 대규모 원자력 건설의 재개를 이끌겠다고 발표했다. 이는 현대건설의 미국 원전 사업 참여 확대를 의미한다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower Announces Key Commercialization Agreements for Natrium® Plants with Korean Counterparts",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/TerraPower-Announces-Key-Commercialization-Agreements-for-Natrium-Plants-with-Korean-Counterparts",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워가 한국 파트너들과 나트륨 원전 상용화를 위한 주요 협약을 체결했다고 발표했다. 이는 한국 기업들과의 원전 사업 협력 확대를 의미한다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "NRC Approves the Natrium® Reactor Construction Permit",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/NRC-Approves-Natrium-Reactor-Construction-Permit",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "미국 원자력규제위원회(NRC)가 테라파워의 나트륨 원자로 건설 허가를 승인했다. 이는 테라파워의 상용화 절차에 있어 중요한 규제 이정표다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Korea Hydro & Nuclear Power Joins TerraPower Investor Base",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/KHNP-Joins-TerraPower-Investor-Base",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "한국수력원자력",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "한국수력원자력이 테라파워의 투자자 그룹에 합류했다고 발표됐다. 이는 한국 기업의 테라파워 나트륨 원전 사업에 대한 투자 참여를 의미한다.",
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": true
