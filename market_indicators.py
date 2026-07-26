@@ -19,10 +19,9 @@ generate_daily_archive.py에서 이번 달 값이 이미 있으면 재사용한�
       (data.krx.co.kr 회원 로그인 필요 — 환경변수 KRX_ID/KRX_PW)
       주의: 1019는 존재하지 않는 코드로, 네이버금융에서 조용히 코스피 지수로
       폴백되는 것이 확인됨. 반드시 1018을 사용할 것.
-    - 국내 동종사(건설사 5곳) + 국내 원자력 관련주(2곳) → pykrx
-      (data.krx.co.kr 회원 로그인 필요 — 환경변수 KRX_ID/KRX_PW)
-    - 해외 원자력 관련주(FRMI/CCJ/CEG/OKLO) → Yahoo Finance 차트 JSON API 직접 호출
-      (USD 가격 그대로 반환)
+    - 동종사 / 원자력 관련주 → fetch_dynamic_stock_group_full() (관리자 패널 config.json으로
+      종목 구성을 바꿀 수 있음. code면 pykrx, ticker면 Yahoo. config.json이 없으면
+      DEFAULT_DOMESTIC_PEERS / DEFAULT_NUCLEAR_RELATED를 기본값으로 씀)
 
 월간 지표 소스:
     - cidx2(건설공사비지수) → KOSIS Open API (orgId=397, tblId=DT_39701_A003)
@@ -136,11 +135,6 @@ _YAHOO_TICKERS = {
     "nlr": ("NLR", 2),
     "ura": ("URA", 2),
     "wti": ("CL=F", 2),
-    # 해외 원자력 관련주 (USD 가격 그대로)
-    "frmi": ("FRMI", 2),
-    "ccj": ("CCJ", 2),
-    "ceg": ("CEG", 2),
-    "oklo": ("OKLO", 2),
 }
 
 
@@ -192,41 +186,80 @@ def _fetch_cidx1_full() -> tuple:
 
 
 # ---------------------------------------------------------------------------
-# 국내 동종사 + 국내 원자력 관련주 (pykrx, 개별 종목)
+# 국내 동종사 + 원자력 관련주 (관리자 패널 config.json으로 종목 구성을 바꿀 수 있음)
 # ---------------------------------------------------------------------------
+# config.json의 indicators.domestic_peers / indicators.nuclear_related가 있으면
+# 그 목록을, 없으면(또는 비어 있으면) 아래 기본값을 쓴다. 각 항목은
+# {"label": "...", "code": "047040"}(국내, pykrx) 또는
+# {"label": "...", "ticker": "FRMI"}(해외, Yahoo) 형태다.
 
-# key -> (종목코드, 소수점 자리수) — 종가는 원(KRW) 단위라 정수로 표기
-_PYKRX_STOCK_TICKERS = {
-    # 건설사 동종사
-    "daewoo_enc": ("047040", 0),    # 대우건설
-    "gs_enc": ("006360", 0),        # GS건설
-    "dl_enc": ("375500", 0),        # DL이앤씨
-    "samsung_ena": ("028050", 0),   # 삼성E&A
-    "hdc_idc": ("294870", 0),       # HDC현대산업개발
-    # 국내 원자력 관련주
-    "doosan_enerbility": ("034020", 0),  # 두산에너빌리티
-    "kepco_eng": ("052690", 0),          # 한전기술
-}
+DEFAULT_DOMESTIC_PEERS = [
+    {"label": "대우건설", "code": "047040"},
+    {"label": "GS건설", "code": "006360"},
+    {"label": "DL이앤씨", "code": "375500"},
+    {"label": "삼성E&A", "code": "028050"},
+    {"label": "HDC현대산업개발", "code": "294870"},
+]
+
+DEFAULT_NUCLEAR_RELATED = [
+    {"label": "두산에너빌리티", "code": "034020"},
+    {"label": "한전기술", "code": "052690"},
+    {"label": "FRMI", "ticker": "FRMI"},
+    {"label": "CCJ", "ticker": "CCJ"},
+    {"label": "CEG", "ticker": "CEG"},
+    {"label": "OKLO", "ticker": "OKLO"},
+]
 
 
-def _fetch_pykrx_stock_full(key: str) -> tuple:
-    from pykrx import stock
+def _fetch_dynamic_stock_full(entry: dict) -> tuple:
+    """entry: {"label":..., "code": "047040"}(국내, pykrx) 또는
+    {"label":..., "ticker": "FRMI"}(해외, Yahoo). 종가는 국내는 원 단위 정수,
+    해외는 소수점 2자리로 표기한다."""
+    label = entry.get("label", "")
+    if entry.get("code"):
+        from pykrx import stock
 
-    code, decimals = _PYKRX_STOCK_TICKERS[key]
-    end = datetime.datetime.now().strftime("%Y%m%d")
-    start = (datetime.datetime.now() - datetime.timedelta(days=_HISTORY_LOOKBACK_DAYS)).strftime("%Y%m%d")
-    df = stock.get_market_ohlcv(start, end, code)
-    if df is None or df.empty:
-        raise RuntimeError(f"{key}({code}): pykrx에서 데이터를 받지 못했습니다 (KRX_ID/KRX_PW 확인 필요)")
+        code = entry["code"]
+        end = datetime.datetime.now().strftime("%Y%m%d")
+        start = (datetime.datetime.now() - datetime.timedelta(days=_HISTORY_LOOKBACK_DAYS)).strftime("%Y%m%d")
+        df = stock.get_market_ohlcv(start, end, code)
+        if df is None or df.empty:
+            raise RuntimeError(f"{label}({code}): pykrx에서 데이터를 받지 못했습니다 (KRX_ID/KRX_PW 확인 필요)")
 
-    latest = df.iloc[-1]
-    close = float(latest["종가"])
-    # get_market_ohlcv는 등락률(%) 컬럼을 직접 제공하므로 스냅샷은 전일 종가로 재계산하지
-    # 않고 그대로 쓴다. 히스토리는 종가 시계열을 그대로 뽑는다.
-    change_ratio = float(latest["등락률"]) / 100
-    snapshot = [_fmt_number(close, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
-    points = [(idx.strftime("%Y-%m-%d"), float(v)) for idx, v in df["종가"].items()]
-    history = _history_from_points(points, decimals)
+        latest = df.iloc[-1]
+        close = float(latest["종가"])
+        # get_market_ohlcv는 등락률(%) 컬럼을 직접 제공하므로 스냅샷은 전일 종가로
+        # 재계산하지 않고 그대로 쓴다. 히스토리는 종가 시계열을 그대로 뽑는다.
+        change_ratio = float(latest["등락률"]) / 100
+        snapshot = [_fmt_number(close, 0), _fmt_pct(change_ratio), _direction(change_ratio)]
+        points = [(idx.strftime("%Y-%m-%d"), float(v)) for idx, v in df["종가"].items()]
+        history = _history_from_points(points, 0)
+        return snapshot, history
+
+    if entry.get("ticker"):
+        ticker = entry["ticker"]
+        points = _yahoo_close_points(ticker, label or ticker)
+        return _snapshot_from_points(points, 2), _history_from_points(points, 2)
+
+    raise ValueError(f"잘못된 지표 항목: {entry!r} ('code' 또는 'ticker' 필요)")
+
+
+def fetch_dynamic_stock_group_full(entries: list) -> tuple:
+    """관리자 패널에서 구성 가능한 종목 그룹(동종사/원자력 관련주 등)을 조회한다.
+
+    (snapshot, history) 튜플을 반환한다. key는 code 또는 ticker 문자열 그대로 쓴다.
+    개별 종목 조회가 실패해도 나머지는 계속 진행한다(한 종목 오류로 전체가
+    실패하면 안 되므로).
+    """
+    snapshot, history = {}, {}
+    for entry in entries:
+        key = entry.get("code") or entry.get("ticker")
+        if not key:
+            continue
+        try:
+            snapshot[key], history[key] = _fetch_dynamic_stock_full(entry)
+        except Exception as e:
+            print(f"[경고] 지표 {entry!r} 조회 실패, 건너뜀: {e}")
     return snapshot, history
 
 
@@ -235,12 +268,16 @@ def _fetch_pykrx_stock_full(key: str) -> tuple:
 # ---------------------------------------------------------------------------
 
 def fetch_market_indicators_full() -> tuple:
-    """일간 시황 지표의 스냅샷과 히스토리를 함께 수집한다.
+    """일간 시황 지표(고정 지표 세트)의 스냅샷과 히스토리를 함께 수집한다.
 
     (snapshot, history) 튜플을 반환한다.
     - snapshot: {key: [값, 등락률, 방향]} — 기존 fetch_market_indicators()와 동일한 모양
     - history: {key: [[날짜, 값], ...]} — 최근 약 1개월(22거래일)치 시계열
       (지표 카드 호버 시 보여줄 차트용. cidx2는 별도로 월간 캐시에서 처리한다)
+
+    동종사/원자력 관련주처럼 관리자 패널에서 종목 구성을 바꿀 수 있는 그룹은
+    여기 포함되지 않는다 — generate_daily_archive.py가 config.json을 읽어
+    fetch_dynamic_stock_group_full()로 별도 조회한다.
 
     스냅샷/히스토리를 따로 조회하면 소스별 API를 두 번씩 호출하게 되므로,
     각 필드마다 한 번만 조회해서 두 결과를 함께 뽑아낸다.
@@ -250,21 +287,18 @@ def fetch_market_indicators_full() -> tuple:
         snapshot[key], history[key] = _fetch_fdr_full(key)
     for key in _YAHOO_TICKERS:
         snapshot[key], history[key] = _fetch_yahoo_full(key)
-    for key in _PYKRX_STOCK_TICKERS:
-        snapshot[key], history[key] = _fetch_pykrx_stock_full(key)
     snapshot["fx"], history["fx"] = _fetch_fx_full()
     snapshot["cidx1"], history["cidx1"] = _fetch_cidx1_full()
     return snapshot, history
 
 
 def fetch_market_indicators() -> dict:
-    """일간 시황 지표를 수집해 {key: [값, 등락률, 방향]} 형태로 반환한다.
+    """일간 시황 지표(고정 지표 세트)를 수집해 {key: [값, 등락률, 방향]} 형태로 반환한다.
 
-    kospi, kosdaq, nasdaq, dow, sp500, hdec, cidx1, smr, tiger_nuke, nlr, ura, fx, wti,
-    daewoo_enc, gs_enc, dl_enc, samsung_ena, hdc_idc, doosan_enerbility, kepco_eng,
-    frmi, ccj, ceg, oklo
+    kospi, kosdaq, nasdaq, dow, sp500, hdec, cidx1, smr, tiger_nuke, nlr, ura, fx, wti
 
-    (하위 호환용 — 히스토리도 필요하면 fetch_market_indicators_full()을 직접 쓸 것.
+    (동종사/원자력 관련주는 fetch_dynamic_stock_group_full() 참고.
+    하위 호환용 — 히스토리도 필요하면 fetch_market_indicators_full()을 직접 쓸 것.
     이 함수는 내부적으로 동일하게 조회하고 히스토리를 버릴 뿐이라, 스냅샷과 히스토리가
     둘 다 필요한 경우 이 함수 대신 fetch_market_indicators_full()을 써야 API를
     중복 호출하지 않는다.)
@@ -363,6 +397,9 @@ if __name__ == "__main__":
     import os
 
     print(json.dumps(fetch_market_indicators(), ensure_ascii=False, indent=2))
+
+    dyn_snapshot, _ = fetch_dynamic_stock_group_full(DEFAULT_DOMESTIC_PEERS + DEFAULT_NUCLEAR_RELATED)
+    print(json.dumps(dyn_snapshot, ensure_ascii=False, indent=2))
 
     kosis_key = os.environ.get("KOSIS_API_KEY")
     if kosis_key:

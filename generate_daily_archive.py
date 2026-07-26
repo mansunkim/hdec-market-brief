@@ -26,7 +26,13 @@ import os
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from market_indicators import fetch_construction_cost_index_full, fetch_market_indicators_full
+from market_indicators import (
+    DEFAULT_DOMESTIC_PEERS,
+    DEFAULT_NUCLEAR_RELATED,
+    fetch_construction_cost_index_full,
+    fetch_dynamic_stock_group_full,
+    fetch_market_indicators_full,
+)
 from stock_news_crawler import CATEGORY_CONFIGS, crawl_category, dedup_cross_source, sort_articles
 
 KST = ZoneInfo("Asia/Seoul")
@@ -34,6 +40,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
 INDEX_PATH = os.path.join(ARCHIVE_DIR, "index.json")
 CIDX2_CACHE_PATH = os.path.join(ARCHIVE_DIR, "cidx2_cache.json")
+CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
 RETENTION_DAYS = 30
 
 # 카테고리1(현대건설)의 최종 화면 노출 건수. crawl_category()의 max_articles(15)는
@@ -68,6 +75,44 @@ def _save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def load_admin_config() -> dict:
+    """관리자 패널에서 내보낸 config.json을 읽는다.
+
+    저장소 루트의 config.json이 없거나 형식이 잘못됐으면 빈 dict를 반환해,
+    카테고리 수집 기준/지표 종목 구성이 모두 코드에 하드코딩된 기본값으로
+    폴백되게 한다(기존 동작과 100% 동일하게 유지됨).
+    """
+    if not os.path.exists(CONFIG_PATH):
+        return {}
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"[경고] config.json 파싱 실패, 하드코딩 기본값으로 폴백: {e}")
+        return {}
+
+
+def _effective_category_config(name: str, admin_config: dict) -> dict:
+    """카테고리 기본 설정(CATEGORY_CONFIGS)에 config.json의 관리자 설정을 덮어씌운다.
+
+    config.json에 해당 카테고리의 include/exclude/tier1/tier2가 있고 비어있지
+    않으면 그 값을 쓰고, 없으면 코드에 하드코딩된 기본값을 그대로 쓴다.
+    main_source_url/supplementary_query/max_articles 등 구조적인 값은
+    관리자 패널에서 건드리지 않는 값이라 항상 기본값을 쓴다.
+    """
+    base = dict(CATEGORY_CONFIGS_BY_NAME[name])
+    override = admin_config.get("categories", {}).get(name, {})
+    if override.get("include"):
+        base["include_keywords"] = override["include"]
+    if override.get("exclude"):
+        base["exclude_keywords"] = override["exclude"]
+    if override.get("tier1"):
+        base["tier1_whitelist"] = override["tier1"]
+    if override.get("tier2"):
+        base["tier2_whitelist"] = override["tier2"]
+    return base
+
+
 def get_cidx2_monthly_full(now: datetime) -> tuple:
     """이번 달에 이미 조회한 값이 있으면 캐시를 재사용하고, 없으면 KOSIS API로 새로 조회한다.
 
@@ -87,7 +132,7 @@ def get_cidx2_monthly_full(now: datetime) -> tuple:
     return data, history
 
 
-def crawl_all_categories() -> dict:
+def crawl_all_categories(admin_config: dict) -> dict:
     """5개 카테고리를 크롤링한다.
 
     카테고리1(현대건설)은 crawl_category()가 반환한 기사 중 subject=="자사"인
@@ -96,17 +141,20 @@ def crawl_all_categories() -> dict:
     결과 중 subject=="자사"(현대건설 목표주가/투자의견/신용등급/회사채 등)는
     카테고리1로 이관한다. 즉 카테고리1의 최종 결과는 "현대건설이 무엇을 했다"가
     주어인 기사만 남고, 카테고리5는 개별 종목이 아닌 시장 전반 시황만 남는다.
+
+    각 카테고리의 include/exclude 키워드·화이트리스트는 _effective_category_config()를
+    통해 admin_config(관리자 패널 config.json)의 값으로 덮어써질 수 있다.
     """
     news = {}
 
     print("[뉴스] 현대건설 크롤링 중...")
-    hdec_articles = crawl_category(**CATEGORY_CONFIGS_BY_NAME["현대건설"])
+    hdec_articles = crawl_category(**_effective_category_config("현대건설", admin_config))
     hdec_own = [a for a in hdec_articles if a.get("subject") == "자사"]
     hdec_migrate = [a for a in hdec_articles if a.get("subject") != "자사"]
     # news["현대건설"]은 아래에서 자본시장 이관분까지 합친 뒤 마지막에 확정한다.
 
     print("[뉴스] 건설업 크롤링 중...")
-    gs_config = CATEGORY_CONFIGS_BY_NAME["건설업"]
+    gs_config = _effective_category_config("건설업", admin_config)
     gs_articles = crawl_category(**gs_config)
     if hdec_migrate:
         print(f"[뉴스] 현대건설에서 건설업으로 이관: {len(hdec_migrate)}건 (중복 제외 전)")
@@ -127,7 +175,7 @@ def crawl_all_categories() -> dict:
     news["건설업"] = gs_keep[: gs_config["max_articles"]]
 
     print("[뉴스] 원자력 크롤링 중...")
-    nuke_config = CATEGORY_CONFIGS_BY_NAME["원자력"]
+    nuke_config = _effective_category_config("원자력", admin_config)
     nuke_articles = crawl_category(**nuke_config)
     if gs_nuke_migrate:
         print(f"[뉴스] 건설업에서 원자력으로 이관: {len(gs_nuke_migrate)}건 (중복 제외 전)")
@@ -136,10 +184,10 @@ def crawl_all_categories() -> dict:
     news["원자력"] = nuke_articles[: nuke_config["max_articles"]]
 
     print("[뉴스] 도시정비 크롤링 중...")
-    news["도시정비"] = crawl_category(**CATEGORY_CONFIGS_BY_NAME["도시정비"])
+    news["도시정비"] = crawl_category(**_effective_category_config("도시정비", admin_config))
 
     print("[뉴스] 자본시장 크롤링 중...")
-    capital_config = CATEGORY_CONFIGS_BY_NAME["자본시장"]
+    capital_config = _effective_category_config("자본시장", admin_config)
     capital_articles = crawl_category(**capital_config)
     capital_own = [a for a in capital_articles if a.get("subject") == "자사"]
     capital_keep = [a for a in capital_articles if a.get("subject") != "자사"]
@@ -155,7 +203,23 @@ def crawl_all_categories() -> dict:
     return news
 
 
-def build_day_payload(now: datetime) -> dict:
+def _resolve_dynamic_indicator_groups(admin_config: dict) -> dict:
+    """config.json의 indicators.domestic_peers/nuclear_related를 쓰고,
+    없거나 비어 있으면 코드 기본값으로 폴백한다."""
+    admin_indicators = admin_config.get("indicators", {})
+    return {
+        "domestic_peers": {
+            "label": "동종사",
+            "entries": admin_indicators.get("domestic_peers") or DEFAULT_DOMESTIC_PEERS,
+        },
+        "nuclear_related": {
+            "label": "원자력 관련주",
+            "entries": admin_indicators.get("nuclear_related") or DEFAULT_NUCLEAR_RELATED,
+        },
+    }
+
+
+def build_day_payload(now: datetime, admin_config: dict) -> dict:
     print("[시황] 일간 지표 수집 중...")
     indicators, indicator_history = fetch_market_indicators_full()
 
@@ -167,13 +231,29 @@ def build_day_payload(now: datetime) -> dict:
     indicators["cidx2"] = cidx2_snapshot
     indicator_history["cidx2"] = cidx2_history
 
-    news = crawl_all_categories()
+    print("[시황] 동종사/원자력 관련주(관리자 설정) 수집 중...")
+    # 관리자 패널에서 종목 구성을 바꿀 수 있는 그룹. key는 종목코드/티커 그대로 쓰고,
+    # HTML이 라벨/그룹을 알 수 있도록 indicator_meta에 같이 기록한다.
+    dynamic_groups = _resolve_dynamic_indicator_groups(admin_config)
+    indicator_meta = {}
+    for group_key, group in dynamic_groups.items():
+        snap, hist = fetch_dynamic_stock_group_full(group["entries"])
+        indicators.update(snap)
+        indicator_history.update(hist)
+        for entry in group["entries"]:
+            key = entry.get("code") or entry.get("ticker")
+            if key in snap:
+                indicator_meta[key] = {"label": entry["label"], "group": group_key}
+
+    news = crawl_all_categories(admin_config)
 
     return {
         "date": now.strftime("%Y-%m-%d"),
         "generated_at": now.isoformat(),
         "indicators": indicators,
         "indicator_history": indicator_history,
+        "indicator_meta": indicator_meta,
+        "daily_comment": admin_config.get("daily_comment") or "",
         "news": news,
     }
 
@@ -261,7 +341,13 @@ def main():
     _ensure_archive_dir()
     now = datetime.now(KST)
 
-    day_payload = build_day_payload(now)
+    admin_config = load_admin_config()
+    if admin_config:
+        print("[설정] config.json 로드됨 — 관리자 설정 적용")
+    else:
+        print("[설정] config.json 없음 — 하드코딩 기본값 사용")
+
+    day_payload = build_day_payload(now, admin_config)
 
     archive_path = os.path.join(ARCHIVE_DIR, f"{day_payload['date']}.json")
     day_payload = merge_with_existing_archive(archive_path, day_payload)

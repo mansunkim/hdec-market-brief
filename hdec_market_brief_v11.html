@@ -75,6 +75,12 @@
 
   .hero-desc{ font-size:13px; color:#A9B7DC; margin-top:12px; line-height:1.6; max-width:360px; }
 
+  .hero-comment{
+    margin-top:12px; padding:10px 14px; max-width:360px;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px; font-size:12.5px; color:#EDEFF5; line-height:1.55;
+  }
+
   .hero-divider{ border:none; border-top:1px solid rgba(255,255,255,0.14); margin:22px 0 16px; }
 
   .hero-meta-row{
@@ -84,7 +90,17 @@
   .hero-meta-row b{ color:#fff; font-weight:600; }
 
   /* 날짜 드롭다운 버튼 (우상단) */
-  .date-selector{ position:absolute; top:26px; right:30px; z-index:30; }
+  .header-actions{ position:absolute; top:26px; right:30px; z-index:30; display:flex; gap:8px; align-items:flex-start; }
+  .date-selector{ position:relative; }
+  .admin-btn{
+    display:flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.22);
+    color:#EDEFF5; font-family:var(--mono); font-size:11px;
+    padding:7px 11px; border-radius:9px; cursor:pointer;
+    transition: background .15s;
+  }
+  .admin-btn:hover{ background:rgba(255,255,255,0.15); }
   .date-btn{
     display:flex; align-items:center; gap:7px;
     background:rgba(255,255,255,0.08);
@@ -225,8 +241,10 @@
     .hero-eyebrow{ font-size:10px; }
     .hero-desc{ max-width:none; font-size:12.5px; }
     .hero-meta-row{ font-size:11px; gap:14px; }
-    .date-selector{ position:static; margin-top:14px; width:100%; }
-    .date-btn{ width:100%; justify-content:space-between; }
+    .hero-comment{ max-width:none; }
+    .header-actions{ position:static; margin-top:14px; width:100%; flex-direction:column; }
+    .date-selector{ width:100%; }
+    .date-btn, .admin-btn{ width:100%; justify-content:space-between; }
     .date-dropdown{ position:fixed; left:12px; right:12px; top:auto; width:auto; max-width:none; margin-top:6px; }
     .hero-light{ padding:22px 20px; }
     .stat-big .num{ font-size:34px; }
@@ -254,6 +272,124 @@
     .stat-big .num{ font-size:29px; }
     .ind-grid{ grid-template-columns: repeat(2, 1fr); }
   }
+
+  /* ================= 관리자 패널 ================= */
+  .admin-overlay{
+    position:fixed; inset:0; background:rgba(11,24,52,0.45);
+    z-index:490; display:none;
+  }
+  .admin-overlay.show{ display:block; }
+
+  .admin-panel{
+    position:fixed; top:0; right:0; height:100vh; width:min(480px, 100vw);
+    background:var(--paper); box-shadow:var(--shadow-pop);
+    z-index:500; transform:translateX(100%); transition:transform .25s ease;
+    display:flex; flex-direction:column;
+  }
+  .admin-panel.open{ transform:translateX(0); }
+
+  .admin-panel-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 22px; background:var(--navy-deep); color:#fff; flex-shrink:0;
+  }
+  .admin-panel-title{ font-size:15.5px; font-weight:800; letter-spacing:-0.01em; }
+  .admin-panel-title .sub{ display:block; font-size:10.5px; font-weight:500; color:#9AB0DD; margin-top:3px; font-family:var(--mono); }
+  .admin-close-btn{
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:14px; flex-shrink:0;
+  }
+  .admin-close-btn:hover{ background:rgba(255,255,255,0.2); }
+
+  .admin-panel-body{ flex:1; overflow-y:auto; padding:20px 22px 40px; }
+
+  .admin-section{
+    background:var(--surface); border-radius:14px; box-shadow:var(--shadow-card);
+    padding:16px 18px; margin-bottom:14px;
+  }
+  .admin-section-title{ font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:6px; }
+  .admin-section-hint{ font-size:11px; color:var(--ink-faint); margin-bottom:12px; line-height:1.5; }
+
+  .admin-field-label{ font-size:11px; font-weight:600; color:var(--ink-soft); margin:10px 0 5px; }
+  .admin-textarea{
+    display:block; width:100%; min-height:58px; resize:vertical;
+    border:1px solid var(--line); border-radius:9px; padding:8px 10px;
+    font-family:var(--mono); font-size:11.5px; color:var(--ink); background:var(--paper);
+  }
+  .admin-textarea:focus{ outline:none; border-color:var(--accent); background:var(--surface); }
+
+  .admin-category-block{ border-top:1px solid var(--line); padding-top:12px; margin-top:12px; }
+  .admin-category-block:first-child{ border-top:none; padding-top:0; margin-top:0; }
+  .admin-category-name{ font-size:12.5px; font-weight:700; color:var(--accent); margin-bottom:2px; }
+
+  .admin-stock-row{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .admin-stock-row input, .admin-stock-row select{
+    border:1px solid var(--line); border-radius:7px; padding:6px 8px;
+    font-family:var(--mono); font-size:11px; background:var(--paper); color:var(--ink);
+  }
+  .admin-stock-row input:focus, .admin-stock-row select:focus{ outline:none; border-color:var(--accent); background:var(--surface); }
+  .admin-stock-label{ flex:1 1 88px; min-width:0; }
+  .admin-stock-type{ flex:0 0 auto; }
+  .admin-stock-code{ flex:1 1 72px; min-width:0; }
+  .admin-stock-remove{
+    background:none; border:none; color:var(--rise); cursor:pointer; font-size:15px;
+    width:22px; height:22px; flex-shrink:0; border-radius:6px;
+  }
+  .admin-stock-remove:hover{ background:var(--verify-soft); }
+  .admin-stock-add{
+    font-family:var(--mono); font-size:10.5px; color:var(--accent); background:var(--accent-soft);
+    border:none; border-radius:7px; padding:6px 10px; cursor:pointer; margin-top:2px;
+  }
+  .admin-stock-add:hover{ background:#D9E6FE; }
+
+  .admin-comment-input{
+    display:block; width:100%; border:1px solid var(--line); border-radius:9px; padding:9px 11px;
+    font-family:var(--sans); font-size:12.5px; color:var(--ink); background:var(--paper);
+  }
+  .admin-comment-input:focus{ outline:none; border-color:var(--accent); background:var(--surface); }
+
+  .admin-actions{ display:flex; gap:8px; margin-top:4px; }
+  .admin-btn-primary{
+    flex:1; background:var(--accent); color:#fff; border:none; border-radius:9px;
+    padding:11px; font-family:var(--sans); font-weight:700; font-size:12.5px; cursor:pointer;
+  }
+  .admin-btn-primary:hover{ background:#2559c4; }
+  .admin-btn-secondary{
+    background:var(--surface); color:var(--ink-soft); border:1px solid var(--line); border-radius:9px;
+    padding:11px 14px; font-family:var(--sans); font-weight:600; font-size:12.5px; cursor:pointer;
+  }
+  .admin-btn-secondary:hover{ background:var(--paper); }
+
+  .admin-guide{
+    font-size:11px; color:var(--ink-soft); line-height:1.75; background:var(--accent-soft);
+    border-radius:10px; padding:12px 14px; margin-top:10px;
+  }
+  .admin-guide b{ color:var(--ink); }
+
+  .admin-warning{
+    font-size:10.5px; color:var(--verify); background:var(--verify-soft);
+    border-radius:8px; padding:9px 11px; margin-bottom:14px; line-height:1.55;
+  }
+
+  /* 비밀번호 모달 */
+  .admin-pw-overlay{
+    position:fixed; inset:0; background:rgba(11,24,52,0.55);
+    z-index:600; display:none; align-items:center; justify-content:center; padding:16px;
+  }
+  .admin-pw-overlay.show{ display:flex; }
+  .admin-pw-modal{
+    background:var(--surface); border-radius:16px; box-shadow:var(--shadow-pop);
+    padding:26px 24px; width:min(320px, 100%);
+  }
+  .admin-pw-title{ font-size:15px; font-weight:800; color:var(--ink); margin-bottom:8px; }
+  .admin-pw-desc{ font-size:11px; color:var(--ink-faint); line-height:1.55; margin-bottom:14px; }
+  .admin-pw-input{
+    display:block; width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px;
+    font-family:var(--mono); font-size:13px; margin-bottom:8px; color:var(--ink);
+  }
+  .admin-pw-input:focus{ outline:none; border-color:var(--accent); }
+  .admin-pw-error{ font-size:11px; color:var(--rise); margin-bottom:8px; }
+  .admin-pw-actions{ display:flex; gap:8px; margin-top:6px; }
+  .admin-pw-actions .admin-btn-primary, .admin-pw-actions .admin-btn-secondary{ padding:9px; font-size:12px; }
 </style>
 </head>
 <body>
@@ -266,20 +402,24 @@
       <div class="hero-eyebrow"><span class="dash"></span>HDEC · IR DAILY NOTE</div>
       <div class="hero-title">현대건설<br><span class="line2">시장동향</span></div>
       <div class="hero-desc">하루에 두 번 주요 뉴스를 정리합니다.</div>
+      <div class="hero-comment" id="hero-comment" style="display:none;"></div>
       <hr class="hero-divider">
       <div class="hero-meta-row">
         <span><b id="meta-date">2026.07.26 · SAT</b></span>
         <span>07:30 발행 · <b>IR팀</b></span>
       </div>
 
-      <div class="date-selector" id="date-selector">
-        <button class="date-btn" id="date-btn">
-          <span id="date-btn-text">최신</span>
-          <span class="chevron">▾</span>
-        </button>
-        <div class="date-dropdown" id="date-dropdown">
-          <div class="dd-label">지난 7일 돌아보기</div>
-          <div id="date-list"></div>
+      <div class="header-actions">
+        <button class="admin-btn" id="admin-btn">관리자</button>
+        <div class="date-selector" id="date-selector">
+          <button class="date-btn" id="date-btn">
+            <span id="date-btn-text">최신</span>
+            <span class="chevron">▾</span>
+          </button>
+          <div class="date-dropdown" id="date-dropdown">
+            <div class="dd-label">지난 7일 돌아보기</div>
+            <div id="date-list"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -316,15 +456,42 @@
 
 </div>
 
+<!-- 관리자 패널 -->
+<div class="admin-overlay" id="admin-overlay"></div>
+<div class="admin-panel" id="admin-panel">
+  <div class="admin-panel-header">
+    <div class="admin-panel-title">관리자 패널<span class="sub">config.json 편집 · 수동 반영</span></div>
+    <button class="admin-close-btn" id="admin-close-btn" aria-label="닫기">✕</button>
+  </div>
+  <div class="admin-panel-body" id="admin-panel-body"></div>
+</div>
+
+<!-- 관리자 비밀번호 모달 -->
+<div class="admin-pw-overlay" id="admin-pw-overlay">
+  <div class="admin-pw-modal">
+    <div class="admin-pw-title">관리자 접근</div>
+    <div class="admin-pw-desc">비밀번호를 입력하세요. 브라우저에서만 확인하는 수준이며, 완전한 보안 기능은 아닙니다.</div>
+    <input type="password" class="admin-pw-input" id="admin-pw-input" placeholder="비밀번호">
+    <div class="admin-pw-error" id="admin-pw-error" style="display:none;">비밀번호가 올바르지 않습니다.</div>
+    <div class="admin-pw-actions">
+      <button class="admin-btn-secondary" id="admin-pw-cancel" style="flex:1;">취소</button>
+      <button class="admin-btn-primary" id="admin-pw-submit">확인</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    archive/{날짜}.json 을 fetch해서 렌더링한다.
    ============================================================ */
 
+// 동종사/원자력 관련주는 관리자 패널(config.json)에서 종목 구성을 바꿀 수 있어
+// 고정된 fields 배열 대신, 그날 archive JSON의 indicator_meta에서 해당
+// group에 속한 key들을 찾아 동적으로 카드를 만든다 (dynamicGroup 참고).
 const indicatorGroups = [
   {label:"해외증시", fields:["kosdaq","dow","sp500"]},
-  {label:"동종사", fields:["daewoo_enc","gs_enc","dl_enc","samsung_ena","hdc_idc"]},
-  {label:"원자력 관련주", fields:["doosan_enerbility","kepco_eng","frmi","ccj","ceg","oklo"]},
+  {label:"동종사", dynamicGroup:"domestic_peers"},
+  {label:"원자력 관련주", dynamicGroup:"nuclear_related"},
   {label:"지수", fields:["smr","tiger_nuke","nlr","ura"]},
   {label:"시장지표", fields:["fx","wti","cidx2"]}
 ];
@@ -332,11 +499,16 @@ const indicatorGroups = [
 const fieldMeta = {
   kospi:{label:"코스피"}, kosdaq:{label:"코스닥"}, nasdaq:{label:"나스닥"}, dow:{label:"다우존스"}, sp500:{label:"S&P500"},
   hdec:{label:"현대건설"}, cidx1:{label:"건설지수"},
-  daewoo_enc:{label:"대우건설"}, gs_enc:{label:"GS건설"}, dl_enc:{label:"DL이앤씨"}, samsung_ena:{label:"삼성E&A"}, hdc_idc:{label:"HDC현대산업개발"},
-  doosan_enerbility:{label:"두산에너빌리티"}, kepco_eng:{label:"한전기술"}, frmi:{label:"FRMI"}, ccj:{label:"CCJ"}, ceg:{label:"CEG"}, oklo:{label:"OKLO"},
   smr:{label:"SOL 한국원자력SMR지수"}, tiger_nuke:{label:"TIGER 코리아원자력"}, nlr:{label:"VanEck Uranium and Nuclear ETF(NLR)"}, ura:{label:"Global X Uranium ETF(URA)"},
   fx:{label:"원/달러 환율"}, wti:{label:"WTI 원유"}, cidx2:{label:"건설공사비지수"}
 };
+
+// fieldMeta(고정 지표)에 없는 키는 동적 지표이므로 indicator_meta에서 라벨을 찾는다.
+function getIndicatorLabel(key){
+  if(fieldMeta[key]) return fieldMeta[key].label;
+  const meta = (indicatorMetaByDate[currentDate] || {})[key];
+  return meta ? meta.label : key;
+}
 
 const categories = [
   {num:"01", name:"현대건설"},
@@ -359,6 +531,10 @@ const tickerByDate = {};
 const newsByDate = {};
 // dateKey -> {key: [[날짜,값], ...]}. 지표 카드 호버 차트용.
 const historyByDate = {};
+// dateKey -> {key: {label, group}}. 관리자 설정 동적 지표(동종사/원자력 관련주)의 라벨.
+const indicatorMetaByDate = {};
+// dateKey -> "오늘의 코멘트" 문자열(없으면 "").
+const dailyCommentByDate = {};
 
 /* ---------- 데이터 로딩 ---------- */
 
@@ -394,6 +570,8 @@ async function loadDay(dateKey){
 
   tickerByDate[dateKey] = day.indicators;
   historyByDate[dateKey] = day.indicator_history || {};
+  indicatorMetaByDate[dateKey] = day.indicator_meta || {};
+  dailyCommentByDate[dateKey] = day.daily_comment || "";
 
   const news = {};
   for(const cat of categories){
@@ -422,16 +600,35 @@ function renderHeroStat(dateKey){
   document.getElementById("hero-footer").textContent = `기준 · 07:30 KST 종가`;
 }
 
+/* ---------- 오늘의 코멘트 (관리자 패널에서 설정) ---------- */
+function renderDailyComment(dateKey){
+  const el = document.getElementById("hero-comment");
+  const text = dailyCommentByDate[dateKey];
+  if(text){
+    el.textContent = text;
+    el.style.display = "block";
+  }else{
+    el.style.display = "none";
+  }
+}
+
 /* ---------- 지표 그룹 ---------- */
 function renderIndicators(dateKey){
   const data = tickerByDate[dateKey];
+  const meta = indicatorMetaByDate[dateKey] || {};
   const root = document.getElementById("indicator-root");
   root.innerHTML = indicatorGroups.map(group=>{
-    const cards = group.fields.map(key=>{
+    // 동종사/원자력 관련주는 fields가 고정돼 있지 않고, 그날 archive의
+    // indicator_meta에서 해당 group에 속한 key들을 찾아 카드를 만든다.
+    const fields = group.dynamicGroup
+      ? Object.keys(meta).filter(k => meta[k].group === group.dynamicGroup)
+      : group.fields;
+    const cards = fields.map(key=>{
+      if(!data[key]) return "";
       const [value, chg, dir] = data[key];
       const arrow = dir==="rise" ? "▲" : dir==="fall" ? "▼" : "―";
       return `<div class="indicator-card" data-key="${key}">
-        <div class="ind-label">${fieldMeta[key].label}</div>
+        <div class="ind-label">${getIndicatorLabel(key)}</div>
         <div class="ind-value">${value}</div>
         <div class="ind-chg ${dir}">${arrow} ${chg}</div>
       </div>`;
@@ -446,7 +643,7 @@ function renderIndicators(dateKey){
 /* ---------- 지표 카드 호버 미니 차트 ---------- */
 // cidx2(건설공사비지수)만 월간 지표라 1년치, 나머지는 일간 지표라 1개월치를 보여준다.
 function buildTooltipContent(key, history){
-  const label = fieldMeta[key] ? fieldMeta[key].label : key;
+  const label = getIndicatorLabel(key);
   const period = key === "cidx2" ? "최근 1년" : "최근 1개월";
   if(!history || history.length < 2){
     return `<div class="spark-title">${label} · ${period}</div><div class="spark-empty">차트 데이터 없음</div>`;
@@ -636,6 +833,7 @@ function renderDateDropdown(){
       document.getElementById("date-btn-text").textContent = buildDateLabel(currentDate);
       document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
       renderHeroStat(currentDate);
+      renderDailyComment(currentDate);
       renderIndicators(currentDate);
       renderCategories(currentDate);
       renderDateDropdown();
@@ -656,6 +854,242 @@ function initDateSelector(){
   });
 }
 
+/* ============================================================
+   관리자 패널 — 백엔드 서버 없이 정적 사이트로 운영하기 위해,
+   "브라우저에서 편집 → config.json 내보내기(다운로드) → GitHub에 수동 커밋 →
+   다음 Actions 실행부터 반영" 방식으로 동작한다. GitHub 토큰을 브라우저에
+   넣는 방식은 쓰지 않는다.
+   ============================================================ */
+
+// 관리자 패널 비밀번호. 브라우저에서만 확인하는 수준이라 완전한 보안 기능이
+// 아니다(레포가 Public이면 이 페이지 소스 자체는 누구나 볼 수 있음). 바꾸려면
+// 이 문자열만 수정하면 된다.
+const ADMIN_PASSWORD = "hdec2026";
+
+const ADMIN_CATEGORY_FIELDS = [
+  {key:"include", label:"포함 키워드 (include)"},
+  {key:"exclude", label:"제외 키워드 (exclude)"},
+  {key:"tier1", label:"Tier1 언론사"},
+  {key:"tier2", label:"Tier2 언론사"},
+];
+
+let adminConfig = null;
+let adminConfigOriginal = null;
+let adminConfigLoadedOk = false;
+let adminPanelDelegationInited = false;
+
+function parseListInput(text){
+  return (text || "").split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+}
+function formatListInput(arr){
+  return (arr || []).join("\n");
+}
+function escapeAttr(s){
+  return (s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+async function ensureAdminConfigLoaded(){
+  if(adminConfig) return;
+  try{
+    const res = await fetch("config.json", {cache:"no-store"});
+    if(!res.ok) throw new Error("config.json not found");
+    adminConfig = await res.json();
+    adminConfigLoadedOk = true;
+  }catch(e){
+    adminConfig = {categories:{}, indicators:{domestic_peers:[], nuclear_related:[]}, daily_comment:""};
+    adminConfigLoadedOk = false;
+  }
+  adminConfigOriginal = JSON.parse(JSON.stringify(adminConfig));
+}
+
+function buildStockRowHTML(group, entry){
+  const type = entry.code ? "code" : "ticker";
+  const codeVal = entry.code || entry.ticker || "";
+  return `<div class="admin-stock-row" data-group="${group}">
+    <input type="text" class="admin-stock-label" placeholder="종목명" value="${escapeAttr(entry.label)}">
+    <select class="admin-stock-type">
+      <option value="code" ${type==="code" ? "selected" : ""}>국내(코드)</option>
+      <option value="ticker" ${type==="ticker" ? "selected" : ""}>해외(티커)</option>
+    </select>
+    <input type="text" class="admin-stock-code" placeholder="코드/티커" value="${escapeAttr(codeVal)}">
+    <button type="button" class="admin-stock-remove" data-action="remove-stock-row" aria-label="삭제">✕</button>
+  </div>`;
+}
+
+function renderAdminForm(config){
+  const body = document.getElementById("admin-panel-body");
+  const cfg = config || {};
+  const cfgCategories = cfg.categories || {};
+  const cfgIndicators = cfg.indicators || {};
+  const domesticPeers = cfgIndicators.domestic_peers || [];
+  const nuclearRelated = cfgIndicators.nuclear_related || [];
+
+  let html = "";
+
+  if(!adminConfigLoadedOk){
+    html += `<div class="admin-warning">config.json을 저장소에서 불러오지 못했습니다. 아직 없거나 형식이 잘못됐을 수 있습니다. 아래 내용을 채운 뒤 "내보내기"하면 새로 만들 수 있습니다.</div>`;
+  }
+
+  html += `<div class="admin-section">
+    <div class="admin-section-title">카테고리별 수집 기준</div>
+    <div class="admin-section-hint">쉼표(,) 또는 줄바꿈으로 여러 항목을 구분해 입력하세요.</div>`;
+  categories.forEach(cat => {
+    const catCfg = cfgCategories[cat.name] || {};
+    html += `<div class="admin-category-block"><div class="admin-category-name">${cat.name}</div>`;
+    ADMIN_CATEGORY_FIELDS.forEach(f => {
+      html += `<div class="admin-field-label">${f.label}</div>
+        <textarea class="admin-textarea" data-category="${escapeAttr(cat.name)}" data-field="${f.key}">${formatListInput(catCfg[f.key])}</textarea>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="admin-section">
+    <div class="admin-section-title">지표 종목 관리</div>
+    <div class="admin-section-hint">국내 종목은 pykrx 종목코드, 해외 종목은 Yahoo Finance 티커를 입력하세요.</div>
+    <div class="admin-field-label">동종사 (domestic_peers)</div>
+    <div id="admin-stock-domestic_peers">${domesticPeers.map(e => buildStockRowHTML("domestic_peers", e)).join("")}</div>
+    <button type="button" class="admin-stock-add" data-action="add-stock-row" data-group="domestic_peers">+ 종목 추가</button>
+
+    <div class="admin-field-label" style="margin-top:16px;">원자력 관련주 (nuclear_related)</div>
+    <div id="admin-stock-nuclear_related">${nuclearRelated.map(e => buildStockRowHTML("nuclear_related", e)).join("")}</div>
+    <button type="button" class="admin-stock-add" data-action="add-stock-row" data-group="nuclear_related">+ 종목 추가</button>
+  </div>`;
+
+  html += `<div class="admin-section">
+    <div class="admin-section-title">오늘의 코멘트</div>
+    <div class="admin-section-hint">당일 발행 전 IR팀이 남기는 한 줄 코멘트입니다. 비워두면 대시보드에 표시되지 않습니다.</div>
+    <input type="text" class="admin-comment-input" id="admin-daily-comment" value="${escapeAttr(cfg.daily_comment)}" placeholder="예: 오늘은 미국 FOMC 결과 발표로 변동성이 큽니다.">
+  </div>`;
+
+  html += `<div class="admin-actions">
+    <button type="button" class="admin-btn-primary" id="admin-export-btn">config.json 내보내기</button>
+    <button type="button" class="admin-btn-secondary" id="admin-reset-btn">되돌리기</button>
+  </div>
+  <div class="admin-guide">
+    <b>반영 방법</b><br>
+    ① 위 "config.json 내보내기" 클릭 → 파일 다운로드<br>
+    ② GitHub 저장소 → config.json → 연필(✏) 아이콘 → 내용 붙여넣기 → Commit<br>
+    ③ Actions 탭 → Run workflow (또는 다음 예정 스케줄 07:30/15:00 KST까지 대기)
+  </div>`;
+
+  body.innerHTML = html;
+
+  document.getElementById("admin-export-btn").addEventListener("click", exportConfigJson);
+  document.getElementById("admin-reset-btn").addEventListener("click", () => renderAdminForm(adminConfigOriginal));
+}
+
+function initAdminPanelDelegation(){
+  const body = document.getElementById("admin-panel-body");
+  body.addEventListener("click", (e) => {
+    const addBtn = e.target.closest('[data-action="add-stock-row"]');
+    if(addBtn){
+      const group = addBtn.dataset.group;
+      document.getElementById(`admin-stock-${group}`)
+        .insertAdjacentHTML("beforeend", buildStockRowHTML(group, {label:"", code:""}));
+      return;
+    }
+    const removeBtn = e.target.closest('[data-action="remove-stock-row"]');
+    if(removeBtn){
+      removeBtn.closest(".admin-stock-row").remove();
+    }
+  });
+}
+
+function collectConfigFromForm(){
+  const body = document.getElementById("admin-panel-body");
+  const categoriesOut = {};
+  categories.forEach(cat => {
+    categoriesOut[cat.name] = {};
+    ADMIN_CATEGORY_FIELDS.forEach(f => {
+      const ta = body.querySelector(`textarea[data-category="${CSS.escape(cat.name)}"][data-field="${f.key}"]`);
+      categoriesOut[cat.name][f.key] = ta ? parseListInput(ta.value) : [];
+    });
+  });
+
+  function collectStockGroup(group){
+    const container = document.getElementById(`admin-stock-${group}`);
+    const rows = container ? Array.from(container.querySelectorAll(".admin-stock-row")) : [];
+    return rows.map(row => {
+      const label = row.querySelector(".admin-stock-label").value.trim();
+      const type = row.querySelector(".admin-stock-type").value;
+      const value = row.querySelector(".admin-stock-code").value.trim();
+      const entry = {label};
+      if(type === "code") entry.code = value; else entry.ticker = value;
+      return entry;
+    }).filter(e => e.label && (e.code || e.ticker));
+  }
+
+  return {
+    categories: categoriesOut,
+    indicators: {
+      domestic_peers: collectStockGroup("domestic_peers"),
+      nuclear_related: collectStockGroup("nuclear_related"),
+    },
+    daily_comment: (document.getElementById("admin-daily-comment").value || "").trim(),
+  };
+}
+
+function exportConfigJson(){
+  const config = collectConfigFromForm();
+  const blob = new Blob([JSON.stringify(config, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "config.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function openAdminPanel(){
+  document.getElementById("admin-overlay").classList.add("show");
+  document.getElementById("admin-panel").classList.add("open");
+  if(!adminPanelDelegationInited){
+    initAdminPanelDelegation();
+    adminPanelDelegationInited = true;
+  }
+  renderAdminForm(adminConfig);
+}
+
+function closeAdminPanel(){
+  document.getElementById("admin-overlay").classList.remove("show");
+  document.getElementById("admin-panel").classList.remove("open");
+}
+
+function initAdminAccess(){
+  const adminBtn = document.getElementById("admin-btn");
+  const pwOverlay = document.getElementById("admin-pw-overlay");
+  const pwInput = document.getElementById("admin-pw-input");
+  const pwError = document.getElementById("admin-pw-error");
+
+  adminBtn.addEventListener("click", () => {
+    pwInput.value = "";
+    pwError.style.display = "none";
+    pwOverlay.classList.add("show");
+    pwInput.focus();
+  });
+
+  async function trySubmit(){
+    if(pwInput.value === ADMIN_PASSWORD){
+      pwOverlay.classList.remove("show");
+      await ensureAdminConfigLoaded();
+      openAdminPanel();
+    }else{
+      pwError.style.display = "block";
+    }
+  }
+
+  document.getElementById("admin-pw-submit").addEventListener("click", trySubmit);
+  pwInput.addEventListener("keydown", (e) => { if(e.key === "Enter") trySubmit(); });
+  document.getElementById("admin-pw-cancel").addEventListener("click", () => pwOverlay.classList.remove("show"));
+  pwOverlay.addEventListener("click", (e) => { if(e.target === pwOverlay) pwOverlay.classList.remove("show"); });
+
+  document.getElementById("admin-close-btn").addEventListener("click", closeAdminPanel);
+  document.getElementById("admin-overlay").addEventListener("click", closeAdminPanel);
+}
+
 /* ---------- 초기화 ---------- */
 async function init(){
   await loadIndex();
@@ -665,12 +1099,14 @@ async function init(){
   document.getElementById("date-btn-text").textContent = buildDateLabel(currentDate);
   document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
   renderHeroStat(currentDate);
+  renderDailyComment(currentDate);
   renderIndicators(currentDate);
   renderTabs();
   renderCategories(currentDate);
   renderDateDropdown();
   initDateSelector();
   initIndicatorTooltip();
+  initAdminAccess();
 }
 init();
 </script>
