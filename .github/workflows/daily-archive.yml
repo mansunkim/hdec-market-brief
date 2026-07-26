@@ -48,13 +48,30 @@ jobs:
             echo "변경사항 없음 — 커밋 건너뜀"
           else
             git commit -m "chore: update daily archive ($(date -u +'%Y-%m-%d %H:%M UTC'))"
-            # 실행 도중 다른 push(수동 실행/로컬 push 등)가 먼저 들어오면 거절될 수 있어
-            # rebase 후 재시도한다.
+
+            # checkout 이후 원격에 다른 커밋(다른 실행/수동 push 등)이 먼저 들어오면
+            # push가 non-fast-forward로 거절된다. push 직전에 항상 먼저 rebase해
+            # 원격 변경사항 위로 이 커밋을 올린다. archive/ 파일은 매번 새로 생성되는
+            # 데이터라 과거 값을 보존할 이유가 없으므로, 리베이스 중 충돌이 나면
+            # 이번 실행에서 만든 값을 우선한다.
+            # 주의: git rebase는 merge와 달리 ours/theirs 의미가 뒤바뀐다 — rebase 중
+            # "ours"는 리베이스 대상(원격), "theirs"는 리베이스되는 쪽(이번 실행의 로컬
+            # 커밋)을 가리킨다. 따라서 "로컬(이번 실행) 우선"을 위해서는 -X theirs를 써야
+            # 한다 (-X ours를 쓰면 반대로 원격의 예전 값이 남는다).
+            # 그래도 push가 실패하면(rebase~push 사이에 또 push가 끼어든 경우) 최대
+            # 3회 재시도한다.
+            success=false
             for i in 1 2 3; do
+              git pull --rebase -X theirs origin master
               if git push; then
+                success=true
                 break
               fi
-              echo "push 실패, rebase 후 재시도 ($i/3)"
-              git pull --rebase
+              echo "push 실패 ($i/3), 5초 후 재시도"
+              sleep 5
             done
+            if [ "$success" != "true" ]; then
+              echo "::error::3회 재시도 후에도 push 실패"
+              exit 1
+            fi
           fi
