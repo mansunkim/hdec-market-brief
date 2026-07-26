@@ -9,10 +9,12 @@ generate_daily_archive.py에서 이번 달 값이 이미 있으면 재사용한�
     pip install finance-datareader pykrx requests
 
 일간 지표 소스:
-    - kospi, kosdaq, nasdaq, dow, sp500, hdec, smr, tiger_nuke, nlr, ura, fx
-      → FinanceDataReader (로그인 불필요)
-    - wti → Yahoo Finance 차트 JSON API 직접 호출
-      (FinanceDataReader의 "WTI" 심볼은 원유 가격이 아닌 다른 데이터로 확인되어 사용하지 않음)
+    - kospi, kosdaq, hdec, smr, tiger_nuke, fx → FinanceDataReader (KRX 소스, 로그인 불필요)
+    - nasdaq, dow, sp500, nlr, ura, wti → Yahoo Finance 차트 JSON API 직접 호출
+      (FDR이 이 필드들에 내부적으로 쓰는 Yahoo 경로는 GitHub Actions 같은 클라우드 IP에서
+      막히거나 실패해 "nan"을 반환하는 것이 실제 운영 환경에서 확인됨. 직접 차트 API를
+      호출하면 안정적으로 동작한다. WTI의 "WTI" FDR 심볼도 애초에 원유 가격이 아닌
+      다른 데이터로 확인되어 사용하지 않았던 것과 같은 이유로 전부 통일함)
     - cidx1(KOSPI 건설업 지수, 티커 1018) → pykrx
       (data.krx.co.kr 회원 로그인 필요 — 환경변수 KRX_ID/KRX_PW)
       주의: 1019는 존재하지 않는 코드로, 네이버금융에서 조용히 코스피 지수로
@@ -54,21 +56,16 @@ def _fmt_number(value: float, decimals: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# FinanceDataReader 기반 지표 (kospi/kosdaq/nasdaq/dow/sp500/hdec/smr/tiger_nuke/nlr/ura/fx)
+# FinanceDataReader 기반 지표 (KRX 소스: kospi/kosdaq/hdec/smr/tiger_nuke)
 # ---------------------------------------------------------------------------
 
 # key -> (FDR 심볼, 소수점 자리수)
 _FDR_TICKERS = {
     "kospi": ("KS11", 2),
     "kosdaq": ("KQ11", 2),
-    "nasdaq": ("IXIC", 2),
-    "dow": ("DJI", 2),
-    "sp500": ("US500", 2),
     "hdec": ("000720", 0),
     "smr": ("0092B0", 0),
     "tiger_nuke": ("0091P0", 0),
-    "nlr": ("NLR", 2),
-    "ura": ("URA", 2),
 }
 
 
@@ -102,12 +99,25 @@ def _fetch_fx() -> list:
 
 
 # ---------------------------------------------------------------------------
-# WTI — Yahoo Finance 차트 JSON API 직접 호출
-# (FDR의 "WTI" 심볼은 원유 가격이 아닌 것으로 확인되어 사용하지 않음)
+# Yahoo Finance 차트 JSON API 직접 호출
+# (nasdaq/dow/sp500/nlr/ura/wti — FDR이 이 필드들에 쓰는 Yahoo 경로가 GitHub Actions
+# 같은 클라우드 IP에서 막혀 "nan"을 반환하는 것이 확인되어, 직접 API를 호출한다)
 # ---------------------------------------------------------------------------
 
-def _fetch_wti() -> list:
-    url = "https://query1.finance.yahoo.com/v8/finance/chart/CL=F"
+# key -> (Yahoo 티커, 소수점 자리수)
+_YAHOO_TICKERS = {
+    "nasdaq": ("^IXIC", 2),
+    "dow": ("^DJI", 2),
+    "sp500": ("^GSPC", 2),
+    "nlr": ("NLR", 2),
+    "ura": ("URA", 2),
+    "wti": ("CL=F", 2),
+}
+
+
+def _fetch_yahoo_field(key: str) -> list:
+    ticker, decimals = _YAHOO_TICKERS[key]
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(ticker)}"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         data = json.load(resp)
@@ -116,7 +126,7 @@ def _fetch_wti() -> list:
     price = meta["regularMarketPrice"]
     prev_close = meta["previousClose"]
     change_ratio = (price - prev_close) / prev_close
-    return [_fmt_number(price, 2), _fmt_pct(change_ratio), _direction(change_ratio)]
+    return [_fmt_number(price, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
 
 
 # ---------------------------------------------------------------------------
@@ -150,8 +160,9 @@ def fetch_market_indicators() -> dict:
     result = {}
     for key in _FDR_TICKERS:
         result[key] = _fetch_fdr_field(key)
+    for key in _YAHOO_TICKERS:
+        result[key] = _fetch_yahoo_field(key)
     result["fx"] = _fetch_fx()
-    result["wti"] = _fetch_wti()
     result["cidx1"] = _fetch_cidx1()
     return result
 
