@@ -53,7 +53,7 @@ def _save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def get_cidx2_monthly(now: datetime) -> dict:
+def get_cidx2_monthly(now: datetime) -> list:
     """이번 달에 이미 조회한 값이 있으면 캐시를 재사용하고, 없으면 KOSIS API로 새로 조회한다."""
     current_month = now.strftime("%Y-%m")
     cache = _load_json(CIDX2_CACHE_PATH, None)
@@ -83,7 +83,9 @@ def build_day_payload(now: datetime) -> dict:
     indicators = fetch_market_indicators()
 
     print("[시황] 건설공사비지수(월간) 확인 중...")
-    cidx2_monthly = get_cidx2_monthly(now)
+    # cidx2도 다른 지표와 동일한 [값, 등락률, 방향] 형태이므로 그대로 indicators에 합쳐서
+    # HTML의 "시장지표" 그리드에 카드로 함께 렌더링되게 한다.
+    indicators["cidx2"] = get_cidx2_monthly(now)
 
     news = crawl_all_categories()
 
@@ -91,7 +93,6 @@ def build_day_payload(now: datetime) -> dict:
         "date": now.strftime("%Y-%m-%d"),
         "generated_at": now.isoformat(),
         "indicators": indicators,
-        "cidx2_monthly": cidx2_monthly,
         "news": news,
     }
 

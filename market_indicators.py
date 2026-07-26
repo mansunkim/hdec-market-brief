@@ -175,11 +175,14 @@ _KOSIS_ORG_ID = "397"
 _KOSIS_TBL_ID = "DT_39701_A003"
 
 
-def fetch_construction_cost_index(api_key: str) -> dict:
+def fetch_construction_cost_index(api_key: str) -> list:
     """건설공사비지수(월간, 2020=100)를 KOSIS Open API에서 조회한다.
 
-    매일 호출하는 지표가 아니므로 fetch_market_indicators()에는 포함하지 않는다.
-    반환 형태: {"value": "137.67", "base": "2020=100", "period": "2026-05"}
+    매일 호출하는 지표가 아니므로 fetch_market_indicators()에는 포함하지 않는다
+    (generate_daily_archive.py가 월 1회만 새로 조회하고 캐시를 재사용한다).
+    다른 일간 지표와 동일하게 [값, 등락률, 방향] 형태로 반환해 "시장지표" 그리드에
+    카드로 그대로 렌더링할 수 있게 하되, 월간 지표라는 성격을 드러내기 위해
+    등락률은 전일대비가 아니라 전월말대비로 계산하고, 값 옆에 기준월을 주석으로 덧붙인다.
     """
     params = {
         "method": "getList",
@@ -201,21 +204,35 @@ def fetch_construction_cost_index(api_key: str) -> dict:
     if isinstance(rows, dict) and "err" in rows:
         raise RuntimeError(f"KOSIS API 오류: {rows.get('errMsg', rows)}")
 
-    # "건설" 종합지수(업종별 최상위 항목)만 필터링, 최신 발표월 선택
-    construction_rows = [r for r in rows if r.get("C1_NM") == "건설"]
+    # "건설" 종합지수(업종별 최상위 항목)만 필터링, 최신 발표월 순으로 정렬
+    construction_rows = sorted(
+        (r for r in rows if r.get("C1_NM") == "건설"),
+        key=lambda r: r["PRD_DE"],
+        reverse=True,
+    )
     if not construction_rows:
         raise RuntimeError("KOSIS 응답에서 '건설' 종합지수를 찾지 못했습니다")
 
-    latest = max(construction_rows, key=lambda r: r["PRD_DE"])
+    latest = construction_rows[0]
+    value = float(latest["DT"])
     prd_de = latest["PRD_DE"]  # "202605"
-    period = f"{prd_de[:4]}-{prd_de[4:]}"
-    unit = latest.get("UNIT_NM", "").replace("＝", "=")  # "2020＝100" -> "2020=100"
+    period_label = f"{prd_de[:4]}년 {int(prd_de[4:])}월"
 
-    return {
-        "value": latest["DT"],
-        "base": unit,
-        "period": period,
-    }
+    if len(construction_rows) >= 2:
+        prev_value = float(construction_rows[1]["DT"])
+        change_ratio = (value - prev_value) / prev_value
+        chg_str = f"{_fmt_pct(change_ratio)}(전월말대비)"
+        direction = _direction(change_ratio)
+    else:
+        chg_str = "-(전월말대비)"
+        direction = "flat"
+
+    value_html = (
+        f"{value:,.2f}"
+        f'<span style="font-size:9.5px;font-weight:500;color:var(--ink-faint);margin-left:4px;">'
+        f"※{period_label}기준</span>"
+    )
+    return [value_html, chg_str, direction]
 
 
 # ---------------------------------------------------------------------------

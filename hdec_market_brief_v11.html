@@ -288,7 +288,6 @@
 
   <!-- 지표 그룹 -->
   <div class="indicators" id="indicator-root"></div>
-  <div class="stat-footer" id="cidx2-caption"></div>
 
   <!-- 섹션 인트로 + 탭 -->
   <div class="section-intro">
@@ -317,7 +316,7 @@
 const indicatorGroups = [
   {label:"해외증시", fields:["kosdaq","dow","sp500"]},
   {label:"지수", fields:["smr","tiger_nuke","nlr","ura"]},
-  {label:"시장지표", fields:["fx","wti"]}
+  {label:"시장지표", fields:["fx","wti","cidx2"]}
 ];
 
 const fieldMeta = {
@@ -346,7 +345,6 @@ let currentDate = null;
 // dateKey -> 각 데이터. loadDay()가 채운다.
 const tickerByDate = {};
 const newsByDate = {};
-const cidx2ByDate = {};
 // dateKey -> {total, high, top_titles}. archive/index.json에서 채운다.
 const summaryByDate = {};
 
@@ -384,7 +382,6 @@ async function loadDay(dateKey){
   const day = await res.json();
 
   tickerByDate[dateKey] = day.indicators;
-  cidx2ByDate[dateKey] = day.cidx2_monthly;
 
   const news = {};
   for(const cat of categories){
@@ -411,17 +408,6 @@ function renderHeroStat(dateKey){
   `;
 
   document.getElementById("hero-footer").textContent = `기준 · 07:30 KST 종가`;
-}
-
-/* ---------- 건설공사비지수(월간) 배지 ---------- */
-// cidx2는 매일 갱신되는 다른 지표와 성격이 달라(월 1회 발표) 지표 그리드에
-// 함께 넣지 않고, 별도 자막으로 분리해서 표시한다.
-function renderCidx2Caption(dateKey){
-  const data = cidx2ByDate[dateKey];
-  const el = document.getElementById("cidx2-caption");
-  if(!data){ el.textContent = ""; return; }
-  const [year, month] = data.period.split("-");
-  el.textContent = `건설공사비지수(월간 지표, ${data.base}) ${data.value} · ${year}년 ${Number(month)}월 기준`;
 }
 
 /* ---------- 지표 그룹 ---------- */
@@ -573,7 +559,6 @@ function renderDateDropdown(){
       document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
       renderHeroStat(currentDate);
       renderIndicators(currentDate);
-      renderCidx2Caption(currentDate);
       renderCategories(currentDate);
       renderDateDropdown();
       document.getElementById("date-selector").classList.remove("open");
@@ -603,7 +588,6 @@ async function init(){
   document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
   renderHeroStat(currentDate);
   renderIndicators(currentDate);
-  renderCidx2Caption(currentDate);
   renderTabs();
   renderCategories(currentDate);
   renderDateDropdown();

@@ -1,8 +1,8 @@
 {
   "fetched_month": "2026-07",
-  "data": {
-    "value": "137.67",
-    "base": "2020=100",
-    "period": "2026-05"
-  }
+  "data": [
+    "137.67<span style=\"font-size:9.5px;font-weight:500;color:var(--ink-faint);margin-left:4px;\">※2026년 5월기준</span>",
+    "+0.40%(전월말대비)",
+    "rise"
+  ]
 }
