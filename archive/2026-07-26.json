@@ -149,22 +149,6 @@
     ],
     "건설업": [
       {
-        "title": "대미 원전 투자 1호 가시화…현대건설·삼성물산 원전사업 날개 달까",
-        "press": "더구루",
-        "time": "18시간 전",
-        "url": "https://www.theguru.co.kr/news/article.html?no=104811",
-        "domain": "건설업",
-        "scope": "해외",
-        "subject": "경쟁사",
-        "entity": "현대건설·삼성물산",
-        "importance": "High",
-        "relevance": "high",
-        "summary_kr": "미국 내 원전 투자 1호 사업이 구체화되면서 현대건설과 삼성물산의 원전 사업에 긍정적 영향이 기대된다는 내용이다. 대미 원전 투자 확대가 두 기업의 사업 확장 발판이 될 것으로 전망된다.",
-        "source": "supplementary",
-        "tier": "t2",
-        "verify_needed": false
-      },
-      {
         "title": "삼성E&A, 2분기 영업익 2731억…전년비 51%↑",
         "press": "이데일리",
         "time": "3일 전",
@@ -226,38 +210,6 @@
         "summary_kr": null,
         "source": "supplementary",
         "tier": "t2",
-        "verify_needed": false
-      },
-      {
-        "title": "삼성물산, 원전 사업 확장 본격화…목표가 25% 상향-KB",
-        "press": "이데일리",
-        "time": "3일 전",
-        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=02804406645517472",
-        "domain": "건설업",
-        "scope": "국내",
-        "subject": "경쟁사",
-        "entity": "삼성물산",
-        "importance": "Normal",
-        "relevance": "high",
-        "summary_kr": null,
-        "source": "supplementary",
-        "tier": "t2",
-        "verify_needed": false
-      },
-      {
-        "title": "\"삼성물산, 원전 사업 확대·할인율 축소 기대…목표가↑\"-KB",
-        "press": "한국경제",
-        "time": "3일 전",
-        "url": "https://www.hankyung.com/article/2026072306446",
-        "domain": "건설업",
-        "scope": "국내",
-        "subject": "경쟁사",
-        "entity": "삼성물산",
-        "importance": "Normal",
-        "relevance": "high",
-        "summary_kr": null,
-        "source": "supplementary",
-        "tier": "t1",
         "verify_needed": false
       },
       {
@@ -453,6 +405,38 @@
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": true
+      },
+      {
+        "title": "삼성물산, 원전 사업 확장 본격화…목표가 25% 상향-KB",
+        "press": "이데일리",
+        "time": "3일 전",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=02804406645517472",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성물산",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "\"삼성물산, 원전 사업 확대·할인율 축소 기대…목표가↑\"-KB",
+        "press": "한국경제",
+        "time": "3일 전",
+        "url": "https://www.hankyung.com/article/2026072306446",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성물산",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
       }
     ],
     "도시정비": [
