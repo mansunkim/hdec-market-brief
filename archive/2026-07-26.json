@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T15:08:56.722656+09:00",
+  "generated_at": "2026-07-26T15:22:11.835977+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -11,21 +11,6 @@
       "748.22",
       "-5.32%",
       "fall"
-    ],
-    "nasdaq": [
-      "nan",
-      "+nan%",
-      "flat"
-    ],
-    "dow": [
-      "nan",
-      "+nan%",
-      "flat"
-    ],
-    "sp500": [
-      "nan",
-      "+nan%",
-      "flat"
     ],
     "hdec": [
       "106,200",
@@ -42,24 +27,39 @@
       "-2.78%",
       "fall"
     ],
+    "nasdaq": [
+      "24,975.82",
+      "-0.64%",
+      "fall"
+    ],
+    "dow": [
+      "51,947.25",
+      "+0.46%",
+      "rise"
+    ],
+    "sp500": [
+      "7,411.98",
+      "+0.05%",
+      "rise"
+    ],
     "nlr": [
-      "nan",
-      "+nan%",
-      "flat"
+      "108.10",
+      "-2.97%",
+      "fall"
     ],
     "ura": [
-      "nan",
-      "+nan%",
-      "flat"
-    ],
-    "fx": [
-      "1,462.1",
-      "-11.9",
+      "39.89",
+      "-3.01%",
       "fall"
     ],
     "wti": [
       "89.31",
       "-3.12%",
+      "fall"
+    ],
+    "fx": [
+      "1,462.1",
+      "-11.9",
       "fall"
     ],
     "cidx1": [
@@ -125,7 +125,7 @@
         "domain": "현대건설",
         "scope": "국내",
         "subject": "정책",
-        "entity": "중견 건설사 30곳",
+        "entity": "중견 건설사 30곳 상생협약",
         "importance": "Normal",
         "source": "main",
         "tier": "t1",
@@ -178,7 +178,7 @@
       {
         "title": "호반건설, 군포 금정3구역 재개발 수주…656가구 브랜드 단지 조성",
         "press": "매일경제",
-        "time": "3시간 전",
+        "time": "4시간 전",
         "url": "https://www.mk.co.kr/article/12107534",
         "domain": "건설업",
         "scope": "국내",
@@ -192,20 +192,6 @@
     ],
     "원자력": [
       {
-        "title": "[속보] 美 “미국-사우디, 평화적 원자력 협력 협정 체결” 외 1개 언론사 보도",
-        "press": "매일경제",
-        "time": "3일 전",
-        "url": "https://www.mk.co.kr/article/12105027",
-        "domain": "원자력",
-        "scope": "해외",
-        "subject": "정책",
-        "entity": "미국-사우디",
-        "importance": "High",
-        "source": "supplementary",
-        "tier": "tier1",
-        "verify_needed": false
-      },
-      {
         "title": "현대엔지니어링, 원자력·SMR 전문가 초청 세미나 개최",
         "press": "파이낸셜뉴스",
         "time": "2일 전",
@@ -217,6 +203,20 @@
         "importance": "Normal",
         "source": "supplementary",
         "tier": "tier2",
+        "verify_needed": false
+      },
+      {
+        "title": "[속보] 美 “미국-사우디, 평화적 원자력 협력 협정 체결” 외 1개 언론사 보도",
+        "press": "매일경제",
+        "time": "3일 전",
+        "url": "https://www.mk.co.kr/article/12105027",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "미국-사우디",
+        "importance": "Normal",
+        "source": "supplementary",
+        "tier": "tier1",
         "verify_needed": false
       },
       {
@@ -283,7 +283,7 @@
         "domain": "원자력",
         "scope": "해외",
         "subject": "정책",
-        "entity": "사우디 원전협정",
+        "entity": "사우디·이스라엘",
         "importance": "Normal",
         "source": "supplementary",
         "tier": "tier2",
@@ -298,21 +298,7 @@
         "url": "https://www.hankyung.com/article/202607266096i",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "경쟁사",
-        "entity": "호반건설",
-        "importance": "High",
-        "source": "supplementary",
-        "tier": "tier1",
-        "verify_needed": false
-      },
-      {
-        "title": "호반건설, 군포 금정3구역 재개발 수주…656가구 브랜드 단지 조성",
-        "press": "매일경제",
-        "time": "3시간 전",
-        "url": "https://www.mk.co.kr/article/12107534",
-        "domain": "도시정비",
-        "scope": "국내",
-        "subject": "경쟁사",
+        "subject": "자사",
         "entity": "호반건설",
         "importance": "High",
         "source": "supplementary",
@@ -322,7 +308,7 @@
       {
         "title": "법원 “재건축 1세대 판단, 주민등록 아닌 실제 생활관계 기준”",
         "press": "매일경제",
-        "time": "1시간 전",
+        "time": "2시간 전",
         "url": "https://www.mk.co.kr/article/12107569",
         "domain": "도시정비",
         "scope": "국내",
@@ -340,7 +326,7 @@
         "url": "https://www.newspim.com/news/view/20260724001113",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "정책",
+        "subject": "시장전반",
         "entity": "갈현1구역",
         "importance": "Normal",
         "source": "supplementary",
@@ -354,7 +340,7 @@
         "url": "https://www.hankyung.com/article/202607243956i",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "정책",
+        "subject": "시장전반",
         "entity": "갈현1구역",
         "importance": "Normal",
         "source": "supplementary",
@@ -368,7 +354,7 @@
         "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=03752326645517800",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "정책",
+        "subject": "시장전반",
         "entity": "갈현제1구역",
         "importance": "Normal",
         "source": "supplementary",
@@ -384,6 +370,20 @@
         "scope": "국내",
         "subject": "시장전반",
         "entity": null,
+        "importance": "Normal",
+        "source": "supplementary",
+        "tier": "tier1",
+        "verify_needed": false
+      },
+      {
+        "title": "영등포구, 정비사업 속도낸다…현장지원ㆍ전문자문 ‘투 트랙’",
+        "press": "대한경제",
+        "time": "2일 전",
+        "url": "https://www.dnews.co.kr/uhtml/view.jsp?idxno=202607241633379510444",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "영등포구",
         "importance": "Normal",
         "source": "supplementary",
         "tier": "tier1",
