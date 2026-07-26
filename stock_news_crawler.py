@@ -140,15 +140,39 @@ _SUPP_EXTRACT_JS = r"""
 """
 
 
+def _expand_query(query: str) -> list[str]:
+    """검색어 문자열을 네이버뉴스에 실제로 넣을 리터럴 검색어 목록으로 변환한다.
+
+    네이버뉴스 검색은 불리언 연산자를 지원하지 않고 문자 그대로 취급하므로,
+    아래 패턴만 해석해서 여러 번의 리터럴 검색으로 확장한다:
+      - "A AND (B OR C OR D)" → ["A B", "A C", "A D"]
+        (공백으로 결합한 문자열은 네이버 검색창에서 암묵적 AND로 동작)
+      - "A OR B OR C" → ["A", "B", "C"]
+      - 그 외 → [query] (있는 그대로 한 번 검색)
+    """
+    query = (query or "").strip()
+    if not query:
+        return []
+
+    and_match = re.match(r"^(.+?)\s+AND\s+\((.+)\)$", query, flags=re.IGNORECASE)
+    if and_match:
+        prefix = and_match.group(1).strip()
+        or_terms = [
+            t.strip() for t in re.split(r"\s+OR\s+", and_match.group(2), flags=re.IGNORECASE) if t.strip()
+        ]
+        return [f"{prefix} {t}" for t in or_terms]
+
+    or_terms = [t.strip() for t in re.split(r"\s+OR\s+", query, flags=re.IGNORECASE) if t.strip()]
+    return or_terms if or_terms else [query]
+
+
 def fetch_supplementary_source(query: str, max_results: int = 30) -> list[dict]:
     """네이버뉴스 검색 결과를 크롤링해 title/press/time/url을 수집한다.
 
-    네이버뉴스 검색은 불리언 "OR" 문법을 지원하지 않고 문자 그대로 취급하므로,
-    query에 " OR "가 포함되어 있으면 각 검색어를 개별적으로 검색한 뒤
-    URL 기준으로 중복을 제거해 합친다. (예: "현대건설 OR 현대엔지니어링"
-    → "현대건설", "현대엔지니어링" 두 번 검색 후 병합)
+    query는 " OR "와 "A AND (B OR C)" 패턴을 해석해 여러 번의 리터럴 검색으로
+    확장한 뒤 URL 기준으로 중복을 제거해 합친다. (_expand_query 참고)
     """
-    terms = [t.strip() for t in re.split(r"\s+OR\s+", query, flags=re.IGNORECASE) if t.strip()]
+    terms = _expand_query(query)
     if not terms:
         return []
 
@@ -330,8 +354,9 @@ _TAG_SCHEMA = {
                     },
                     "entity": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                     "importance": {"type": "string", "enum": ["High", "Normal"]},
+                    "relevance": {"type": "string", "enum": ["high", "low"]},
                 },
-                "required": ["index", "scope", "subject", "entity", "importance"],
+                "required": ["index", "scope", "subject", "entity", "importance", "relevance"],
                 "additionalProperties": False,
             },
         }
@@ -346,7 +371,7 @@ def tag_articles_with_llm(
     domain: str,
     client: anthropic.Anthropic,
 ) -> list[dict]:
-    """각 기사에 scope/subject/entity/importance를 LLM으로 채운다 (1회 배치 호출)."""
+    """각 기사에 scope/subject/entity/importance/relevance를 LLM으로 채운다 (1회 배치 호출)."""
     if not articles:
         return articles
 
@@ -360,6 +385,10 @@ def tag_articles_with_llm(
   정부/제도/정책 관련이면 "정책", 특정 기업이 아닌 시장 전반 동향이면 "시장전반"
 - entity: 기사에서 언급된 구체적 프로젝트명/기관명/기업명 (특정할 수 없으면 null)
 - importance: 수주, 계약, 공시 관련 내용을 포함하면 "High", 그 외는 "Normal"
+- relevance: 기사의 실질적 가치를 "high" 또는 "low"로 판단
+  - "low": 단순 홍보/이벤트/사내소식/동정성 기사, 보도자료를 사실상 그대로 옮긴 기사,
+    회사명이 스치듯 한 번만 언급되고 핵심 내용이 아닌 경우
+  - "high": 사업/실적/계약/정책/시장에 실질적 영향이 있는 내용
 
 기사 목록:
 {numbered}
@@ -387,6 +416,7 @@ def tag_articles_with_llm(
         a["subject"] = tag.get("subject", "자사")
         a["entity"] = tag.get("entity")
         a["importance"] = tag.get("importance", "Normal")
+        a["relevance"] = tag.get("relevance", "high")
     return articles
 
 
@@ -394,7 +424,43 @@ def tag_articles_with_llm(
 # 7. 메인 오케스트레이터
 # ---------------------------------------------------------------------------
 
-def crawl_category(
+def sort_articles(articles: list[dict]) -> list[dict]:
+    """importance High 우선 → 오늘 발행 기사 우선 순으로 정렬한다.
+
+    stable sort이므로 동일 키 그룹 내에서는 입력 순서(대개 최신순)가 보존된다.
+    generate_daily_archive.py의 오케스트레이션 단계(카테고리 간 기사 이관·병합)에서도
+    재사용한다.
+    """
+    return sorted(
+        articles,
+        key=lambda a: (
+            0 if a.get("importance") == "High" else 1,
+            0 if is_published_today(a.get("time", "")) else 1,
+        ),
+    )
+
+
+def _to_output_article(a: dict, category_name: str) -> dict:
+    return {
+        "title": a["title"],
+        "press": a["press"],
+        "time": a.get("time", ""),
+        "url": a.get("url", ""),
+        "domain": a.get("domain", category_name),
+        "scope": a.get("scope"),
+        "subject": a.get("subject"),
+        "entity": a.get("entity"),
+        "importance": a.get("importance"),
+        "relevance": a.get("relevance"),
+        "source": a.get("source"),
+        # 메인소스(공식 종목뉴스 피드)는 항상 Tier 1로 간주.
+        # 보조소스는 화이트리스트 등급(tier1/tier2)을 그대로 반영.
+        "tier": "t1" if a.get("source") == "main" else a.get("source_tier", "t2"),
+        "verify_needed": a.get("verify_needed", False),
+    }
+
+
+def _crawl_category_impl(
     category_name: str,
     main_source_url: str,
     supplementary_query: str,
@@ -403,8 +469,11 @@ def crawl_category(
     tier1_whitelist: list[str],
     tier2_whitelist: list[str],
     max_articles: int = 7,
-) -> list[dict]:
-    """카테고리별 종목뉴스를 크롤링/필터링/태깅해 최종 기사 리스트를 반환한다."""
+) -> tuple[list[dict], list[dict]]:
+    """crawl_category() / crawl_category_debug()의 공통 구현.
+
+    (최종 포함된 기사, relevance="low"로 제외된 기사) 튜플을 반환한다.
+    """
 
     # main_source_url 예: "https://finance.naver.com/item/news_news.naver?code=000720"
     code_match = re.search(r"code=(\d+)", main_source_url or "")
@@ -413,7 +482,8 @@ def crawl_category(
     main_raw = fetch_main_source(stock_code, pages=2)
     supp_raw = fetch_supplementary_source(supplementary_query)
 
-    # 1차 필터 (포함/제외 키워드)
+    # 1차 필터 (포함/제외 키워드). relevance가 2차 필터 역할을 하므로
+    # exclude_keywords는 명백한 노이즈(스포츠단, 광고성 문구 등) 정도만 최소로 둔다.
     main_filtered = apply_keyword_filter(main_raw, include_keywords, exclude_keywords)
     supp_filtered = apply_keyword_filter(supp_raw, include_keywords, exclude_keywords)
 
@@ -429,57 +499,77 @@ def crawl_category(
 
     all_articles = main_merged + supp_merged
 
-    # LLM 태깅 (domain/scope/subject/entity/importance)
+    # LLM 태깅 (domain/scope/subject/entity/importance/relevance)
     client = anthropic.Anthropic()
     all_articles = tag_articles_with_llm(all_articles, category_name, client)
 
+    # relevance 2차 필터: 홍보성/사소한 기사는 exclude_keywords 없이도 걸러낸다
+    included = [a for a in all_articles if a.get("relevance", "high") != "low"]
+    excluded_low_relevance = [a for a in all_articles if a.get("relevance", "high") == "low"]
+
     # Tier2 매체 + 제목에 "단독" 포함 → importance Normal 강등 + verify_needed 플래그
-    for a in all_articles:
+    for a in included:
         if a.get("source_tier") == "tier2" and "단독" in a["title"]:
             a["importance"] = "Normal"
             a["verify_needed"] = True
         else:
             a.setdefault("verify_needed", False)
 
-    # importance High 우선 → 그 다음 오늘 발행 기사 우선 → 그 안에서는 소스 내 정렬
-    # 순서(=최신순) 유지 (stable sort이므로 동일 키 그룹 내에서는 원래 순서가 보존됨)
-    all_articles.sort(
-        key=lambda a: (
-            0 if a.get("importance") == "High" else 1,
-            0 if is_published_today(a.get("time", "")) else 1,
-        )
+    included = sort_articles(included)
+    final_articles = included[:max_articles]
+
+    return (
+        [_to_output_article(a, category_name) for a in final_articles],
+        [_to_output_article(a, category_name) for a in excluded_low_relevance],
     )
 
-    final_articles = all_articles[:max_articles]
 
-    return [
-        {
-            "title": a["title"],
-            "press": a["press"],
-            "time": a.get("time", ""),
-            "url": a.get("url", ""),
-            "domain": a.get("domain", category_name),
-            "scope": a.get("scope"),
-            "subject": a.get("subject"),
-            "entity": a.get("entity"),
-            "importance": a.get("importance"),
-            "source": a.get("source"),
-            # 메인소스(공식 종목뉴스 피드)는 항상 Tier 1로 간주.
-            # 보조소스는 화이트리스트 등급(tier1/tier2)을 그대로 반영.
-            "tier": "t1" if a.get("source") == "main" else a.get("source_tier", "t2"),
-            "verify_needed": a.get("verify_needed", False),
-        }
-        for a in final_articles
-    ]
+def crawl_category(
+    category_name: str,
+    main_source_url: str,
+    supplementary_query: str,
+    include_keywords: list[str],
+    exclude_keywords: list[str],
+    tier1_whitelist: list[str],
+    tier2_whitelist: list[str],
+    max_articles: int = 7,
+) -> list[dict]:
+    """카테고리별 종목뉴스를 크롤링/필터링/태깅해 최종 기사 리스트를 반환한다."""
+    included, _ = _crawl_category_impl(
+        category_name, main_source_url, supplementary_query,
+        include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
+        max_articles,
+    )
+    return included
+
+
+def crawl_category_debug(
+    category_name: str,
+    main_source_url: str,
+    supplementary_query: str,
+    include_keywords: list[str],
+    exclude_keywords: list[str],
+    tier1_whitelist: list[str],
+    tier2_whitelist: list[str],
+    max_articles: int = 7,
+) -> tuple[list[dict], list[dict]]:
+    """crawl_category()와 동일하지만 relevance="low"로 제외된 기사도 함께 반환한다.
+
+    (최종 포함된 기사, 제외된 기사) — 필터링이 실제로 타당한지 육안 검증할 때 사용.
+    """
+    return _crawl_category_impl(
+        category_name, main_source_url, supplementary_query,
+        include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
+        max_articles,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 카테고리 1~5 스펙 (generate_daily_archive.py에서 import해서 사용)
 # ---------------------------------------------------------------------------
-
-_TIER1_WHITELIST = ["대한경제", "건설경제", "매일경제", "한국경제", "서울경제"]
-_TIER2_WHITELIST = ["더그루", "이데일리", "뉴스핌", "파이낸셜뉴스"]
-_EXCLUDE_KEYWORDS = ["구단", "야구단", "축구단", "테마주", "급등주"]
+# 각 카테고리마다 화이트리스트/키워드가 서로 다른 전문 매체·용어를 쓰므로 공용
+# 상수로 묶지 않고 카테고리별로 그대로 명시한다. relevance가 2차 필터 역할을
+# 하므로 exclude_keywords는 명백한 노이즈만 최소로 유지한다.
 
 CATEGORY_CONFIGS = [
     dict(
@@ -489,49 +579,66 @@ CATEGORY_CONFIGS = [
         include_keywords=[
             "수주", "계약", "실적", "공시", "배당", "인수", "지분", "소송", "MOU", "착공", "준공",
         ],
-        exclude_keywords=_EXCLUDE_KEYWORDS,
-        tier1_whitelist=_TIER1_WHITELIST,
-        tier2_whitelist=_TIER2_WHITELIST,
-        max_articles=7,
+        exclude_keywords=["구단", "야구단", "축구단", "테마주", "급등주"],
+        tier1_whitelist=["대한경제", "건설경제", "매일경제", "한국경제", "서울경제"],
+        tier2_whitelist=["더그루", "이데일리", "뉴스핌", "파이낸셜뉴스"],
+        # generate_daily_archive.py에서 subject=="자사"만 남기고 재분류하므로,
+        # 재분류 후에도 상위 7건이 충분히 남도록 넉넉하게 수집한다.
+        max_articles=15,
     ),
     dict(
         category_name="건설업",
         main_source_url="",  # 특정 종목이 없어 보조소스만 사용
-        supplementary_query="건설업 OR 건설경기",
-        include_keywords=["수주", "분양", "정비사업", "PF", "착공", "준공"],
-        exclude_keywords=_EXCLUDE_KEYWORDS,
-        tier1_whitelist=_TIER1_WHITELIST,
-        tier2_whitelist=_TIER2_WHITELIST,
+        supplementary_query="건설업 OR GS건설 OR DL이앤씨 OR 삼성E&A OR 삼성물산 OR HDC현대산업개발",
+        include_keywords=[
+            "수주", "인허가", "PF", "미분양", "시공능력평가", "금리", "국토부",
+            "GS건설", "DL이앤씨", "삼성E&A", "삼성물산", "HDC현대산업개발", "현대산업개발",
+        ],
+        exclude_keywords=["스포츠단", "야구단", "축구단"],
+        tier1_whitelist=["대한경제", "건설경제", "매일경제", "한국경제", "서울경제"],
+        tier2_whitelist=["이데일리", "더구루", "뉴스핌"],
         max_articles=7,
     ),
     dict(
         category_name="원자력",
         main_source_url="",
-        supplementary_query="원자력 OR SMR OR 원전",
-        include_keywords=["원전", "원자력", "SMR", "수주", "수출"],
-        exclude_keywords=_EXCLUDE_KEYWORDS,
-        tier1_whitelist=_TIER1_WHITELIST,
-        tier2_whitelist=_TIER2_WHITELIST,
+        supplementary_query="원전 OR SMR OR 원자력",
+        include_keywords=[
+            "SMR", "원전 수주", "원전 수출", "AP1000", "우라늄", "한수원", "웨스팅하우스",
+            "FRMI", "CCJ", "CEG", "OKLO", "두산에너빌리티", "한전기술",
+        ],
+        exclude_keywords=["탈원전 찬반", "사설"],
+        # 원자력 전문지(에너지신문/전기신문/World Nuclear News)는 실제 네이버뉴스
+        # 검색 결과에 거의 노출되지 않아, 실제로 등장하는 주요 경제지를 추가했다.
+        tier1_whitelist=[
+            "에너지신문", "전기신문", "World Nuclear News",
+            "연합뉴스", "매일경제", "헤럴드경제", "서울경제", "뉴시스",
+        ],
+        tier2_whitelist=["조선비즈", "Reuters", "뉴스1", "파이낸셜뉴스", "머니투데이", "이데일리"],
         max_articles=7,
     ),
     dict(
         category_name="도시정비",
         main_source_url="",
-        supplementary_query="도시정비 OR 재건축 OR 재개발",
-        include_keywords=["재개발", "재건축", "정비사업", "시공사", "입찰", "조합"],
-        exclude_keywords=_EXCLUDE_KEYWORDS,
-        tier1_whitelist=_TIER1_WHITELIST,
-        tier2_whitelist=_TIER2_WHITELIST,
+        supplementary_query="재개발 OR 재건축 OR 정비사업",
+        include_keywords=["공공재개발", "재건축", "통합심의", "시공사 선정", "정비구역"],
+        exclude_keywords=["시세 홍보"],
+        # 대한경제/건설경제 단독으로는 결과가 거의 없어, 실제로 등장하는 매체를 추가했다.
+        tier1_whitelist=["대한경제", "건설경제", "뉴시스", "연합뉴스", "한국경제", "머니투데이"],
+        tier2_whitelist=["이데일리", "뉴스1", "아시아경제", "브릿지경제"],
         max_articles=7,
     ),
     dict(
         category_name="자본시장",
         main_source_url="",
-        supplementary_query="건설사 회사채 OR 건설업 자본시장",
-        include_keywords=["회사채", "신용등급", "유상증자", "목표주가", "투자의견", "실적"],
-        exclude_keywords=_EXCLUDE_KEYWORDS,
-        tier1_whitelist=_TIER1_WHITELIST,
-        tier2_whitelist=_TIER2_WHITELIST,
+        supplementary_query="현대건설 AND (목표주가 OR 회사채 OR 신용등급)",
+        # "목표주가"는 기사 제목에 "목표가"로 줄여 쓰이는 경우가 대부분이라 별도로 추가했다.
+        include_keywords=["목표주가", "목표가", "투자의견", "회사채", "CB", "신용등급", "배당"],
+        exclude_keywords=["개인 SNS"],
+        # 한국경제/매일경제/이데일리/뉴스핌 단독으로는 결과가 거의 없어, 실제로 등장하는
+        # 매체를 추가했다.
+        tier1_whitelist=["한국경제", "매일경제", "조선비즈", "이투데이"],
+        tier2_whitelist=["이데일리", "뉴스핌", "뉴스1", "에너지경제", "연합인포맥스"],
         max_articles=7,
     ),
 ]

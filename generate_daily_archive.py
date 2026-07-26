@@ -27,7 +27,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from market_indicators import fetch_construction_cost_index, fetch_market_indicators
-from stock_news_crawler import CATEGORY_CONFIGS, crawl_category
+from stock_news_crawler import CATEGORY_CONFIGS, crawl_category, dedup_cross_source, sort_articles
 
 KST = ZoneInfo("Asia/Seoul")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +35,13 @@ ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
 INDEX_PATH = os.path.join(ARCHIVE_DIR, "index.json")
 CIDX2_CACHE_PATH = os.path.join(ARCHIVE_DIR, "cidx2_cache.json")
 RETENTION_DAYS = 30
+
+# 카테고리1(현대건설)의 최종 화면 노출 건수. crawl_category()의 max_articles(15)는
+# subject 재분류 후에도 후보가 충분히 남도록 넉넉히 잡은 수집 단계 값이고,
+# 이 값은 재분류 이후 실제로 화면에 보여줄 건수다.
+HDEC_DISPLAY_MAX = 7
+
+CATEGORY_CONFIGS_BY_NAME = {c["category_name"]: c for c in CATEGORY_CONFIGS}
 
 
 def _ensure_archive_dir():
@@ -70,11 +77,35 @@ def get_cidx2_monthly(now: datetime) -> list:
 
 
 def crawl_all_categories() -> dict:
+    """5개 카테고리를 크롤링한다.
+
+    카테고리1(현대건설)은 crawl_category()가 반환한 기사 중 subject=="자사"인
+    것만 남기고, 나머지(정책/시장전반/경쟁사 — 현대건설이 언급됐지만 주어가
+    아닌 기사)는 카테고리2(건설업)로 이관해 병합한다. 즉 카테고리1의 최종
+    결과는 "현대건설이 무엇을 했다"가 주어인 기사만 남는다.
+    """
     news = {}
-    for config in CATEGORY_CONFIGS:
-        name = config["category_name"]
+
+    print("[뉴스] 현대건설 크롤링 중...")
+    hdec_articles = crawl_category(**CATEGORY_CONFIGS_BY_NAME["현대건설"])
+    hdec_own = [a for a in hdec_articles if a.get("subject") == "자사"]
+    hdec_migrate = [a for a in hdec_articles if a.get("subject") != "자사"]
+    news["현대건설"] = sort_articles(hdec_own)[:HDEC_DISPLAY_MAX]
+
+    print("[뉴스] 건설업 크롤링 중...")
+    gs_config = CATEGORY_CONFIGS_BY_NAME["건설업"]
+    gs_articles = crawl_category(**gs_config)
+    if hdec_migrate:
+        print(f"[뉴스] 현대건설에서 건설업으로 이관: {len(hdec_migrate)}건 (중복 제외 전)")
+        # 건설업 자체 크롤링 결과와 제목이 유사한 이관 기사는 중복이므로 제외
+        deduped_migrate = dedup_cross_source(gs_articles, hdec_migrate, threshold=0.7)
+        gs_articles = sort_articles(gs_articles + deduped_migrate)
+    news["건설업"] = gs_articles[: gs_config["max_articles"]]
+
+    for name in ["원자력", "도시정비", "자본시장"]:
         print(f"[뉴스] {name} 크롤링 중...")
-        news[name] = crawl_category(**config)
+        news[name] = crawl_category(**CATEGORY_CONFIGS_BY_NAME[name])
+
     return news
 
 
