@@ -19,6 +19,10 @@ generate_daily_archive.py에서 이번 달 값이 이미 있으면 재사용한�
       (data.krx.co.kr 회원 로그인 필요 — 환경변수 KRX_ID/KRX_PW)
       주의: 1019는 존재하지 않는 코드로, 네이버금융에서 조용히 코스피 지수로
       폴백되는 것이 확인됨. 반드시 1018을 사용할 것.
+    - 국내 동종사(건설사 5곳) + 국내 원자력 관련주(2곳) → pykrx
+      (data.krx.co.kr 회원 로그인 필요 — 환경변수 KRX_ID/KRX_PW)
+    - 해외 원자력 관련주(FRMI/CCJ/CEG/OKLO) → Yahoo Finance 차트 JSON API 직접 호출
+      (USD 가격 그대로 반환)
 
 월간 지표 소스:
     - cidx2(건설공사비지수) → KOSIS Open API (orgId=397, tblId=DT_39701_A003)
@@ -112,6 +116,11 @@ _YAHOO_TICKERS = {
     "nlr": ("NLR", 2),
     "ura": ("URA", 2),
     "wti": ("CL=F", 2),
+    # 해외 원자력 관련주 (USD 가격 그대로)
+    "frmi": ("FRMI", 2),
+    "ccj": ("CCJ", 2),
+    "ceg": ("CEG", 2),
+    "oklo": ("OKLO", 2),
 }
 
 
@@ -149,19 +158,58 @@ def _fetch_cidx1() -> list:
 
 
 # ---------------------------------------------------------------------------
+# 국내 동종사 + 국내 원자력 관련주 (pykrx, 개별 종목)
+# ---------------------------------------------------------------------------
+
+# key -> (종목코드, 소수점 자리수) — 종가는 원(KRW) 단위라 정수로 표기
+_PYKRX_STOCK_TICKERS = {
+    # 건설사 동종사
+    "daewoo_enc": ("047040", 0),    # 대우건설
+    "gs_enc": ("006360", 0),        # GS건설
+    "dl_enc": ("375500", 0),        # DL이앤씨
+    "samsung_ena": ("028050", 0),   # 삼성E&A
+    "hdc_idc": ("294870", 0),       # HDC현대산업개발
+    # 국내 원자력 관련주
+    "doosan_enerbility": ("034020", 0),  # 두산에너빌리티
+    "kepco_eng": ("052690", 0),          # 한전기술
+}
+
+
+def _fetch_pykrx_stock_field(key: str) -> list:
+    from pykrx import stock
+
+    code, decimals = _PYKRX_STOCK_TICKERS[key]
+    end = datetime.datetime.now().strftime("%Y%m%d")
+    start = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y%m%d")
+    df = stock.get_market_ohlcv(start, end, code)
+    if df is None or df.empty:
+        raise RuntimeError(f"{key}({code}): pykrx에서 데이터를 받지 못했습니다 (KRX_ID/KRX_PW 확인 필요)")
+
+    latest = df.iloc[-1]
+    close = float(latest["종가"])
+    # get_market_ohlcv는 등락률(%) 컬럼을 직접 제공하므로 전일 종가로 재계산하지 않는다.
+    change_ratio = float(latest["등락률"]) / 100
+    return [_fmt_number(close, decimals), _fmt_pct(change_ratio), _direction(change_ratio)]
+
+
+# ---------------------------------------------------------------------------
 # 일간 지표 통합
 # ---------------------------------------------------------------------------
 
 def fetch_market_indicators() -> dict:
-    """일간 시황 지표 13개를 수집해 {key: [값, 등락률, 방향]} 형태로 반환한다.
+    """일간 시황 지표를 수집해 {key: [값, 등락률, 방향]} 형태로 반환한다.
 
-    kospi, kosdaq, nasdaq, dow, sp500, hdec, cidx1, smr, tiger_nuke, nlr, ura, fx, wti
+    kospi, kosdaq, nasdaq, dow, sp500, hdec, cidx1, smr, tiger_nuke, nlr, ura, fx, wti,
+    daewoo_enc, gs_enc, dl_enc, samsung_ena, hdc_idc, doosan_enerbility, kepco_eng,
+    frmi, ccj, ceg, oklo
     """
     result = {}
     for key in _FDR_TICKERS:
         result[key] = _fetch_fdr_field(key)
     for key in _YAHOO_TICKERS:
         result[key] = _fetch_yahoo_field(key)
+    for key in _PYKRX_STOCK_TICKERS:
+        result[key] = _fetch_pykrx_stock_field(key)
     result["fx"] = _fetch_fx()
     result["cidx1"] = _fetch_cidx1()
     return result
