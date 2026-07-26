@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>현대건설 시장동향</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF2FA;
+    --surface:#FFFFFF;
+    --ink:#0F1626;
+    --ink-soft:#5B6B8C;
+    --ink-faint:#9AA8C4;
+    --line:#DCE3F2;
+    --navy-deep:#0B1834;
+    --navy-mid:#16305C;
+    --accent:#2F6FED;
+    --accent-bright:#6FA3FF;
+    --accent-soft:#E7EFFE;
+    --rise:#E5484D;
+    --fall:#2F6FED;
+    --flat:#9AA8C4;
+    --verify:#B7791F;
+    --verify-soft:#FEF6E7;
+    --mono:'IBM Plex Mono', monospace;
+    --num:'Inter', -apple-system, sans-serif;
+    --sans:'Pretendard', -apple-system, sans-serif;
+    --shadow-card: 0 2px 10px rgba(15,22,38,0.05);
+    --shadow-card-hover: 0 6px 18px rgba(15,22,38,0.08);
+    --shadow-pop: 0 14px 34px rgba(15,22,38,0.18);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    font-family:var(--sans);
+    color:var(--ink);
+    padding: 24px 16px 64px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{ max-width: 980px; margin: 0 auto; }
+
+  /* ================= 히어로 (2분할) ================= */
+  .hero-split{
+    display:grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap:2px;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* ---- 좌측 다크 패널 ---- */
+  .hero-dark{
+    background: radial-gradient(circle at 85% 0%, rgba(111,163,255,0.16), transparent 55%), var(--navy-deep);
+    color:#fff;
+    padding: 34px 34px 26px;
+    position:relative;
+  }
+  .hero-eyebrow{
+    display:flex; align-items:center; gap:9px;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.12em;
+    color:#8FA6D6; text-transform:uppercase;
+  }
+  .hero-eyebrow .dash{ width:18px; height:2px; background:var(--accent-bright); display:inline-block; }
+
+  .hero-title{
+    font-size:38px; font-weight:800; letter-spacing:-0.02em; line-height:1.14;
+    margin-top:18px;
+  }
+  .hero-title .line2{ color:var(--accent-bright); }
+
+  .hero-desc{ font-size:13px; color:#A9B7DC; margin-top:12px; line-height:1.6; max-width:360px; }
+
+  .hero-divider{ border:none; border-top:1px solid rgba(255,255,255,0.14); margin:22px 0 16px; }
+
+  .hero-meta-row{
+    display:flex; gap:22px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:12px; color:#C7D2EE;
+  }
+  .hero-meta-row b{ color:#fff; font-weight:600; }
+
+  /* 날짜 드롭다운 버튼 (우상단) */
+  .date-selector{ position:absolute; top:26px; right:30px; z-index:30; }
+  .date-btn{
+    display:flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.22);
+    color:#EDEFF5; font-family:var(--mono); font-size:11px;
+    padding:7px 11px; border-radius:9px; cursor:pointer;
+    transition: background .15s;
+  }
+  .date-btn:hover{ background:rgba(255,255,255,0.15); }
+  .date-btn .chevron{ font-size:9px; color:#9AB0DD; transition:transform .18s; }
+  .date-selector.open .date-btn .chevron{ transform:rotate(180deg); }
+  .date-selector.open .date-btn{ background:rgba(255,255,255,0.16); }
+  .date-dropdown{
+    position:absolute; top:calc(100% + 10px); right:0;
+    background:var(--surface); border-radius:16px; box-shadow: var(--shadow-pop);
+    width:320px; max-height:380px; overflow-y:auto; padding:8px; display:none;
+  }
+  .date-selector.open .date-dropdown{ display:block; }
+  .dd-label{ font-size:10.5px; font-weight:700; color:var(--ink-faint); padding:8px 10px 4px; }
+  .date-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; }
+  .date-row:hover{ background:var(--paper); }
+  .date-row.active{ background:var(--accent-soft); }
+  .date-row-date{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--ink); }
+  .date-row-date .dow{ color:var(--ink-soft); font-weight:500; margin-left:3px; }
+  .date-row-summary{ font-size:11px; color:var(--ink-soft); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px; }
+  .date-row-stat{ font-family:var(--mono); font-size:9.5px; padding:3px 7px; border-radius:999px; background:var(--paper); color:var(--ink-soft); white-space:nowrap; flex-shrink:0; }
+  .date-row-stat.has-high{ background:var(--accent-soft); color:var(--accent); }
+
+  /* ---- 우측 라이트 스탯 패널 ---- */
+  .hero-light{
+    background: linear-gradient(160deg, #F5F8FF, #EDF2FC);
+    padding: 30px 30px 24px;
+    display:flex; flex-direction:column;
+  }
+  .stat-eyebrow{ font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; }
+  .stat-big{ display:flex; align-items:baseline; gap:8px; margin-top:14px; }
+  .stat-big .num{ font-family:var(--num); font-size:44px; font-weight:800; letter-spacing:-0.02em; color:var(--ink); font-variant-numeric: tabular-nums; }
+  .stat-big .unit{ font-size:14px; font-weight:700; color:var(--accent); }
+  .stat-chg{ display:flex; align-items:center; gap:6px; margin-top:8px; font-family:var(--num); font-size:13px; font-weight:700; }
+  .stat-chg.rise{ color:var(--rise); } .stat-chg.fall{ color:var(--fall); } .stat-chg.flat{ color:var(--flat); }
+  .stat-chg .sub{ font-weight:500; color:var(--ink-faint); font-size:11px; }
+
+  .stat-divider{ border:none; border-top:1px solid var(--line); margin:20px 0 14px; }
+
+  .stat-secondary-row{ display:flex; gap:0; }
+  .stat-secondary-item{ flex:1; padding-right:14px; border-right:1px solid var(--line); }
+  .stat-secondary-item:last-child{ border-right:none; padding-right:0; padding-left:14px; }
+  .stat-secondary-item .v{ font-family:var(--num); font-size:15px; font-weight:700; color:var(--ink); font-variant-numeric: tabular-nums; }
+  .stat-secondary-item .l{ font-size:10.5px; color:var(--ink-soft); margin-top:3px; }
+
+  .stat-footer{ margin-top:auto; padding-top:18px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); }
+
+  /* ================= 지표 그룹 (컴팩트) ================= */
+  .indicators{ margin-top:16px; }
+  .ind-group{ margin-bottom:12px; }
+  .ind-group:last-child{ margin-bottom:0; }
+  .ind-group-label{ font-size:11px; font-weight:700; color:var(--ink-soft); margin:0 4px 8px; letter-spacing:0.01em; }
+  .ind-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(122px, 1fr)); gap:8px; }
+
+  .indicator-card{
+    background:var(--surface);
+    border-radius:12px;
+    padding:11px 13px;
+    box-shadow: var(--shadow-card);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .indicator-card:hover{ transform: translateY(-1px); box-shadow: var(--shadow-card-hover); }
+  .ind-label{ font-size:10.5px; color:var(--ink-soft); font-weight:600; }
+  .ind-value{ font-family:var(--num); font-size:15px; font-weight:700; color:var(--ink); margin-top:6px; font-variant-numeric: tabular-nums; letter-spacing:-0.01em; }
+  .ind-chg{ display:inline-flex; align-items:center; gap:3px; font-family:var(--num); font-size:10.5px; font-weight:700; margin-top:5px; }
+  .ind-chg.rise{ color:var(--rise); }
+  .ind-chg.fall{ color:var(--fall); }
+  .ind-chg.flat{ color:var(--flat); }
+
+  /* ================= 섹션 인트로 + 세그먼트 탭 ================= */
+  .section-intro{ margin-top:34px; display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .section-eyebrow{ display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; }
+  .section-eyebrow .dash{ width:16px; height:2px; background:var(--accent); display:inline-block; }
+  .section-title{ font-size:20px; font-weight:800; letter-spacing:-0.01em; margin-top:8px; }
+
+  .tab-group{ display:inline-flex; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px; gap:2px; box-shadow: var(--shadow-card); max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .tab-pill{ padding:8px 15px; border-radius:999px; font-size:12.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; white-space:nowrap; transition: background .15s, color .15s; }
+  .tab-pill .n{ font-family:var(--mono); font-size:10px; margin-right:5px; opacity:0.7; }
+  .tab-pill.active{ background:var(--navy-deep); color:#fff; }
+  .tab-pill:not(.active):hover{ color:var(--ink); }
+
+  /* ================= 카테고리 아코디언 ================= */
+  .categories{ margin-top:16px; display:flex; flex-direction:column; gap:10px; }
+  details.category{ background:var(--surface); border-radius:16px; overflow:hidden; box-shadow: var(--shadow-card); }
+  details.category > summary{ list-style:none; cursor:pointer; padding:16px 18px; display:grid; grid-template-columns: auto auto 1fr auto auto; align-items:center; gap:12px; }
+  details.category > summary::-webkit-details-marker{ display:none; }
+  details.category[open]{ box-shadow: var(--shadow-card-hover); }
+  details.category[open] > summary{ border-bottom:1px solid var(--line); }
+  .cat-num{ font-family:var(--mono); font-size:11.5px; color:var(--accent); font-weight:700; }
+  .cat-name{ font-size:14.5px; font-weight:700; white-space:nowrap; }
+  .cat-top-headline{ font-size:13.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+  .cat-top-headline .flag-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:7px; background:var(--flat); position:relative; top:-1px; }
+  .cat-top-headline .flag-dot.high{ background:var(--accent); }
+  .cat-count{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); background:var(--paper); padding:4px 9px; border-radius:999px; white-space:nowrap; }
+  .cat-chevron{ font-size:13px; color:var(--ink-faint); transition:transform .18s; }
+  details.category[open] .cat-chevron{ transform:rotate(90deg); color:var(--accent); }
+
+  .article-list{ padding: 6px 18px 14px; }
+  .article{ display:grid; grid-template-columns: 64px 1fr auto; gap:16px; padding:13px 0; border-top:1px solid var(--line); align-items:center; }
+  .article:first-child{ border-top:none; }
+  .flag{ font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:0.02em; padding:4px 7px; border-radius:6px; text-align:center; height:fit-content; white-space:nowrap; }
+  .flag.high{ background:var(--accent-soft); color:var(--accent); }
+  .flag.normal{ background:var(--paper); color:var(--ink-soft); }
+  .art-body a{ color:var(--ink); text-decoration:none; font-size:13.5px; font-weight:600; line-height:1.45; }
+  .art-body a:hover{ color:var(--accent); }
+  .tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+  .tag{ font-size:10px; font-family:var(--mono); padding:3px 7px; border-radius:999px; background:var(--paper); color:var(--ink-soft); }
+  .tag.entity{ color:var(--accent); background:var(--accent-soft); }
+  .tag.verify{ color:var(--verify); background:var(--verify-soft); }
+
+  .meta-right{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; font-family:var(--mono); min-width:96px; }
+  .meta-time{ font-family:var(--num); font-size:11px; font-weight:600; color:var(--ink); font-variant-numeric: tabular-nums; }
+  .meta-press{ font-size:10.5px; color:var(--ink-soft); }
+  .meta-right .tier{ font-size:9px; padding:2px 7px; border-radius:999px; background:var(--paper); color:var(--ink-soft); }
+  .meta-right .tier.t1{ background:#E3F6E9; color:#1A8A4C; }
+  .meta-right .tier.t2{ background:var(--verify-soft); color:var(--verify); }
+
+  .foot{ display:flex; justify-content:space-between; align-items:center; padding:26px 6px 0; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); }
+
+  @media (max-width:760px){
+    body{ padding: 16px 12px 48px; }
+    .hero-split{ grid-template-columns: 1fr; border-radius:18px; }
+    .hero-dark{ padding:22px 20px 20px; }
+    .hero-title{ font-size:26px; }
+    .hero-eyebrow{ font-size:10px; }
+    .hero-desc{ max-width:none; font-size:12.5px; }
+    .hero-meta-row{ font-size:11px; gap:14px; }
+    .date-selector{ position:static; margin-top:14px; width:100%; }
+    .date-btn{ width:100%; justify-content:space-between; }
+    .date-dropdown{ position:fixed; left:12px; right:12px; top:auto; width:auto; max-width:none; margin-top:6px; }
+    .hero-light{ padding:22px 20px; }
+    .stat-big .num{ font-size:34px; }
+    .stat-secondary-row{ flex-wrap:wrap; gap:14px; }
+    .stat-secondary-item{ border-right:none; padding-right:0; flex:1 1 45%; }
+    .stat-secondary-item:last-child{ padding-left:0; }
+    .indicators{ margin-top:14px; }
+    .ind-grid{ grid-template-columns: repeat(2, 1fr); gap:8px; }
+    .ind-label{ font-size:10px; line-height:1.35; }
+    .section-intro{ margin-top:26px; align-items:flex-start; }
+    .section-title{ font-size:17px; }
+    .tab-group{ width:100%; }
+    .tab-pill{ padding:8px 13px; font-size:12px; }
+  }
+  @media (max-width:640px){
+    details.category > summary{ grid-template-columns: auto 1fr auto; grid-template-areas: "num name chev" "head head head" "count count count"; row-gap:6px; padding:14px 16px; }
+    .cat-num{ grid-area:num; } .cat-name{ grid-area:name; } .cat-chevron{ grid-area:chev; }
+    .cat-top-headline{ grid-area:head; white-space:normal; }
+    .cat-count{ grid-area:count; justify-self:start; }
+    .article{ grid-template-columns: 52px 1fr; }
+    .meta-right{ grid-column:1/-1; flex-direction:row; align-items:center; gap:8px; }
+  }
+  @media (max-width:400px){
+    .hero-title{ font-size:23px; }
+    .stat-big .num{ font-size:29px; }
+    .ind-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- 히어로: 2분할 -->
+  <div class="hero-split">
+    <div class="hero-dark">
+      <div class="hero-eyebrow"><span class="dash"></span>HDEC · IR DAILY NOTE</div>
+      <div class="hero-title">현대건설<br><span class="line2">시장동향</span></div>
+      <div class="hero-desc">하루에 두 번 주요 뉴스를 정리합니다.</div>
+      <hr class="hero-divider">
+      <div class="hero-meta-row">
+        <span><b id="meta-date">2026.07.26 · SAT</b></span>
+        <span>07:30 발행 · <b>IR팀</b></span>
+      </div>
+
+      <div class="date-selector" id="date-selector">
+        <button class="date-btn" id="date-btn">
+          <span id="date-btn-text">최신</span>
+          <span class="chevron">▾</span>
+        </button>
+        <div class="date-dropdown" id="date-dropdown">
+          <div class="dd-label">지난 7일 돌아보기</div>
+          <div id="date-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-light">
+      <div class="stat-eyebrow">현대건설</div>
+      <div class="stat-big"><span class="num" id="hdec-value">106,200</span><span class="unit">KRW</span></div>
+      <div class="stat-chg" id="hdec-chg"></div>
+      <hr class="stat-divider">
+      <div class="stat-secondary-row" id="hero-secondary"></div>
+      <div class="stat-footer" id="hero-footer">기준 · 07:30 KST 종가</div>
+    </div>
+  </div>
+
+  <!-- 지표 그룹 -->
+  <div class="indicators" id="indicator-root"></div>
+  <div class="stat-footer" id="cidx2-caption"></div>
+
+  <!-- 섹션 인트로 + 탭 -->
+  <div class="section-intro">
+    <div>
+      <div class="section-eyebrow"><span class="dash"></span>BRIEFING</div>
+      <div class="section-title">오늘의 이슈를 정리했습니다.</div>
+    </div>
+    <div class="tab-group" id="cat-tabs"></div>
+  </div>
+
+  <!-- 카테고리별 뉴스 -->
+  <div class="categories" id="category-root"></div>
+
+  <div class="foot">
+    <span>HYUNDAI E&amp;C · INVESTOR RELATIONS</span>
+    <span>투자판단의 근거로 사용될 수 없습니다</span>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   archive/{날짜}.json 을 fetch해서 렌더링한다.
+   ============================================================ */
+
+const indicatorGroups = [
+  {label:"해외증시", fields:["kosdaq","nasdaq","dow","sp500"]},
+  {label:"지수", fields:["smr","tiger_nuke","nlr","ura"]},
+  {label:"시장지표", fields:["fx","wti"]}
+];
+
+const fieldMeta = {
+  kospi:{label:"코스피"}, kosdaq:{label:"코스닥"}, nasdaq:{label:"나스닥"}, dow:{label:"다우존스"}, sp500:{label:"S&P500"},
+  hdec:{label:"현대건설"}, cidx1:{label:"건설지수"},
+  smr:{label:"SOL 한국원자력SMR지수"}, tiger_nuke:{label:"TIGER 코리아원자력"}, nlr:{label:"NLR"}, ura:{label:"URA"},
+  fx:{label:"원/달러 환율"}, wti:{label:"WTI 원유"}, cidx2:{label:"건설업지수(건설공사비지수)"}
+};
+
+const categories = [
+  {num:"01", name:"현대건설"},
+  {num:"02", name:"건설업"},
+  {num:"03", name:"원자력"},
+  {num:"04", name:"도시정비"},
+  {num:"05", name:"자본시장"}
+];
+
+const DOW_KO = ["일","월","화","수","목","금","토"];
+const DOW_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+
+// archive/index.json 로드 후 채워짐 (최신순 날짜 문자열 "YYYY-MM-DD" 배열)
+let dateKeys = [];
+let LATEST = null;
+let currentDate = null;
+
+// dateKey -> 각 데이터. loadDay()가 채운다.
+const tickerByDate = {};
+const newsByDate = {};
+const cidx2ByDate = {};
+// dateKey -> {total, high, top_titles}. archive/index.json에서 채운다.
+const summaryByDate = {};
+
+/* ---------- 데이터 로딩 ---------- */
+
+// 크롤러 출력(importance:"High"/"Normal", verify_needed)을
+// 기존 렌더 함수가 기대하는 모양(importance 소문자, verify)으로 변환한다.
+function normalizeArticle(a){
+  return {
+    ...a,
+    importance: (a.importance || "Normal").toLowerCase(),
+    time: formatDisplayTime(a.time),
+    verify: !!a.verify_needed,
+  };
+}
+
+// 메인소스 시각("2026.07.24 16:49")은 "HH:MM"만 표시하고,
+// 보조소스의 상대시각("3시간 전")은 그대로 둔다.
+function formatDisplayTime(time){
+  const m = /^\d{4}\.\d{2}\.\d{2}\s+(\d{2}:\d{2})$/.exec(time || "");
+  return m ? m[1] : (time || "");
+}
+
+async function loadIndex(){
+  const res = await fetch("archive/index.json");
+  const index = await res.json(); // 최신순 정렬되어 있음 (generate_daily_archive.py)
+  dateKeys = index.map(e => e.date).slice(0, 7); // "지난 7일 돌아보기"
+  LATEST = dateKeys[0];
+  index.forEach(e => { summaryByDate[e.date] = e; });
+}
+
+async function loadDay(dateKey){
+  if(tickerByDate[dateKey]) return; // 이미 로드됨
+  const res = await fetch(`archive/${dateKey}.json`);
+  const day = await res.json();
+
+  tickerByDate[dateKey] = day.indicators;
+  cidx2ByDate[dateKey] = day.cidx2_monthly;
+
+  const news = {};
+  for(const cat of categories){
+    news[cat.name] = (day.news[cat.name] || []).map(normalizeArticle);
+  }
+  newsByDate[dateKey] = news;
+}
+
+/* ---------- 히어로 대표 스탯 ---------- */
+function renderHeroStat(dateKey){
+  const data = tickerByDate[dateKey];
+  const [hVal, hChg, hDir] = data.hdec;
+  const arrow = hDir==="rise" ? "▲" : hDir==="fall" ? "▼" : "―";
+  document.getElementById("hdec-value").textContent = hVal;
+  const chgEl = document.getElementById("hdec-chg");
+  chgEl.className = `stat-chg ${hDir}`;
+  chgEl.innerHTML = `${arrow} ${hChg} <span class="sub">전일대비</span>`;
+
+  const [kVal, kChg, kDir] = data.kospi;
+  const [cVal, cChg, cDir] = data.cidx1;
+  document.getElementById("hero-secondary").innerHTML = `
+    <div class="stat-secondary-item"><div class="v">${kVal}</div><div class="l">코스피 (${kChg})</div></div>
+    <div class="stat-secondary-item"><div class="v">${cVal}</div><div class="l">건설지수 (${cChg})</div></div>
+  `;
+
+  document.getElementById("hero-footer").textContent = `기준 · 07:30 KST 종가`;
+}
+
+/* ---------- 건설공사비지수(월간) 배지 ---------- */
+// cidx2는 매일 갱신되는 다른 지표와 성격이 달라(월 1회 발표) 지표 그리드에
+// 함께 넣지 않고, 별도 자막으로 분리해서 표시한다.
+function renderCidx2Caption(dateKey){
+  const data = cidx2ByDate[dateKey];
+  const el = document.getElementById("cidx2-caption");
+  if(!data){ el.textContent = ""; return; }
+  const [year, month] = data.period.split("-");
+  el.textContent = `건설공사비지수(월간 지표, ${data.base}) ${data.value} · ${year}년 ${Number(month)}월 기준`;
+}
+
+/* ---------- 지표 그룹 ---------- */
+function renderIndicators(dateKey){
+  const data = tickerByDate[dateKey];
+  const root = document.getElementById("indicator-root");
+  root.innerHTML = indicatorGroups.map(group=>{
+    const cards = group.fields.map(key=>{
+      const [value, chg, dir] = data[key];
+      const arrow = dir==="rise" ? "▲" : dir==="fall" ? "▼" : "―";
+      return `<div class="indicator-card">
+        <div class="ind-label">${fieldMeta[key].label}</div>
+        <div class="ind-value">${value}</div>
+        <div class="ind-chg ${dir}">${arrow} ${chg}</div>
+      </div>`;
+    }).join("");
+    return `<div class="ind-group">
+      <div class="ind-group-label">${group.label}</div>
+      <div class="ind-grid">${cards}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- 카테고리 세그먼트 탭 ---------- */
+function renderTabs(){
+  const root = document.getElementById("cat-tabs");
+  root.innerHTML = categories.map((c,i)=>
+    `<div class="tab-pill ${i===0 ? "active" : ""}" data-idx="${i}"><span class="n">${c.num}</span>${c.name}</div>`
+  ).join("");
+  root.querySelectorAll(".tab-pill").forEach(tab=>{
+    tab.addEventListener("click", ()=>{
+      const idx = Number(tab.dataset.idx);
+      const detail = document.querySelectorAll("details.category")[idx];
+      if(!detail) return;
+      detail.open = true;
+      detail.scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+  });
+}
+
+function syncTabsWithAccordion(){
+  document.querySelectorAll("details.category").forEach((d, idx)=>{
+    d.addEventListener("toggle", ()=>{
+      const tab = document.querySelectorAll(".tab-pill")[idx];
+      if(tab) tab.classList.toggle("active", d.open);
+    });
+  });
+}
+
+/* ---------- 카테고리 아코디언 ---------- */
+function renderCategories(dateKey){
+  const dayData = newsByDate[dateKey] || {};
+  const root = document.getElementById("category-root");
+  root.innerHTML = categories.map(cat=>{
+    const items = dayData[cat.name] || [];
+    if(items.length === 0){
+      return `<details class="category">
+        <summary>
+          <span class="cat-num">${cat.num}</span>
+          <span class="cat-name">${cat.name}</span>
+          <span class="cat-top-headline" style="color:var(--ink-faint)">수집된 기사가 없습니다</span>
+          <span class="cat-count">0건</span>
+          <span class="cat-chevron">▸</span>
+        </summary>
+      </details>`;
+    }
+    const top = items[0];
+    const dotClass = top.importance === "high" ? "high" : "";
+    return `<details class="category" ${cat.num==="01" ? "open" : ""}>
+      <summary>
+        <span class="cat-num">${cat.num}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-top-headline"><span class="flag-dot ${dotClass}"></span>${top.title}</span>
+        <span class="cat-count">${items.length}건</span>
+        <span class="cat-chevron">▸</span>
+      </summary>
+      <div class="article-list">${items.map(renderArticle).join("")}</div>
+    </details>`;
+  }).join("");
+  syncTabsWithAccordion();
+}
+
+function renderArticle(a){
+  const tags = [
+    a.scope ? `<span class="tag">${a.scope}</span>` : "",
+    a.subject ? `<span class="tag">${a.subject}</span>` : "",
+    a.entity ? `<span class="tag entity">${a.entity}</span>` : "",
+    a.verify ? `<span class="tag verify">확인필요</span>` : ""
+  ].join("");
+  return `<div class="article">
+    <span class="flag ${a.importance}">${a.importance.toUpperCase()}</span>
+    <div class="art-body">
+      <a href="${a.url}" target="_blank">${a.title}</a>
+      <div class="tags">${tags}</div>
+    </div>
+    <div class="meta-right">
+      <span class="meta-time">${a.time}</span>
+      <span class="meta-press">${a.press}</span>
+      <span class="tier ${a.tier}">${a.tier === "t1" ? "Tier 1" : "Tier 2"}</span>
+    </div>
+  </div>`;
+}
+
+/* ---------- 날짜 드롭다운 ---------- */
+// key: "YYYY-MM-DD" — 시간대 이슈를 피하기 위해 시간 없이 연/월/일만 파싱한다.
+function dateKeyToDate(key){
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function buildDateLabel(key){
+  if(key === LATEST) return "최신";
+  const date = dateKeyToDate(key);
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${mm}.${dd} (${DOW_KO[date.getDay()]})`;
+}
+function buildMetaDate(key){
+  const date = dateKeyToDate(key);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd} · ${DOW_EN[date.getDay()]}`;
+}
+
+function renderDateDropdown(){
+  const listRoot = document.getElementById("date-list");
+  listRoot.innerHTML = dateKeys.map(key=>{
+    const summary = summaryByDate[key] || {total:0, high:0, top_titles:[]};
+    const summaryText = summary.top_titles.length ? summary.top_titles.join(" · ") : "수집 데이터 없음";
+    const date = dateKeyToDate(key);
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+
+    return `<div class="date-row ${key===currentDate ? "active" : ""}" data-key="${key}">
+      <div class="date-row-left">
+        <div class="date-row-date">${mm}.${dd}<span class="dow">(${DOW_KO[date.getDay()]})${key===LATEST ? " · 최신" : ""}</span></div>
+        <div class="date-row-summary">${summaryText}</div>
+      </div>
+      <div class="date-row-stat ${summary.high > 0 ? "has-high" : ""}">총 ${summary.total}건 · HIGH ${summary.high}</div>
+    </div>`;
+  }).join("");
+
+  listRoot.querySelectorAll(".date-row").forEach(row=>{
+    row.addEventListener("click", async ()=>{
+      const key = row.dataset.key;
+      await loadDay(key);
+      currentDate = key;
+      document.getElementById("date-btn-text").textContent = buildDateLabel(currentDate);
+      document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
+      renderHeroStat(currentDate);
+      renderIndicators(currentDate);
+      renderCidx2Caption(currentDate);
+      renderCategories(currentDate);
+      renderDateDropdown();
+      document.getElementById("date-selector").classList.remove("open");
+    });
+  });
+}
+
+function initDateSelector(){
+  const selector = document.getElementById("date-selector");
+  const btn = document.getElementById("date-btn");
+  btn.addEventListener("click", (e)=>{
+    e.stopPropagation();
+    selector.classList.toggle("open");
+  });
+  document.addEventListener("click", (e)=>{
+    if(!selector.contains(e.target)) selector.classList.remove("open");
+  });
+}
+
+/* ---------- 초기화 ---------- */
+async function init(){
+  await loadIndex();
+  currentDate = LATEST;
+  await loadDay(currentDate);
+
+  document.getElementById("date-btn-text").textContent = buildDateLabel(currentDate);
+  document.getElementById("meta-date").textContent = buildMetaDate(currentDate);
+  renderHeroStat(currentDate);
+  renderIndicators(currentDate);
+  renderCidx2Caption(currentDate);
+  renderTabs();
+  renderCategories(currentDate);
+  renderDateDropdown();
+  initDateSelector();
+}
+init();
+</script>
+
+</body>
+</html>

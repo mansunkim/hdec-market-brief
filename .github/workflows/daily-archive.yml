@@ -1,0 +1,52 @@
+name: Daily Market Archive
+
+on:
+  schedule:
+    # cron은 UTC 기준. KST = UTC+9
+    - cron: "30 22 * * *"  # 07:30 KST
+    - cron: "30 6 * * *"   # 15:30 KST
+  workflow_dispatch: {}   # 수동 실행 버튼
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-archive
+  cancel-in-progress: false
+
+jobs:
+  generate-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Generate daily archive
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          KRX_ID: ${{ secrets.KRX_ID }}
+          KRX_PW: ${{ secrets.KRX_PW }}
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+        run: python generate_daily_archive.py
+
+      - name: Commit and push archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add archive/
+          if git diff --cached --quiet; then
+            echo "변경사항 없음 — 커밋 건너뜀"
+          else
+            git commit -m "chore: update daily archive ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git push
+          fi

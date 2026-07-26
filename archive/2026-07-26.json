@@ -1,0 +1,395 @@
+{
+  "date": "2026-07-26",
+  "generated_at": "2026-07-26T14:14:20.756104+09:00",
+  "indicators": {
+    "kospi": [
+      "6,690.62",
+      "-5.72%",
+      "fall"
+    ],
+    "kosdaq": [
+      "748.22",
+      "-5.32%",
+      "fall"
+    ],
+    "nasdaq": [
+      "24,975.82",
+      "-0.64%",
+      "fall"
+    ],
+    "dow": [
+      "51,947.25",
+      "+0.46%",
+      "rise"
+    ],
+    "sp500": [
+      "7,411.98",
+      "+0.05%",
+      "rise"
+    ],
+    "hdec": [
+      "106,200",
+      "-2.48%",
+      "fall"
+    ],
+    "smr": [
+      "13,775",
+      "-2.65%",
+      "fall"
+    ],
+    "tiger_nuke": [
+      "14,850",
+      "-2.78%",
+      "fall"
+    ],
+    "nlr": [
+      "108.10",
+      "-2.97%",
+      "fall"
+    ],
+    "ura": [
+      "39.89",
+      "-3.01%",
+      "fall"
+    ],
+    "fx": [
+      "1,462.1",
+      "-11.9",
+      "fall"
+    ],
+    "wti": [
+      "89.31",
+      "-3.12%",
+      "fall"
+    ],
+    "cidx1": [
+      "151.95",
+      "-3.46%",
+      "fall"
+    ]
+  },
+  "cidx2_monthly": {
+    "value": "137.67",
+    "base": "2020=100",
+    "period": "2026-05"
+  },
+  "news": {
+    "현대건설": [
+      {
+        "title": "지역별 최고가 단지 보니…10곳 중 4곳은 ‘도시정비 수주 TOP5’ 외 2개 언론사 보도",
+        "press": "한국경제",
+        "time": "2026.07.24 16:49",
+        "url": "https://n.news.naver.com/mnews/article/015/0005313541",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "도시정비 수주 TOP5",
+        "importance": "High",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      },
+      {
+        "title": "지역 대장 단지 10곳 중 4곳, 도시정비 수주 '빅5'가 지었다",
+        "press": "이데일리",
+        "time": "2026.07.24 11:09",
+        "url": "https://n.news.naver.com/mnews/article/018/0006336107",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "도시정비 수주 빅5",
+        "importance": "High",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      },
+      {
+        "title": "지역 최고가 아파트 45%, 정비사업 수주 '빅5' 시공",
+        "press": "뉴시스",
+        "time": "2026.07.24 10:40",
+        "url": "https://n.news.naver.com/mnews/article/003/0014085861",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "정비사업 수주 빅5",
+        "importance": "High",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      },
+      {
+        "title": "하자소송 책임 나누고 유보금 없앤다…중견 건설사 30곳 상생협약",
+        "press": "뉴스1",
+        "time": "2026.07.24 10:30",
+        "url": "https://n.news.naver.com/mnews/article/421/0009076727",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      },
+      {
+        "title": "건설사 2Q 실적, 원가율에 희비",
+        "press": "머니투데이",
+        "time": "2026.07.24 04:02",
+        "url": "https://n.news.naver.com/mnews/article/008/0005390248",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": null,
+        "importance": "Normal",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      },
+      {
+        "title": "대우·현산 웃고 현대·GS·DL 울고…원가율이 가른 건설사 2분기 실적",
+        "press": "머니투데이",
+        "time": "2026.07.23 16:45",
+        "url": "https://n.news.naver.com/mnews/article/008/0005390096",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "대우건설, HDC현대산업개발, 현대건설, GS건설, DL이앤씨",
+        "importance": "Normal",
+        "source": "main",
+        "verify_needed": false,
+        "tier": "t1"
+      }
+    ],
+    "건설업": [
+      {
+        "title": "호반건설, 경기 군포 금정3구역 재개발 수주…수도권 정비사업 확대",
+        "press": "한국경제",
+        "time": "4시간 전",
+        "url": "https://www.hankyung.com/article/202607266096i",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "호반건설",
+        "importance": "High",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "호반건설, 군포 금정3구역 재개발 수주…656가구 브랜드 단지 조성",
+        "press": "매일경제",
+        "time": "3시간 전",
+        "url": "https://www.mk.co.kr/article/12107534",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "호반건설",
+        "importance": "High",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      }
+    ],
+    "원자력": [
+      {
+        "title": "현대엔지니어링, 원자력·SMR 전문가 초청 세미나 개최",
+        "press": "파이낸셜뉴스",
+        "time": "2일 전",
+        "url": "http://www.fnnews.com/news/202607241101415410",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대엔지니어링",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "[속보] 美 “미국-사우디, 평화적 원자력 협력 협정 체결” 외 1개 언론사 보도",
+        "press": "매일경제",
+        "time": "3일 전",
+        "url": "https://www.mk.co.kr/article/12105027",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "미국-사우디",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "현대ENG, SMR 원천기술 확보 나선다…“고부가 사업자 도약”",
+        "press": "서울경제",
+        "time": "2일 전",
+        "url": "https://www.sedaily.com/article/20071473?ref=naver",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대ENG",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "[단독] SMR 상용화 시점 앞당긴다…개발·규제 아우르는 TF 가동",
+        "press": "매일경제",
+        "time": "3일 전",
+        "url": "https://www.mk.co.kr/article/12105584",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "SMR TF",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "트럼프, 원전협정 지렛대로 사우디·이스라엘 수교 압박",
+        "press": "파이낸셜뉴스",
+        "time": "2일 전",
+        "url": "http://www.fnnews.com/news/202607240417286803",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "사우디·이스라엘",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "울주군, 대학생 2290명에 장학금…원전지원금 17억",
+        "press": "서울경제",
+        "time": "2일 전",
+        "url": "https://www.sedaily.com/article/20071421?ref=naver",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "울주군",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "트럼프 \"사우디 원전협정, 이스라엘 수교가 전제\"…협정 이행에 제동",
+        "press": "이데일리",
+        "time": "3일 전",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=06750246645517472",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "사우디·이스라엘",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      }
+    ],
+    "도시정비": [
+      {
+        "title": "호반건설, 경기 군포 금정3구역 재개발 수주…수도권 정비사업 확대",
+        "press": "한국경제",
+        "time": "4시간 전",
+        "url": "https://www.hankyung.com/article/202607266096i",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "호반건설",
+        "importance": "High",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "호반건설, 군포 금정3구역 재개발 수주…656가구 브랜드 단지 조성",
+        "press": "매일경제",
+        "time": "3시간 전",
+        "url": "https://www.mk.co.kr/article/12107534",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "호반건설",
+        "importance": "High",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "법원 “재건축 1세대 판단, 주민등록 아닌 실제 생활관계 기준”",
+        "press": "매일경제",
+        "time": "57분 전",
+        "url": "https://www.mk.co.kr/article/12107569",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "은평구 최대 재개발 '갈현1구역' 정비계획변경 고시",
+        "press": "뉴스핌",
+        "time": "2일 전",
+        "url": "https://www.newspim.com/news/view/20260724001113",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "갈현1구역",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "은평구 '갈현1구역' 재개발 정비계획변경 고시, 4467가구로",
+        "press": "한국경제",
+        "time": "2일 전",
+        "url": "https://www.hankyung.com/article/202607243956i",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "갈현1구역",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "[포토] ‘갈현제1구역 주택재개발 정비사업’ 고시",
+        "press": "이데일리",
+        "time": "2일 전",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=03752326645517800",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "갈현제1구역",
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      },
+      {
+        "title": "정비사업의 주택 공급효과 확인됐지만…발목 잡는건 여전히 ‘속도’[집...",
+        "press": "서울경제",
+        "time": "1일 전",
+        "url": "https://www.sedaily.com/article/20071719?ref=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": null,
+        "importance": "Normal",
+        "source": "supplementary",
+        "verify_needed": false,
+        "tier": "t2"
+      }
+    ],
+    "자본시장": []
+  }
+}
