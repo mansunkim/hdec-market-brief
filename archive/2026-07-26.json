@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T15:22:11.835977+09:00",
+  "generated_at": "2026-07-26T15:39:40.630476+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -66,12 +66,12 @@
       "151.95",
       "-3.46%",
       "fall"
+    ],
+    "cidx2": [
+      "137.67<span style=\"font-size:9.5px;font-weight:500;color:var(--ink-faint);margin-left:4px;\">※2026년 5월기준</span>",
+      "+0.40%(전월말대비)",
+      "rise"
     ]
-  },
-  "cidx2_monthly": {
-    "value": "137.67",
-    "base": "2020=100",
-    "period": "2026-05"
   },
   "news": {
     "현대건설": [
@@ -79,7 +79,7 @@
         "title": "지역별 최고가 단지 보니…10곳 중 4곳은 ‘도시정비 수주 TOP5’ 외 2개 언론사 보도",
         "press": "한국경제",
         "time": "2026.07.24 16:49",
-        "url": "https://n.news.naver.com/mnews/article/015/0005313541",
+        "url": "https://finance.naver.com/item/news_read.naver?article_id=0005313541&office_id=015&code=000720&page=1&sm=",
         "domain": "현대건설",
         "scope": "국내",
         "subject": "경쟁사",
@@ -125,7 +125,7 @@
         "domain": "현대건설",
         "scope": "국내",
         "subject": "정책",
-        "entity": "중견 건설사 30곳 상생협약",
+        "entity": null,
         "importance": "Normal",
         "source": "main",
         "tier": "t1",
@@ -153,7 +153,7 @@
         "domain": "현대건설",
         "scope": "국내",
         "subject": "경쟁사",
-        "entity": "대우건설, 현대산업개발, 현대건설, GS건설, DL이앤씨",
+        "entity": "현대건설",
         "importance": "Normal",
         "source": "main",
         "tier": "t1",
@@ -192,6 +192,34 @@
     ],
     "원자력": [
       {
+        "title": "[속보] 美 “미국-사우디, 평화적 원자력 협력 협정 체결” 외 1개 언론사 보도",
+        "press": "매일경제",
+        "time": "3일 전",
+        "url": "https://www.mk.co.kr/article/12105027",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "미국-사우디",
+        "importance": "High",
+        "source": "supplementary",
+        "tier": "tier1",
+        "verify_needed": false
+      },
+      {
+        "title": "트럼프 \"사우디 원전협정, 이스라엘 수교가 전제\"…협정 이행에 제동",
+        "press": "이데일리",
+        "time": "3일 전",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=06750246645517472",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "정책",
+        "entity": "사우디·이스라엘",
+        "importance": "High",
+        "source": "supplementary",
+        "tier": "tier2",
+        "verify_needed": false
+      },
+      {
         "title": "현대엔지니어링, 원자력·SMR 전문가 초청 세미나 개최",
         "press": "파이낸셜뉴스",
         "time": "2일 전",
@@ -203,20 +231,6 @@
         "importance": "Normal",
         "source": "supplementary",
         "tier": "tier2",
-        "verify_needed": false
-      },
-      {
-        "title": "[속보] 美 “미국-사우디, 평화적 원자력 협력 협정 체결” 외 1개 언론사 보도",
-        "press": "매일경제",
-        "time": "3일 전",
-        "url": "https://www.mk.co.kr/article/12105027",
-        "domain": "원자력",
-        "scope": "해외",
-        "subject": "정책",
-        "entity": "미국-사우디",
-        "importance": "Normal",
-        "source": "supplementary",
-        "tier": "tier1",
         "verify_needed": false
       },
       {
@@ -274,20 +288,6 @@
         "source": "supplementary",
         "tier": "tier1",
         "verify_needed": false
-      },
-      {
-        "title": "트럼프 \"사우디 원전협정, 이스라엘 수교가 전제\"…협정 이행에 제동",
-        "press": "이데일리",
-        "time": "3일 전",
-        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=06750246645517472",
-        "domain": "원자력",
-        "scope": "해외",
-        "subject": "정책",
-        "entity": "사우디·이스라엘",
-        "importance": "Normal",
-        "source": "supplementary",
-        "tier": "tier2",
-        "verify_needed": false
       }
     ],
     "도시정비": [
@@ -306,15 +306,15 @@
         "verify_needed": false
       },
       {
-        "title": "법원 “재건축 1세대 판단, 주민등록 아닌 실제 생활관계 기준”",
+        "title": "호반건설, 군포 금정3구역 재개발 수주…656가구 브랜드 단지 조성",
         "press": "매일경제",
-        "time": "2시간 전",
-        "url": "https://www.mk.co.kr/article/12107569",
+        "time": "4시간 전",
+        "url": "https://www.mk.co.kr/article/12107534",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "정책",
-        "entity": null,
-        "importance": "Normal",
+        "subject": "자사",
+        "entity": "호반건설",
+        "importance": "High",
         "source": "supplementary",
         "tier": "tier1",
         "verify_needed": false
@@ -326,7 +326,7 @@
         "url": "https://www.newspim.com/news/view/20260724001113",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "시장전반",
+        "subject": "정책",
         "entity": "갈현1구역",
         "importance": "Normal",
         "source": "supplementary",
@@ -340,7 +340,7 @@
         "url": "https://www.hankyung.com/article/202607243956i",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "시장전반",
+        "subject": "정책",
         "entity": "갈현1구역",
         "importance": "Normal",
         "source": "supplementary",
@@ -354,7 +354,7 @@
         "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=03752326645517800",
         "domain": "도시정비",
         "scope": "국내",
-        "subject": "시장전반",
+        "subject": "정책",
         "entity": "갈현제1구역",
         "importance": "Normal",
         "source": "supplementary",
