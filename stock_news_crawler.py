@@ -596,8 +596,9 @@ def _to_output_article(a: dict, category_name: str) -> dict:
         "summary_kr": a.get("summary_kr"),
         "source": a.get("source"),
         # 메인소스(공식 종목뉴스 피드)는 항상 Tier 1로 간주.
-        # 보조소스는 화이트리스트 등급(tier1/tier2)을 그대로 반영.
-        "tier": "t1" if a.get("source") == "main" else a.get("source_tier", "t2"),
+        # 보조소스는 apply_whitelist_filter가 매긴 "tier1"/"tier2" 값을 HTML이
+        # 기대하는 짧은 형식("t1"/"t2")으로 정규화한다.
+        "tier": "t1" if a.get("source") == "main" or a.get("source_tier") == "tier1" else "t2",
         "verify_needed": a.get("verify_needed", False),
     }
 
