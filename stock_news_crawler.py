@@ -207,6 +207,11 @@ def fetch_supplementary_source(query: str, max_results: int = 30) -> list[dict]:
                 press = (info.get("press") or "").strip()
                 press = re.sub(r"^언론사\s*선정?\s*", "", press).strip()
                 time_text = (info.get("time") or "").strip()
+                # 네이버 검색 UI는 "3시간 전"처럼 상대시각을 준다. 이 문자열을 그대로
+                # 저장하면, 하루 2회 누적 병합되며 나중에(몇 시간 뒤) 다시 정렬할 때
+                # "지금 기준 3시간 전"으로 잘못 재해석되어 정렬이 틀어진다. 수집 시점에
+                # 절대시각으로 고정해둔다 (메인소스·해외 RSS는 이미 절대시각을 준다).
+                time_text = _freeze_time(time_text)
 
                 articles.append({
                     "title": title,
@@ -289,6 +294,21 @@ def _parse_article_datetime(time_text: str) -> datetime:
             return datetime.min
 
     return datetime.min
+
+
+def _freeze_time(time_text: str) -> str:
+    """상대시각("3시간 전")을 절대시각("YYYY.MM.DD HH:MM")으로 수집 시점에 고정한다.
+
+    상대시각 문자열을 그대로 저장하면, 하루 2회 누적 병합 이후 몇 시간 뒤에
+    다시 정렬할 때 "지금 기준 N시간 전"으로 잘못 재해석돼 정렬이 틀어진다.
+    이미 절대시각이거나 파싱할 수 없으면 원본 문자열을 그대로 둔다.
+    """
+    if not time_text:
+        return time_text
+    dt = _parse_article_datetime(time_text)
+    if dt == datetime.min:
+        return time_text
+    return dt.strftime("%Y.%m.%d %H:%M")
 
 
 # ---------------------------------------------------------------------------
