@@ -43,6 +43,14 @@ HDEC_DISPLAY_MAX = 7
 
 CATEGORY_CONFIGS_BY_NAME = {c["category_name"]: c for c in CATEGORY_CONFIGS}
 
+# 건설업 카테고리 검색 결과 중 원전/원자력 관련 기사를 원자력 카테고리로 재분류할 때
+# 쓰는 키워드. 원자력 카테고리 자체의 include_keywords(검색 결과 1차 필터링용, 일부러
+# 좁게 잡음)와 달리, 이미 건설업 필터를 통과한 기사를 재분류하는 용도라 넓게 잡는다.
+NUCLEAR_MIGRATE_KEYWORDS = [
+    "원전", "원자력", "SMR", "우라늄", "한수원", "웨스팅하우스", "AP1000",
+    "nuclear", "holtec", "westinghouse", "fermi", "terrapower", "natrium",
+]
+
 
 def _ensure_archive_dir():
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
@@ -100,9 +108,29 @@ def crawl_all_categories() -> dict:
         # 건설업 자체 크롤링 결과와 제목이 유사한 이관 기사는 중복이므로 제외
         deduped_migrate = dedup_cross_source(gs_articles, hdec_migrate, threshold=0.7)
         gs_articles = sort_articles(gs_articles + deduped_migrate)
-    news["건설업"] = gs_articles[: gs_config["max_articles"]]
 
-    for name in ["원자력", "도시정비", "자본시장"]:
+    # 건설업 결과 중 원전/원자력 관련 기사(예: "대미 원전 투자...")는 원자력
+    # 카테고리로 재분류한다. 건설업 검색어(GS건설/DL이앤씨 등)에는 걸리지만
+    # 내용상으로는 원자력 카테고리가 더 적합한 기사들이다.
+    gs_keep, gs_nuke_migrate = [], []
+    for a in gs_articles:
+        title_lower = a["title"].lower()
+        if any(kw.lower() in title_lower for kw in NUCLEAR_MIGRATE_KEYWORDS):
+            gs_nuke_migrate.append(a)
+        else:
+            gs_keep.append(a)
+    news["건설업"] = gs_keep[: gs_config["max_articles"]]
+
+    print("[뉴스] 원자력 크롤링 중...")
+    nuke_config = CATEGORY_CONFIGS_BY_NAME["원자력"]
+    nuke_articles = crawl_category(**nuke_config)
+    if gs_nuke_migrate:
+        print(f"[뉴스] 건설업에서 원자력으로 이관: {len(gs_nuke_migrate)}건 (중복 제외 전)")
+        deduped_nuke_migrate = dedup_cross_source(nuke_articles, gs_nuke_migrate, threshold=0.7)
+        nuke_articles = sort_articles(nuke_articles + deduped_nuke_migrate)
+    news["원자력"] = nuke_articles[: nuke_config["max_articles"]]
+
+    for name in ["도시정비", "자본시장"]:
         print(f"[뉴스] {name} 크롤링 중...")
         news[name] = crawl_category(**CATEGORY_CONFIGS_BY_NAME[name])
 
@@ -126,6 +154,41 @@ def build_day_payload(now: datetime) -> dict:
         "indicators": indicators,
         "news": news,
     }
+
+
+def _merge_category_articles(existing: list, new: list) -> list:
+    """같은 날짜의 기존 기사 목록에 새로 크롤링한 기사를 누적 병합한다.
+
+    URL이 같으면 동일 기사로 보고 제외하고, URL이 다르지만 제목이 비슷한
+    경우(같은 소식을 다른 매체가 보도)도 dedup_cross_source로 제외한다.
+    max_articles로 다시 자르지 않는다 — 하루 두 번의 실행이 누적되면서
+    실제로 늘어난 만큼 그대로 보여주기 위함이다.
+    """
+    existing_urls = {a.get("url") for a in existing}
+    new_unique = [a for a in new if a.get("url") not in existing_urls]
+    new_unique = dedup_cross_source(existing, new_unique, threshold=0.7)
+    return sort_articles(existing + new_unique)
+
+
+def merge_with_existing_archive(archive_path: str, day_payload: dict) -> dict:
+    """같은 날짜의 아카이브가 이미 존재하면(하루 2회 실행 중 두 번째 실행)
+    뉴스는 기존 목록에 새 기사를 누적 병합하고, 시황 지표는 최신 값으로
+    덮어쓴다(지표는 스냅샷이라 누적할 대상이 아니다)."""
+    existing = _load_json(archive_path, None)
+    if not existing or not existing.get("news"):
+        return day_payload
+
+    print("[뉴스] 당일 기존 아카이브 발견 — 누적 병합")
+    merged_news = {}
+    for name, new_articles in day_payload["news"].items():
+        existing_articles = existing["news"].get(name, [])
+        merged = _merge_category_articles(existing_articles, new_articles)
+        if len(merged) != len(existing_articles):
+            print(f"  {name}: {len(existing_articles)}건 → {len(merged)}건")
+        merged_news[name] = merged
+
+    day_payload["news"] = merged_news
+    return day_payload
 
 
 def update_index(day_payload: dict):
@@ -179,6 +242,7 @@ def main():
     day_payload = build_day_payload(now)
 
     archive_path = os.path.join(ARCHIVE_DIR, f"{day_payload['date']}.json")
+    day_payload = merge_with_existing_archive(archive_path, day_payload)
     _save_json(archive_path, day_payload)
     print(f"저장 완료: {archive_path}")
 
