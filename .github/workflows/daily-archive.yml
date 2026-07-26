@@ -4,7 +4,7 @@ on:
   schedule:
     # cron은 UTC 기준. KST = UTC+9
     - cron: "30 22 * * *"  # 07:30 KST
-    - cron: "30 6 * * *"   # 15:30 KST
+    - cron: "0 6 * * *"    # 15:00 KST
   workflow_dispatch: {}   # 수동 실행 버튼
 
 permissions:
@@ -48,5 +48,13 @@ jobs:
             echo "변경사항 없음 — 커밋 건너뜀"
           else
             git commit -m "chore: update daily archive ($(date -u +'%Y-%m-%d %H:%M UTC'))"
-            git push
+            # 실행 도중 다른 push(수동 실행/로컬 push 등)가 먼저 들어오면 거절될 수 있어
+            # rebase 후 재시도한다.
+            for i in 1 2 3; do
+              if git push; then
+                break
+              fi
+              echo "push 실패, rebase 후 재시도 ($i/3)"
+              git pull --rebase
+            done
           fi
