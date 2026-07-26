@@ -1,6 +1,6 @@
 {
   "date": "2026-07-26",
-  "generated_at": "2026-07-26T17:28:54.791202+09:00",
+  "generated_at": "2026-07-26T17:33:02.594306+09:00",
   "indicators": {
     "kospi": [
       "6,690.62",
@@ -139,7 +139,7 @@
         "domain": "건설업",
         "scope": "해외",
         "subject": "경쟁사",
-        "entity": "현대건설·삼성물산",
+        "entity": "현대건설, 삼성물산",
         "importance": "High",
         "relevance": "high",
         "source": "supplementary",
@@ -246,7 +246,7 @@
         "domain": "원자력",
         "scope": "해외",
         "subject": "정책",
-        "entity": "사우디아라비아",
+        "entity": "사우디",
         "importance": "High",
         "relevance": "high",
         "source": "supplementary",
@@ -261,7 +261,7 @@
         "domain": "원자력",
         "scope": "해외",
         "subject": "정책",
-        "entity": "사우디아라비아",
+        "entity": "사우디",
         "importance": "Normal",
         "relevance": "high",
         "source": "supplementary",
