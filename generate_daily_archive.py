@@ -92,8 +92,10 @@ def crawl_all_categories() -> dict:
 
     카테고리1(현대건설)은 crawl_category()가 반환한 기사 중 subject=="자사"인
     것만 남기고, 나머지(정책/시장전반/경쟁사 — 현대건설이 언급됐지만 주어가
-    아닌 기사)는 카테고리2(건설업)로 이관해 병합한다. 즉 카테고리1의 최종
-    결과는 "현대건설이 무엇을 했다"가 주어인 기사만 남는다.
+    아닌 기사)는 카테고리2(건설업)로 이관해 병합한다. 반대로 카테고리5(자본시장)
+    결과 중 subject=="자사"(현대건설 목표주가/투자의견/신용등급/회사채 등)는
+    카테고리1로 이관한다. 즉 카테고리1의 최종 결과는 "현대건설이 무엇을 했다"가
+    주어인 기사만 남고, 카테고리5는 개별 종목이 아닌 시장 전반 시황만 남는다.
     """
     news = {}
 
@@ -101,7 +103,7 @@ def crawl_all_categories() -> dict:
     hdec_articles = crawl_category(**CATEGORY_CONFIGS_BY_NAME["현대건설"])
     hdec_own = [a for a in hdec_articles if a.get("subject") == "자사"]
     hdec_migrate = [a for a in hdec_articles if a.get("subject") != "자사"]
-    news["현대건설"] = sort_articles(hdec_own)[:HDEC_DISPLAY_MAX]
+    # news["현대건설"]은 아래에서 자본시장 이관분까지 합친 뒤 마지막에 확정한다.
 
     print("[뉴스] 건설업 크롤링 중...")
     gs_config = CATEGORY_CONFIGS_BY_NAME["건설업"]
@@ -133,9 +135,22 @@ def crawl_all_categories() -> dict:
         nuke_articles = sort_articles(nuke_articles + deduped_nuke_migrate)
     news["원자력"] = nuke_articles[: nuke_config["max_articles"]]
 
-    for name in ["도시정비", "자본시장"]:
-        print(f"[뉴스] {name} 크롤링 중...")
-        news[name] = crawl_category(**CATEGORY_CONFIGS_BY_NAME[name])
+    print("[뉴스] 도시정비 크롤링 중...")
+    news["도시정비"] = crawl_category(**CATEGORY_CONFIGS_BY_NAME["도시정비"])
+
+    print("[뉴스] 자본시장 크롤링 중...")
+    capital_config = CATEGORY_CONFIGS_BY_NAME["자본시장"]
+    capital_articles = crawl_category(**capital_config)
+    capital_own = [a for a in capital_articles if a.get("subject") == "자사"]
+    capital_keep = [a for a in capital_articles if a.get("subject") != "자사"]
+    news["자본시장"] = capital_keep[: capital_config["max_articles"]]
+
+    # 자본시장 결과 중 현대건설 자사 기사(목표주가/신용등급 등)는 카테고리1로 이관
+    if capital_own:
+        print(f"[뉴스] 자본시장에서 현대건설로 이관: {len(capital_own)}건 (중복 제외 전)")
+        deduped_capital_migrate = dedup_cross_source(hdec_own, capital_own, threshold=0.7)
+        hdec_own = sort_articles(hdec_own + deduped_capital_migrate)
+    news["현대건설"] = hdec_own[:HDEC_DISPLAY_MAX]
 
     return news
 
