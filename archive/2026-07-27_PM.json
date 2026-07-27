@@ -1,6 +1,6 @@
 {
   "date": "2026-07-27",
-  "generated_at": "2026-07-27T20:40:35.297351+09:00",
+  "generated_at": "2026-07-27T20:45:27.834524+09:00",
   "indicators": {
     "kospi": [
       "6,755.75",
@@ -53,13 +53,13 @@
       "fall"
     ],
     "wti": [
-      "83.47",
-      "-6.54%",
+      "83.05",
+      "-7.01%",
       "fall"
     ],
     "fx": [
-      "1,469.0",
-      "-5.1",
+      "1,469.8",
+      "-4.3",
       "fall"
     ],
     "cidx1": [
@@ -1088,7 +1088,7 @@
       ],
       [
         "2026-07-27",
-        83.47
+        83.05
       ]
     ],
     "fx": [
@@ -1178,7 +1178,7 @@
       ],
       [
         "2026-07-27",
-        1469.0
+        1469.8
       ]
     ],
     "cidx1": [
@@ -2408,6 +2408,22 @@
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": false
+      },
+      {
+        "title": "'르엘'이 바꾼 롯데건설…주택 수주 '30兆 클럽' 시대 열었다",
+        "press": "아시아투데이",
+        "time": "2026.07.21 11:45",
+        "url": "https://www.asiatoday.co.kr/kn/view.php?key=20260721010007495",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "롯데건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
       }
     ],
     "원자력": [
@@ -2490,6 +2506,22 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "Westinghouse Announces Appointment of Dan Sumner as CEO",
+        "press": "Westinghouse",
+        "time": "2026.04.27 13:00",
+        "url": "https://info.westinghousenuclear.com/news/westinghouse-announces-appointment-of-dan-sumner-as-ceo",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "Westinghouse",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "웨스팅하우스가 댄 섬너를 신임 대표이사(CEO) 겸 사장으로 즉시 임명했다고 발표했다. 이번 발표는 4월 27일 이루어졌다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
       },
       {
         "title": "World’s Largest Private Grid, Fermi America™ to File Additional 5GW Clean Air Permit for Project Matador with the Texas Commission on Environmental Quality (TCEQ) Upsizing Campus Projections to 17GW of Private Power",
@@ -2862,6 +2894,22 @@
         "verify_needed": false
       },
       {
+        "title": "서울시 \"재개발·재건축 궁금하면 누구나\" 8월부터 시민교육",
+        "press": "한국경제",
+        "time": "2026.07.27 01:47",
+        "url": "https://www.hankyung.com/article/202607277570i",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "서울시",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
         "title": "성남시, 분당 양지마을 재건축 사업시행자 지정",
         "press": "뉴시스",
         "time": "2026.07.27 00:49",
@@ -2887,6 +2935,38 @@
         "subject": "시장전반",
         "entity": "분당 양지마을",
         "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "재개발·재건축 궁금증 해소…서울시, 정비사업 시민 아카데미",
+        "press": "연합뉴스",
+        "time": "2026.07.26 21:47",
+        "url": "https://www.yna.co.kr/view/AKR20260726026100004?input=1195m",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "서울시",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "재개발·재건축 '쾌속추진'…서울시, 전 자치구 '정비사업 아카데미'",
+        "press": "아시아경제",
+        "time": "2026.07.26 21:47",
+        "url": "https://view.asiae.co.kr/article/2026072417154011814",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "서울시",
+        "importance": "Normal",
         "relevance": "high",
         "summary_kr": null,
         "source": "supplementary",
@@ -3007,6 +3087,38 @@
         "summary_kr": null,
         "source": "main",
         "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "현대건설, ‘정비·해외 주택·에너지’ 3축으로 실적 반등 승부",
+        "press": "아시아투데이",
+        "time": "2026.07.27 10:45",
+        "url": "https://www.asiatoday.co.kr/kn/view.php?key=20260727010009445",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "[더벨][thebell desk] 파이낸셜스토리 입힌 '현대건설 CB'",
+        "press": "더벨",
+        "time": "2026.07.27 09:45",
+        "url": "https://www.thebell.co.kr/free/content/ArticleView.asp?key=202607221048575840101993",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
         "verify_needed": false
       }
     ]
