@@ -545,17 +545,23 @@ def apply_whitelist_filter(
     tier1_whitelist: list[str],
     tier2_whitelist: list[str],
 ) -> list[dict]:
-    result = []
+    """화이트리스트는 더 이상 게이트(자동 탈락)가 아니라 참고 신호다.
+
+    Tier1/Tier2 목록에 없는 언론사라고 매번 놓치는 기사가 생겼다(아시아투데이/
+    더벨 사례). 대신 목록에 없는 기사는 걸러내지 않고 통과시키되
+    source_tier="unlisted"로 표시해 LLM 태깅 단계로 넘긴다. 실제 포함 여부는
+    tag_articles_with_llm()이 판단하는 known_press(출처가 알려진 정상
+    언론사인지)에 맡기고, known_press==True인 경우 verify_needed로 표시해
+    화이트리스트 정식 등록 전까지 계속 "확인필요"로 노출한다."""
     for a in articles:
         press = a["press"]
         if press in tier1_whitelist:
             a["source_tier"] = "tier1"
-            result.append(a)
         elif press in tier2_whitelist:
             a["source_tier"] = "tier2"
-            result.append(a)
-        # 화이트리스트 외 언론사는 자동 제외
-    return result
+        else:
+            a["source_tier"] = "unlisted"
+    return articles
 
 
 # ---------------------------------------------------------------------------
@@ -627,10 +633,12 @@ _TAG_SCHEMA = {
                     "entity": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                     "importance": {"type": "string", "enum": ["High", "Normal"]},
                     "relevance": {"type": "string", "enum": ["high", "low"]},
+                    "known_press": {"type": "boolean"},
                     "summary_kr": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                 },
                 "required": [
-                    "index", "scope", "subject", "entity", "importance", "relevance", "summary_kr",
+                    "index", "scope", "subject", "entity", "importance", "relevance",
+                    "known_press", "summary_kr",
                 ],
                 "additionalProperties": False,
             },
@@ -651,7 +659,8 @@ def tag_articles_with_llm(
         return articles
 
     def _prompt_line(i: int, a: dict) -> str:
-        line = f"{i}. [{a['press']}] {a['title']}"
+        unlisted = " (화이트리스트 미등록 언론사 — known_press 판단 필요)" if a.get("source_tier") == "unlisted" else ""
+        line = f"{i}. [{a['press']}]{unlisted} {a['title']}"
         desc = a.get("description")
         if desc:
             line += f"\n   설명: {desc}"
@@ -705,6 +714,10 @@ def tag_articles_with_llm(
 - summary_kr: 기사 제목이 영어로 작성된 경우에만 작성한다. 제목과 설명(있는 경우)에 담긴
   핵심 사실(주체/행위/시점/숫자)을 바탕으로 한국어 문장을 새로 구성해 2~3문장으로 요약한다.
   원문을 그대로 번역하거나 원문 문장 구조를 그대로 따라가지 않는다. 제목이 한글이면 null로 둔다.
+- known_press: "(화이트리스트 미등록 언론사 — known_press 판단 필요)"라고 표시된 기사에 대해,
+  press가 일반적으로 알려진 정상 국내/해외 언론사(신문사·통신사·방송사·전문 매체 등)면 true,
+  개인 블로그·광고성 사이트·출처 불명 매체처럼 언론사로 보기 어려우면 false로 판단한다.
+  표시가 없는(이미 화이트리스트에 등록된) 기사는 항상 true로 둔다.
 
 기사 목록:
 {numbered}
@@ -736,6 +749,7 @@ def tag_articles_with_llm(
         a["entity"] = tag.get("entity")
         a["importance"] = tag.get("importance", "Normal")
         a["relevance"] = tag.get("relevance", "high")
+        a["known_press"] = tag.get("known_press", True)
         a["summary_kr"] = tag.get("summary_kr")
     return articles
 
@@ -756,6 +770,14 @@ def sort_articles(articles: list[dict]) -> list[dict]:
     return sorted(articles, key=lambda a: _parse_article_datetime(a.get("time", "")), reverse=True)
 
 
+def _tier_label(a: dict) -> str:
+    if a.get("source") == "main" or a.get("source_tier") == "tier1":
+        return "t1"
+    if a.get("source_tier") == "tier2":
+        return "t2"
+    return "unlisted"
+
+
 def _to_output_article(a: dict, category_name: str) -> dict:
     return {
         "title": a["title"],
@@ -771,9 +793,9 @@ def _to_output_article(a: dict, category_name: str) -> dict:
         "summary_kr": a.get("summary_kr"),
         "source": a.get("source"),
         # 메인소스(공식 종목뉴스 피드)는 항상 Tier 1로 간주.
-        # 보조소스는 apply_whitelist_filter가 매긴 "tier1"/"tier2" 값을 HTML이
-        # 기대하는 짧은 형식("t1"/"t2")으로 정규화한다.
-        "tier": "t1" if a.get("source") == "main" or a.get("source_tier") == "tier1" else "t2",
+        # 보조소스는 apply_whitelist_filter가 매긴 "tier1"/"tier2"/"unlisted" 값을
+        # HTML이 기대하는 짧은 형식("t1"/"t2"/"unlisted")으로 정규화한다.
+        "tier": _tier_label(a),
         "verify_needed": a.get("verify_needed", False),
     }
 
@@ -810,7 +832,8 @@ def _crawl_category_impl(
     main_filtered = apply_keyword_filter(main_raw, include_keywords, exclude_keywords)
     supp_filtered = apply_keyword_filter(supp_raw, include_keywords, exclude_keywords)
 
-    # 보조소스 언론사 화이트리스트 필터 (Tier1/Tier2 외 자동 제외)
+    # 보조소스 언론사 화이트리스트 신호 부여 (Tier1/Tier2 외는 더 이상 자동 제외하지
+    # 않고 source_tier="unlisted"로 표시만 해 LLM 태깅 단계(known_press)로 넘긴다)
     supp_whitelisted = apply_whitelist_filter(supp_filtered, tier1_whitelist, tier2_whitelist)
 
     # 메인소스와 제목 유사도 70% 이상 → 중복으로 간주해 보조소스에서 제외
@@ -832,23 +855,34 @@ def _crawl_category_impl(
         f"{before_seen_filter - len(all_articles)}건 제외, {len(all_articles)}건 신규 태깅 예정"
     )
 
-    # LLM 태깅 (domain/scope/subject/entity/importance/relevance)
+    # LLM 태깅 (domain/scope/subject/entity/importance/relevance/known_press)
     client = anthropic.Anthropic()
     all_articles = tag_articles_with_llm(all_articles, category_name, client)
 
-    # relevance 2차 필터: 홍보성/사소한 기사는 exclude_keywords 없이도 걸러낸다
+    # 화이트리스트 미등록(source_tier="unlisted") 언론사는 known_press==False(정상
+    # 언론사로 보기 어려움)면 relevance를 "low"로 강제 덮어써 최종 제외한다.
+    # known_press==True면 relevance 판단을 그대로 존중하고 verify_needed로만 표시한다.
+    for a in all_articles:
+        if a.get("source_tier") == "unlisted" and not a.get("known_press", True):
+            a["relevance"] = "low"
+
+    # relevance 2차 필터: 홍보성/사소한 기사·미등록 매체는 exclude_keywords 없이도 걸러낸다
     included = [a for a in all_articles if a.get("relevance", "high") != "low"]
     excluded_low_relevance = [a for a in all_articles if a.get("relevance", "high") == "low"]
 
     # verify_needed 플래그: ① Tier2 매체 + 제목에 "단독" 포함 → importance Normal 강등,
     # ② 기업이 직접 발행한 보도자료(Holtec/Westinghouse/TerraPower/Fermi America)는
     #    홍보성 가능성이 있어 무조건 verify_needed (importance는 그대로 둔다)
+    # ③ 화이트리스트 미등록 매체(known_press==True로 통과한 경우)는 정식 등록 전까지
+    #    계속 verify_needed로 노출한다
     for a in included:
         verify_needed = False
         if a.get("source_tier") == "tier2" and "단독" in a["title"]:
             a["importance"] = "Normal"
             verify_needed = True
         if a.get("press") in _COMPANY_PR_PRESS_NAMES:
+            verify_needed = True
+        if a.get("source_tier") == "unlisted":
             verify_needed = True
         a["verify_needed"] = verify_needed
 

@@ -230,6 +230,7 @@
   .meta-right .tier{ font-size:9px; padding:2px 7px; border-radius:999px; background:var(--paper); color:var(--ink-soft); }
   .meta-right .tier.t1{ background:#E3F6E9; color:#1A8A4C; }
   .meta-right .tier.t2{ background:var(--verify-soft); color:var(--verify); }
+  .meta-right .tier.unlisted{ background:var(--paper); color:var(--ink-faint); border:1px dashed var(--ink-faint); }
 
   .foot{ display:flex; justify-content:space-between; align-items:center; padding:26px 6px 0; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); }
 
@@ -319,6 +320,19 @@
 
   .admin-category-block{ border-top:1px solid var(--line); padding-top:12px; margin-top:12px; }
   .admin-category-block:first-child{ border-top:none; padding-top:0; margin-top:0; }
+
+  .admin-unlisted-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:7px 0; border-top:1px solid var(--line); font-size:12px;
+  }
+  .admin-unlisted-row:first-child{ border-top:none; }
+  .admin-unlisted-press{ color:var(--ink); }
+  .admin-unlisted-count{
+    font-family:var(--mono); font-size:10.5px; padding:2px 8px; border-radius:999px;
+    background:var(--paper); color:var(--ink-faint);
+  }
+  .admin-unlisted-count.hot{ background:var(--verify-soft); color:var(--verify); font-weight:700; }
+  .admin-unlisted-empty{ font-size:12px; color:var(--ink-faint); }
   .admin-category-name{ font-size:12.5px; font-weight:700; color:var(--accent); margin-bottom:2px; }
 
   .admin-stock-row{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
@@ -815,7 +829,7 @@ function renderArticle(a){
     <div class="meta-right">
       <span class="meta-time">${a.time}</span>
       <span class="meta-press">${a.press}</span>
-      <span class="tier ${a.tier}">${a.tier === "t1" ? "Tier 1" : "Tier 2"}</span>
+      <span class="tier ${a.tier}">${a.tier === "t1" ? "Tier 1" : a.tier === "t2" ? "Tier 2" : "미등록"}</span>
     </div>
   </div>`;
 }
@@ -973,6 +987,13 @@ function renderAdminForm(config){
   html += `</div>`;
 
   html += `<div class="admin-section">
+    <div class="admin-section-title">화이트리스트 후보 (미등록 언론사)</div>
+    <div class="admin-section-hint">최근 7일간 "확인필요"로 노출된 미등록 언론사 빈도입니다. 자주 등장하는
+      매체는 위 카테고리별 Tier1/Tier2 목록에 정식 등록하는 걸 고려하세요.</div>
+    <div id="admin-unlisted-press-list">불러오는 중…</div>
+  </div>`;
+
+  html += `<div class="admin-section">
     <div class="admin-section-title">지표 종목 관리</div>
     <div class="admin-section-hint">국내 종목은 pykrx 종목코드, 해외 종목은 Yahoo Finance 티커를 입력하세요.</div>
     <div class="admin-field-label">동종사 (domestic_peers)</div>
@@ -1005,6 +1026,41 @@ function renderAdminForm(config){
 
   document.getElementById("admin-export-btn").addEventListener("click", exportConfigJson);
   document.getElementById("admin-reset-btn").addEventListener("click", () => renderAdminForm(adminConfigOriginal));
+}
+
+// 최근 7일(dateKeys)의 뉴스 중 tier==="unlisted"(화이트리스트 미등록, LLM이
+// known_press=true로 통과시켜 "확인필요"로 노출된) 기사를 언론사별로 세어
+// 관리자 패널에 보여준다. 자주 등장하는 매체를 Tier1/Tier2에 정식 등록할지
+// 사람이 판단하기 쉽게 하기 위한 참고용 목록이다 (자동 반영되지 않음).
+async function renderUnlistedPressWatchlist(){
+  const container = document.getElementById("admin-unlisted-press-list");
+  if(!container) return;
+  try{
+    await Promise.all(dateKeys.map(loadDay));
+    const counts = {};
+    dateKeys.forEach(dateKey => {
+      const dayNews = newsByDate[dateKey] || {};
+      Object.values(dayNews).forEach(articles => {
+        (articles || []).forEach(a => {
+          if(a.tier === "unlisted"){
+            counts[a.press] = (counts[a.press] || 0) + 1;
+          }
+        });
+      });
+    });
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if(sorted.length === 0){
+      container.innerHTML = `<div class="admin-unlisted-empty">최근 7일간 미등록 언론사 기사가 없습니다.</div>`;
+      return;
+    }
+    container.innerHTML = sorted.map(([press, count]) => `
+      <div class="admin-unlisted-row">
+        <span class="admin-unlisted-press">${press}</span>
+        <span class="admin-unlisted-count ${count >= 3 ? "hot" : ""}">${count}회</span>
+      </div>`).join("");
+  }catch(e){
+    container.innerHTML = `<div class="admin-unlisted-empty">불러오지 못했습니다.</div>`;
+  }
 }
 
 function initAdminPanelDelegation(){
@@ -1079,6 +1135,7 @@ function openAdminPanel(){
     adminPanelDelegationInited = true;
   }
   renderAdminForm(adminConfig);
+  renderUnlistedPressWatchlist();
 }
 
 function closeAdminPanel(){
