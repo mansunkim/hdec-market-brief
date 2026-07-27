@@ -1,6 +1,6 @@
 {
   "date": "2026-07-27",
-  "generated_at": "2026-07-27T19:47:39.841751+09:00",
+  "generated_at": "2026-07-27T20:23:25.422402+09:00",
   "indicators": {
     "kospi": [
       "6,755.75",
@@ -28,38 +28,38 @@
       "fall"
     ],
     "nasdaq": [
-      "24,975.82",
-      "-0.64%",
+      "25,137.69",
+      "-2.15%",
       "fall"
     ],
     "dow": [
-      "51,947.25",
-      "+0.46%",
-      "rise"
+      "51,711.65",
+      "-0.97%",
+      "fall"
     ],
     "sp500": [
-      "7,411.98",
-      "+0.05%",
-      "rise"
+      "7,408.30",
+      "-1.21%",
+      "fall"
     ],
     "nlr": [
-      "108.10",
-      "-2.97%",
-      "fall"
+      "111.41",
+      "+0.02%",
+      "rise"
     ],
     "ura": [
-      "39.89",
-      "-3.01%",
-      "fall"
+      "41.13",
+      "+0.39%",
+      "rise"
     ],
     "wti": [
-      "83.09",
-      "-6.96%",
+      "83.45",
+      "-6.56%",
       "fall"
     ],
     "fx": [
-      "1,468.8",
-      "-5.3",
+      "1,469.3",
+      "-4.7",
       "fall"
     ],
     "cidx1": [
@@ -108,23 +108,23 @@
       "fall"
     ],
     "FRMI": [
-      "7.40",
-      "+17.09%",
-      "rise"
+      "6.32",
+      "-3.95%",
+      "fall"
     ],
     "CCJ": [
-      "87.86",
-      "-1.65%",
+      "89.33",
+      "-1.15%",
       "fall"
     ],
     "CEG": [
-      "274.35",
-      "-0.45%",
-      "fall"
+      "275.60",
+      "+0.25%",
+      "rise"
     ],
     "OKLO": [
-      "40.25",
-      "-8.52%",
+      "44.00",
+      "-1.12%",
       "fall"
     ]
   },
@@ -659,10 +659,6 @@
       [
         "2026-07-23",
         25137.69
-      ],
-      [
-        "2026-07-24",
-        24975.82
       ]
     ],
     "dow": [
@@ -745,10 +741,6 @@
       [
         "2026-07-23",
         51711.65
-      ],
-      [
-        "2026-07-24",
-        51947.25
       ]
     ],
     "sp500": [
@@ -831,10 +823,6 @@
       [
         "2026-07-23",
         7408.3
-      ],
-      [
-        "2026-07-24",
-        7411.98
       ]
     ],
     "nlr": [
@@ -917,10 +905,6 @@
       [
         "2026-07-23",
         111.41
-      ],
-      [
-        "2026-07-24",
-        108.1
       ]
     ],
     "ura": [
@@ -1003,10 +987,6 @@
       [
         "2026-07-23",
         41.13
-      ],
-      [
-        "2026-07-24",
-        39.89
       ]
     ],
     "wti": [
@@ -1088,7 +1068,7 @@
       ],
       [
         "2026-07-27",
-        83.09
+        83.45
       ]
     ],
     "fx": [
@@ -1178,7 +1158,7 @@
       ],
       [
         "2026-07-27",
-        1468.8
+        1469.3
       ]
     ],
     "cidx1": [
@@ -2031,10 +2011,6 @@
       [
         "2026-07-23",
         6.32
-      ],
-      [
-        "2026-07-24",
-        7.4
       ]
     ],
     "CCJ": [
@@ -2117,10 +2093,6 @@
       [
         "2026-07-23",
         89.33
-      ],
-      [
-        "2026-07-24",
-        87.86
       ]
     ],
     "CEG": [
@@ -2203,10 +2175,6 @@
       [
         "2026-07-23",
         275.6
-      ],
-      [
-        "2026-07-24",
-        274.35
       ]
     ],
     "OKLO": [
@@ -2289,10 +2257,6 @@
       [
         "2026-07-23",
         44.0
-      ],
-      [
-        "2026-07-24",
-        40.25
       ]
     ]
   },
@@ -2376,6 +2340,38 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "“신사업 성장에 그룹사 투자 확대 수혜”…삼성E&A 목표주가 상향 [오...",
+        "press": "매일경제",
+        "time": "2026.07.27 00:24",
+        "url": "https://www.mk.co.kr/article/12108015",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "삼성E&A, 첨단산업 성장 본격화…목표가 6.1만원↑-상상인",
+        "press": "이데일리",
+        "time": "2026.07.26 23:24",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=01948326645518784",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
       }
     ],
     "원자력": [
@@ -2393,6 +2389,38 @@
         "summary_kr": null,
         "source": "supplementary",
         "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "창원시의회, SMR 생산기지 조성·특별법 개정 촉구 건의안 채택",
+        "press": "뉴시스",
+        "time": "2026.07.27 07:24",
+        "url": "https://www.newsis.com/view/NISX20260727_0003725113",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "창원시의회",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "한수원, 포천양수발전소 건설지역 주민과 이주대책 합의",
+        "press": "연합뉴스",
+        "time": "2026.07.27 02:24",
+        "url": "https://www.yna.co.kr/view/AKR20260727073900003?input=1195m",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "한수원",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
         "verify_needed": false
       },
       {
@@ -2487,6 +2515,70 @@
         "importance": "High",
         "relevance": "high",
         "summary_kr": "페르미 아메리카가 키스톤 내셔널 그룹과 케이프 커머셜 파이낸스로부터 확보한 2억 달러 규모의 장비 대출을 첫 인출해 프로젝트 마타도어의 11GW 캠퍼스 중 초기 2.3GW 구축을 가속화한다고 밝혔다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Fermi America Deepens Strategic Partnership with Hyundai E&C to Lead the Return of Large-Scale Nuclear Construction in the U.S. with Project Matador",
+        "press": "Fermi America",
+        "time": "2026.02.12 18:38",
+        "url": "https://fermiamerica.com/fermi-america-deepens-strategic-partnership-with-hyundai-ec-to-lead-the-return-of-large-scale-nuclear-construction-in-the-u-s-with-project-matador/",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "Fermi America, 현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "페르미 아메리카가 현대건설(Hyundai E&C)과의 전략적 파트너십을 강화해 미국 내 대규모 원전 건설 재개를 주도하는 마타도르 프로젝트를 함께 추진한다고 밝혔다. 양사는 대형 원전 건설 부문에서 협력을 확대할 예정이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Leading Global Power and Infrastructure Financial Institution MUFG Backs Fermi America™ with $500 Million Equipment Loan to Accelerate 11GW Private Energy Campus",
+        "press": "Fermi America",
+        "time": "2026.02.10 18:41",
+        "url": "https://fermiamerica.com/leading-global-power-and-infrastructure-financial-institution-mufg-backs-fermi-america-with-500-million-equipment-loan-to-accelerate-11gw-private-energy-campus/",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "Fermi America, MUFG",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "일본 MUFG가 페르미 아메리카에 11기가와트 규모 민간 에너지 캠퍼스 구축을 가속화하기 위해 5억 달러 규모의 장비 대출을 제공한다고 발표했다. 이는 대형 에너지 인프라 프로젝트에 대한 금융 지원 사례이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower Takes Major Step Forward in UK Deployment with launch of TerraPower UK and Start of GDA Step 1 for Natrium® Reactor",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/TerraPower-Takes-Major-Step-Forward-in-UK-Deployment-with-launch-of-TerraPower-UK-and-Start-of-GDA-Step-1-for-Natrium-Reactor",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워가 영국 법인 TerraPower UK를 설립하고 나트륨 원자로에 대한 영국 일반설계평가(GDA) 1단계 절차를 개시했다고 밝혔다. 이는 영국 시장 진출을 위한 주요 진전이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower Announces Key Commercialization Agreements for Natrium® Plants with Korean Counterparts",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/TerraPower-Announces-Key-Commercialization-Agreements-for-Natrium-Plants-with-Korean-Counterparts",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower, 한국 기업",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워가 한국 파트너들과 나트륨 원전 상용화를 위한 주요 계약을 체결했다고 발표했다. 이는 한국 기업들과의 협력 확대를 보여주는 사례이다.",
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": true
@@ -2656,7 +2748,40 @@
         "verify_needed": false
       }
     ],
-    "현대건설": []
+    "현대건설": [
+      {
+        "title": "강원도 ‘액체수소 인수기지’ 핵심기술 개발 추진",
+        "press": "매일경제",
+        "time": "2026.07.27 15:52",
+        "url": "https://n.news.naver.com/mnews/article/009/0005712796",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "강원도 액체수소 인수기지",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "삼척에 액체수소 인수기지 구축…강원도, 핵심기술 개발 착수 외 1개 언론사 보도",
+        "press": "연합뉴스",
+        "time": "2026.07.27 14:09",
+        "url": "https://n.news.naver.com/mnews/article/001/0016216919",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "삼척 액체수소 인수기지",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      }
+    ]
   },
   "session": "PM"
 }
