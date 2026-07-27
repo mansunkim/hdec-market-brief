@@ -1,6 +1,6 @@
 {
   "date": "2026-07-27",
-  "generated_at": "2026-07-27T20:34:36.035029+09:00",
+  "generated_at": "2026-07-27T20:40:35.297351+09:00",
   "indicators": {
     "kospi": [
       "6,755.75",
@@ -53,13 +53,13 @@
       "fall"
     ],
     "wti": [
-      "83.35",
-      "-6.67%",
+      "83.47",
+      "-6.54%",
       "fall"
     ],
     "fx": [
-      "1,469.8",
-      "-4.2",
+      "1,469.0",
+      "-5.1",
       "fall"
     ],
     "cidx1": [
@@ -1088,7 +1088,7 @@
       ],
       [
         "2026-07-27",
-        83.35
+        83.47
       ]
     ],
     "fx": [
@@ -1178,7 +1178,7 @@
       ],
       [
         "2026-07-27",
-        1469.8
+        1469.0
       ]
     ],
     "cidx1": [
@@ -2727,6 +2727,86 @@
         "importance": "Normal",
         "relevance": "high",
         "summary_kr": "프라마톰과 테라파워가 첨단 원자로 연료 상용화를 위한 우라늄 금속화 기술에서 성과를 달성했다고 발표했다. 이는 차세대 핵연료 개발의 기술적 진전을 의미한다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower Submits Natrium® Reactor¹ for Regulatory Approval in United Kingdom",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/terrapower-submits-natrium-reactor-for-regulatory-approval-in-united-kingdom",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워가 자사의 나트륨(Natrium) 원자로에 대해 영국 규제당국에 승인 신청서를 제출했다고 밝혔다. 이는 영국 시장 진출을 위한 공식 절차의 일환이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "The Natrium® Project Receives First NRC-Issued Environmental Impact Statement for a Commercial Advanced Nuclear Power Plant",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/natrium-project-receives-first-nrc-issued-environmental-impact-statement-for-a-commercial-advanced-nuclear-power-plant",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워의 나트륨 프로젝트가 상업용 첨단 원자로로는 처음으로 NRC로부터 환경영향평가서를 발급받았다. 이는 미국 내 상업 가동을 위한 중요한 규제 절차 진전이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower, Evergy and the State of Kansas announce agreement to explore advanced nuclear energy deployment",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/terrapower-evergy-and-kansas-announce-agreement-to-explore-advanced-nuclear-energy-deployment",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워와 에버지, 캔자스주가 첨단 원자력 발전 도입을 검토하기 위한 협약을 체결했다고 발표했다. 이는 캔자스주 내 신규 원전 배치 가능성을 타진하기 위한 것이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "TerraPower and KBR Collaborate to Bring Natrium® Advanced Nuclear Power Plant¹ to the UK",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/terrapower-and-kbr-collaborate-to-bring-natrium-to-the-uk",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower, KBR",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "테라파워와 KBR이 협력해 나트륨 첨단 원자력 발전소를 영국에 도입하기로 했다고 발표했다. 양사는 영국 내 프로젝트 추진을 위해 공동 작업할 계획이다.",
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "Utah Office of Energy Development, TerraPower and Flagship Companies Sign MOU to Explore Siting of Advanced Nuclear Reactor",
+        "press": "TerraPower",
+        "time": "",
+        "url": "https://www.terrapower.com/utah-office-of-energy-development-terrapower-and-flagship-companies-sign-mou-to-explore-siting-of-advanced-nuclear-reactor",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "TerraPower, Utah Office of Energy Development",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "유타주 에너지개발국과 테라파워, 플래그십 컴퍼니스가 첨단 원자로 부지 선정을 검토하기 위한 양해각서를 체결했다. 이는 유타주 내 신규 원전 배치 가능성을 모색하기 위한 협약이다.",
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": true
