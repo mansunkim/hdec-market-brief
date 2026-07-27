@@ -31,6 +31,7 @@ from email.utils import parsedate_to_datetime
 from urllib.parse import quote
 
 import anthropic
+import requests
 from playwright.sync_api import sync_playwright
 
 USER_AGENT = (
@@ -42,6 +43,23 @@ USER_AGENT = (
 # ---------------------------------------------------------------------------
 # 1. 메인 소스 — 네이버 금융 종목뉴스 (Playwright)
 # ---------------------------------------------------------------------------
+
+def _fetch_body_snippet(url: str, timeout: float = 5.0) -> str:
+    """exclude_keywords 검사용으로 기사 본문 텍스트를 가져온다.
+
+    네이버 금융 종목뉴스 피드(finance.naver.com/item/news_news.naver)는 본문에
+    종목명이 스치듯 언급되기만 해도(예: "HD현대건설"처럼 부분 문자열이 겹치는
+    별개 회사) 그 종목의 뉴스로 잘못 잡아오는 경우가 있다. 제목만으로는 이런
+    오분류를 걸러낼 수 없어(제목엔 회사명이 아예 안 나오는 경우도 많음) 본문을
+    가져와 exclude_keywords 매칭에 함께 쓴다. 네트워크 실패는 파이프라인을
+    막아선 안 되므로 빈 문자열로 넘어간다."""
+    try:
+        resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=timeout)
+        resp.raise_for_status()
+        return _strip_html(resp.text)
+    except Exception:
+        return ""
+
 
 def fetch_main_source(stock_code: str, pages: int = 2) -> list[dict]:
     """네이버 금융 종목뉴스 페이지를 크롤링해 title/press/time/url을 수집한다."""
@@ -85,6 +103,7 @@ def fetch_main_source(stock_code: str, pages: int = 2) -> list[dict]:
                     "url": link,
                     "source": "main",
                     "source_tier": None,
+                    "body_snippet": _fetch_body_snippet(link),
                 })
         browser.close()
     return articles
@@ -504,7 +523,12 @@ def apply_keyword_filter(
     result = []
     for a in articles:
         title = a["title"].lower()
-        if any(kw.lower() in title for kw in exclude_keywords):
+        # exclude_keywords는 제목뿐 아니라 본문 스니펫(main_source만 해당,
+        # _fetch_body_snippet 참고)도 함께 검사한다. "HD현대건설"처럼 종목명이
+        # 제목에는 안 나오고 본문에만 스치듯 언급되는 다른 회사 기사를 걸러내려면
+        # 제목만으로는 부족하기 때문이다.
+        exclude_haystack = title + " " + (a.get("body_snippet") or "").lower()
+        if any(kw.lower() in exclude_haystack for kw in exclude_keywords):
             continue
         if include_keywords and not any(kw.lower() in title for kw in include_keywords):
             continue
