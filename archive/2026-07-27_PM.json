@@ -1,6 +1,6 @@
 {
   "date": "2026-07-27",
-  "generated_at": "2026-07-27T21:10:58.377771+09:00",
+  "generated_at": "2026-07-27T21:31:48.474986+09:00",
   "indicators": {
     "kospi": [
       "6,755.75",
@@ -28,33 +28,33 @@
       "fall"
     ],
     "nasdaq": [
-      "24,975.82",
-      "-0.64%",
+      "25,137.69",
+      "-2.15%",
       "fall"
     ],
     "dow": [
-      "51,947.25",
-      "+0.46%",
-      "rise"
+      "51,711.65",
+      "-0.97%",
+      "fall"
     ],
     "sp500": [
-      "7,411.98",
-      "+0.05%",
-      "rise"
+      "7,408.30",
+      "-1.21%",
+      "fall"
     ],
     "nlr": [
-      "108.10",
-      "-2.97%",
-      "fall"
+      "111.41",
+      "+0.02%",
+      "rise"
     ],
     "ura": [
-      "39.89",
-      "-3.01%",
-      "fall"
+      "41.13",
+      "+0.39%",
+      "rise"
     ],
     "wti": [
-      "83.51",
-      "-6.49%",
+      "84.15",
+      "-5.78%",
       "fall"
     ],
     "fx": [
@@ -108,23 +108,23 @@
       "fall"
     ],
     "FRMI": [
-      "7.40",
-      "+17.09%",
-      "rise"
+      "6.32",
+      "-3.95%",
+      "fall"
     ],
     "CCJ": [
-      "87.86",
-      "-1.65%",
+      "89.33",
+      "-1.15%",
       "fall"
     ],
     "CEG": [
-      "274.35",
-      "-0.45%",
-      "fall"
+      "275.60",
+      "+0.25%",
+      "rise"
     ],
     "OKLO": [
-      "40.25",
-      "-8.52%",
+      "44.00",
+      "-1.12%",
       "fall"
     ]
   },
@@ -659,10 +659,6 @@
       [
         "2026-07-23",
         25137.69
-      ],
-      [
-        "2026-07-24",
-        24975.82
       ]
     ],
     "dow": [
@@ -745,10 +741,6 @@
       [
         "2026-07-23",
         51711.65
-      ],
-      [
-        "2026-07-24",
-        51947.25
       ]
     ],
     "sp500": [
@@ -831,10 +823,6 @@
       [
         "2026-07-23",
         7408.3
-      ],
-      [
-        "2026-07-24",
-        7411.98
       ]
     ],
     "nlr": [
@@ -917,10 +905,6 @@
       [
         "2026-07-23",
         111.41
-      ],
-      [
-        "2026-07-24",
-        108.1
       ]
     ],
     "ura": [
@@ -1003,10 +987,6 @@
       [
         "2026-07-23",
         41.13
-      ],
-      [
-        "2026-07-24",
-        39.89
       ]
     ],
     "wti": [
@@ -1088,7 +1068,7 @@
       ],
       [
         "2026-07-27",
-        83.51
+        84.15
       ]
     ],
     "fx": [
@@ -2031,10 +2011,6 @@
       [
         "2026-07-23",
         6.32
-      ],
-      [
-        "2026-07-24",
-        7.4
       ]
     ],
     "CCJ": [
@@ -2117,10 +2093,6 @@
       [
         "2026-07-23",
         89.33
-      ],
-      [
-        "2026-07-24",
-        87.86
       ]
     ],
     "CEG": [
@@ -2203,10 +2175,6 @@
       [
         "2026-07-23",
         275.6
-      ],
-      [
-        "2026-07-24",
-        274.35
       ]
     ],
     "OKLO": [
@@ -2289,10 +2257,6 @@
       [
         "2026-07-23",
         44.0
-      ],
-      [
-        "2026-07-24",
-        40.25
       ]
     ]
   },
@@ -2346,6 +2310,22 @@
   "news": {
     "건설업": [
       {
+        "title": "하나증권 \"AI 데이터센터 투자 가시화... 건설업종 최선호주 GS건설\"",
+        "press": "포인트경제",
+        "time": "2026.07.27 09:32",
+        "url": "https://www.pointe.co.kr/news/articleView.html?idxno=82371",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "에코프로에이치엔, 삼성E&A에 '330억' 규모 RCS 공급 계약",
         "press": "이데일리",
         "time": "2026.07.27 08:48",
@@ -2360,6 +2340,70 @@
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": false
+      },
+      {
+        "title": "에코프로에이치엔, 삼성E&A에 330억 온실가스 저감시스템 공급 외 2개 언론사 보도",
+        "press": "연합뉴스",
+        "time": "2026.07.27 08:32",
+        "url": "https://www.yna.co.kr/view/AKR20260727146600003?input=1195m",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "삼성E&A, 2분기 영업이익 51% 급증…관계사·뉴에너지 성장에 연간 목표...",
+        "press": "비즈트리뷴",
+        "time": "2026.07.27 06:32",
+        "url": "http://www.biztribune.co.kr/news/articleView.html?idxno=356545",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "GS건설, 상계주공5단지 시공권 박탈 손배소 일부 승소...법원 \"한국자산...",
+        "press": "뉴스락",
+        "time": "2026.07.27 02:32",
+        "url": "http://www.newslock.co.kr/news/articleView.html?idxno=133477",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "삼성E&A, 신사업이 실적 견인… 반도체·뉴에너지 중심 성장 기대감에 ...",
+        "press": "Korea IT Times",
+        "time": "2026.07.27 01:32",
+        "url": "https://www.koreaittimes.com/news/articleView.html?idxno=155496",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       },
       {
         "title": "목동 정비사업 속도…GS건설, 목동우성 리모델링 2031년 입주 추진",
@@ -2392,6 +2436,22 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "삼성E&A, 목표가 6만1000원으로 상향…상상인證 “신사업 성장·그룹 투...",
+        "press": "조선비즈",
+        "time": "2026.07.26 23:32",
+        "url": "https://biz.chosun.com/stock/stock_general/2026/07/27/6YVLZ5DW7RD2TNNE7M2BFOVPS4/?utm_source=naver&utm_medium=original&utm_campaign=biz",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       },
       {
         "title": "삼성E&A, 첨단산업 성장 본격화…목표가 6.1만원↑-상상인",
@@ -2427,6 +2487,102 @@
       }
     ],
     "원자력": [
+      {
+        "title": "野 \"제12차 전기본에 원전 4기, SMR 2기 추가해야\"",
+        "press": "한국경제",
+        "time": "2026.07.27 12:00",
+        "url": "https://www.hankyung.com/article/202607278751i",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "전기본",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "보수기후환경네트워크 “12차 전기본에 신규 원전 4기·SMR 2기 이상 추가...",
+        "press": "에너지경제",
+        "time": "2026.07.27 11:33",
+        "url": "https://www.ekn.kr/web/view.php?key=20260727020336564",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "전기본",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "두산에너빌리티, 2분기 영업이익 15.9%↑…가스터빈·원전 앞세워 '수주...",
+        "press": "디지털데일리",
+        "time": "2026.07.27 09:33",
+        "url": "https://www.ddaily.co.kr/page/view/2026072717341948671",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "두산에너빌리티",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "\"가스터빈·원전이 효자\" 두산에너빌리티, 상반기 영업익 32.4%↑",
+        "press": "뉴스웍스",
+        "time": "2026.07.27 09:33",
+        "url": "https://www.newsworks.co.kr/news/articleView.html?idxno=848515",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "두산에너빌리티",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "40일 앞으로 다가온 SMR 특별법…촉진위·인력기관 기준 세운다",
+        "press": "아시아투데이",
+        "time": "2026.07.27 09:33",
+        "url": "https://www.asiatoday.co.kr/kn/view.php?key=20260727010009861",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "SMR 특별법",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "원전·가스터빈 쌍끌이…두산에너빌리티, 2분기 영업익 16% 증가",
+        "press": "뉴스웨이",
+        "time": "2026.07.27 08:33",
+        "url": "https://www.newsway.co.kr/news/view?ud=2026072716242990692",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "두산에너빌리티",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
       {
         "title": "두산에너빌, 올 상반기 영업익 5478억...\"대형 원전·SMR로 안정적 성장...",
         "press": "파이낸셜뉴스",
@@ -2846,6 +3002,38 @@
     ],
     "도시정비": [
       {
+        "title": "[현장] 도곡우성 재건축, 롯데건설 단독 입찰...수의계약 수순",
+        "press": "데일리한국",
+        "time": "2026.07.27 09:33",
+        "url": "https://daily.hankooki.com/news/articleView.html?idxno=1389781",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "롯데건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "양재천 벨트 재건축 속도전… 도곡·개포·대치 집값 들썩",
+        "press": "파이낸셜뉴스",
+        "time": "2026.07.27 09:33",
+        "url": "http://www.fnnews.com/news/202607271814206532",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "양재천 벨트",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "분당 양지마을, 6839가구로 재건축",
         "press": "한국경제",
         "time": "2026.07.27 08:49",
@@ -2860,6 +3048,22 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "주공 재건축 끝낸 과천, 이젠 원도심 재개발",
+        "press": "매일경제",
+        "time": "2026.07.27 08:33",
+        "url": "https://www.mk.co.kr/article/12108544",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "과천",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       },
       {
         "title": "도곡우성 재건축 또 유찰…‘단독 응찰’ 롯데건설 수주 유력",
@@ -2878,6 +3082,22 @@
         "verify_needed": true
       },
       {
+        "title": "대통령이 매도한 분당 양지마을, 사업시행자 지정…재건축 본궤도",
+        "press": "데일리안",
+        "time": "2026.07.27 06:33",
+        "url": "https://www.dailian.co.kr/news/view/1671305/?sc=Naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "분당 양지마을",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "분당 양지마을 재건축 본궤도…대신자산신탁 사업시행자 지정",
         "press": "한국경제",
         "time": "2026.07.27 05:49",
@@ -2892,6 +3112,22 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "분당 선도지구 4곳 모두 사업시행자 지정…재건축 본궤도",
+        "press": "노컷뉴스",
+        "time": "2026.07.27 05:33",
+        "url": "https://www.nocutnews.co.kr/news/6553736?utm_source=naver&utm_medium=article&utm_campaign=20260727015146",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "분당 선도지구",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       },
       {
         "title": "서울시 \"재개발·재건축 궁금하면 누구나\" 8월부터 시민교육",
@@ -3088,6 +3324,118 @@
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": false
+      },
+      {
+        "title": "현대건설 상반기 '더블 크라운'...해외수주도, 국내 정비사업도 1위",
+        "press": "인사이트코리아",
+        "time": "2026.07.27 08:32",
+        "url": "https://www.insightkorea.co.kr/news/articleView.html?idxno=251031",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "현대건설, 도시정비 왕좌 굳힌다…목동·한강로 수주 총력",
+        "press": "한국금융신문",
+        "time": "2026.07.27 07:32",
+        "url": "https://www.fntimes.com/html/view.php?ud=202607271200305399b372994c95_18",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "KB證 “현대건설, 원전 모멘텀 하반기에 재점화…목표가 28% 하향\"",
+        "press": "조선비즈",
+        "time": "2026.07.22 12:32",
+        "url": "https://biz.chosun.com/stock/stock_general/2026/07/22/CJBQVCLVJ5AF7F5TCUX7ZLNKAE/?utm_source=naver&utm_medium=original&utm_campaign=biz",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "증권가, 수주 39조 원 전망에도 현대건설 목표가 하향… 주가 반전 열쇠...",
+        "press": "일요서울",
+        "time": "2026.07.22 12:32",
+        "url": "https://www.ilyoseoul.co.kr/news/articleView.html?idxno=520172",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "MOU만 쌓인 현대건설 SMR…첫 매출은 언제 나오나",
+        "press": "뉴스퀘스트",
+        "time": "2026.07.21 12:32",
+        "url": "https://www.newsquest.co.kr/news/articleView.html?idxno=270107",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "[아침밥]교보증권 \"현대건설 원전 수주 지연, 목표가 23만→18만원\"",
+        "press": "동행미디어 시대",
+        "time": "1주 전",
+        "url": "https://www.sidae.com/article/2026072008372595453",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "교보證 \"현대건설, 하반기 원전 수주 기대감에도 목표가 18만원으로 하향...",
+        "press": "이투데이",
+        "time": "1주 전",
+        "url": "https://www.etoday.co.kr/news/view/2604987",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ]
   },
