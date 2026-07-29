@@ -415,12 +415,12 @@
     <div class="hero-dark">
       <div class="hero-eyebrow"><span class="dash"></span>HDEC · IR DAILY NOTE</div>
       <div class="hero-title">현대건설<br><span class="line2">시장동향</span></div>
-      <div class="hero-desc">하루에 두 번 주요 뉴스를 정리합니다.</div>
+      <div class="hero-desc">매일 아침 7시경 전일 주요 뉴스를 정리합니다.</div>
       <div class="hero-comment" id="hero-comment" style="display:none;"></div>
       <hr class="hero-divider">
       <div class="hero-meta-row">
         <span><b id="meta-date">2026.07.26 · SAT</b></span>
-        <span>07:30 발행 · <b>IR팀</b></span>
+        <span>06:40 발행 · <b>IR팀</b></span>
       </div>
 
       <div class="header-actions">
@@ -444,7 +444,7 @@
       <div class="stat-chg" id="hdec-chg"></div>
       <hr class="stat-divider">
       <div class="stat-secondary-row" id="hero-secondary"></div>
-      <div class="stat-footer" id="hero-footer">기준 · 07:30 KST 종가</div>
+      <div class="stat-footer" id="hero-footer">기준 · 06:40 KST 종가</div>
     </div>
   </div>
 
@@ -583,16 +583,33 @@ async function loadIndex(){
 function timeSortKey(time){
   return time || "0000.00.00 00:00";
 }
+// URL이 같거나(같은 기사) 제목이 완전히 같으면(다른 세션/카테고리 이관 과정에서
+// 우연히 겹친 경우) 같은 기사로 보고 먼저 나온 것(최신순 정렬 후이므로 더 최신
+// 기사)만 남긴다. 기사 자체의 유사 제목 병합("외 N개 언론사 보도")은 백엔드
+// (stock_news_crawler.py의 dedup_within_source/dedup_cross_source)가 처리하므로,
+// 여기서는 완전히 동일한 기사가 중복 표시되는 것만 안전망으로 막는다.
+function dedupArticles(list){
+  const seen = new Set();
+  const result = [];
+  for(const a of list){
+    const key = a.url || `title:${(a.title || "").trim().toLowerCase()}`;
+    if(seen.has(key)) continue;
+    seen.add(key);
+    result.push(a);
+  }
+  return result;
+}
 function mergeArticleLists(lists){
   const merged = [].concat(...lists);
   merged.sort((a, b) => timeSortKey(b.time).localeCompare(timeSortKey(a.time)));
-  return merged;
+  return dedupArticles(merged);
 }
 
-// archive는 하루 2회 실행(AM/PM)마다 별도 파일로 저장되지만("어제 저녁~오늘
-// 새벽" 기사는 자연스럽게 오늘 AM에 포함됨), 사용자에게는 "오늘 브리핑"
-// 하나로 합쳐서 보여준다. 지표/코멘트는 더 최신 세션 값(PM이 있으면 PM)을
-// 쓰고, 뉴스는 두 세션을 합쳐 다시 최신순 정렬한다.
+// archive는 매일 06:40 KST에 1회(세션명 AM) 생성된다. 과거에는 하루 2회(AM/PM)
+// 실행해 세션을 나눴던 흔적이 남아있어, PM 파일이 있는 과거 날짜도 그대로
+// 지원하기 위해 두 세션을 모두 조회한 뒤 있는 것만 합쳐서 "오늘 브리핑"
+// 하나로 보여준다. 지표/코멘트는 더 최신 세션 값(PM이 있으면 PM)을
+// 쓰고, 뉴스는 존재하는 세션을 모두 합쳐 다시 최신순 정렬한다.
 async function loadDay(dateKey){
   if(tickerByDate[dateKey]) return; // 이미 로드됨
 
@@ -639,7 +656,7 @@ function renderHeroStat(dateKey){
     <div class="stat-secondary-item" data-key="cidx1"><div class="v">${cVal}</div><div class="l">건설지수 (${cChg})</div></div>
   `;
 
-  document.getElementById("hero-footer").textContent = `기준 · 07:30 KST 종가`;
+  document.getElementById("hero-footer").textContent = `기준 · 06:40 KST 종가`;
 }
 
 /* ---------- 오늘의 코멘트 (관리자 패널에서 설정) ---------- */
@@ -1019,7 +1036,7 @@ function renderAdminForm(config){
     <b>반영 방법</b><br>
     ① 위 "config.json 내보내기" 클릭 → 파일 다운로드<br>
     ② GitHub 저장소 → config.json → 연필(✏) 아이콘 → 내용 붙여넣기 → Commit<br>
-    ③ Actions 탭 → Run workflow (또는 다음 예정 스케줄 07:30/15:00 KST까지 대기)
+    ③ Actions 탭 → Run workflow (또는 다음 예정 스케줄 06:40 KST까지 대기)
   </div>`;
 
   body.innerHTML = html;

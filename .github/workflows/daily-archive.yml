@@ -2,9 +2,8 @@ name: Daily Market Archive
 
 on:
   schedule:
-    # cron은 UTC 기준. KST = UTC+9
-    - cron: "30 22 * * *"  # 07:30 KST
-    - cron: "0 6 * * *"    # 15:00 KST
+    # cron은 UTC 기준. KST = UTC+9. 매일 아침 06:40 KST(전날 21:40 UTC)에 1회 실행.
+    - cron: "40 21 * * *"  # 06:40 KST
   workflow_dispatch: {}   # 수동 실행 버튼
 
 permissions:

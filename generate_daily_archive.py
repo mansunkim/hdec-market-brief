@@ -2,18 +2,20 @@
 일일 아카이브 생성 스크립트
 
 fetch_market_indicators() + crawl_category() 5개 카테고리를 실행해
-archive/{YYYY-MM-DD}_{AM|PM}.json 으로 저장한다 (하루 2회 실행 = 세션 2개).
-07:30 KST 실행은 AM, 15:00 KST 실행은 PM 세션 파일에 각각 저장되며, 같은
-세션이 재실행(재시도/수동 재실행)되면 기존 세션 파일에 새로 발견된 기사만
+archive/{YYYY-MM-DD}_AM.json 으로 저장한다. 매일 06:40 KST에 1회만 실행되며,
+같은 세션이 재실행(재시도/수동 재실행)되면 기존 세션 파일에 새로 발견된 기사만
 누적 병합한다. 30일 지난 파일은 자동 삭제한다.
 
-기사 자체의 중복은 stock_news_crawler.py의 data/seen_urls.json이 실행
-경계를 넘어 전역으로 걸러내므로(직전 실행에서 이미 결과에 포함됐던 기사는
-다음 실행에서 재태깅/재노출되지 않음), 세션 파일을 나누는 이유는 순수하게
-"이 기사를 아침에 처음 봤는지 오후에 처음 봤는지" 구분을 위한 것이다.
+(과거에는 07:30/15:00 KST 하루 2회 실행해 AM/PM 세션을 나눴다. 그 시절 생성된
+PM 세션 파일이 archive/에 남아 있을 수 있어 _session_label()/_load_day_sessions()가
+여전히 AM/PM을 모두 인식하지만, 새로 생성되는 세션은 항상 AM이다.)
 
-archive/index.json 에는 날짜별(AM+PM 합산) 요약(총 기사수, High 건수)을
-유지해서 HTML의 날짜 드롭다운이 파일 목록을 매번 추측/탐색하지 않도록 한다.
+기사 자체의 중복은 stock_news_crawler.py의 data/seen_urls.json이 실행
+경계를 넘어 전역으로 걸러낸다(직전 실행에서 이미 결과에 포함됐던 기사는
+다음 실행에서 재태깅/재노출되지 않음).
+
+archive/index.json 에는 날짜별 요약(총 기사수, High 건수)을 유지해서 HTML의
+날짜 드롭다운이 파일 목록을 매번 추측/탐색하지 않도록 한다.
 
 cidx2(건설공사비지수)는 월 1회만 갱신되는 지표라 매일 새로 조회하지 않는다.
 archive/cidx2_cache.json 에 "이번 달에 이미 조회했는지"를 기록해두고,
@@ -63,6 +65,7 @@ CATEGORY_CONFIGS_BY_NAME = {c["category_name"]: c for c in CATEGORY_CONFIGS}
 # 좁게 잡음)와 달리, 이미 건설업 필터를 통과한 기사를 재분류하는 용도라 넓게 잡는다.
 NUCLEAR_MIGRATE_KEYWORDS = [
     "원전", "원자력", "SMR", "우라늄", "한수원", "웨스팅하우스", "AP1000",
+    "홀텍", "테라파워", "페르미 아메리카",
     "nuclear", "holtec", "westinghouse", "fermi", "terrapower", "natrium",
 ]
 
@@ -72,7 +75,11 @@ def _ensure_archive_dir():
 
 
 def _session_label(now: datetime) -> str:
-    """07:30/15:00 KST 스케줄을 정오 기준으로 나눠 AM/PM 세션명을 정한다."""
+    """실행 시각을 정오 기준으로 나눠 세션명을 정한다.
+
+    현재 스케줄(06:40 KST 1회)은 항상 "AM"이 된다. 과거 하루 2회(07:30/15:00)
+    실행 시절의 PM 세션 파일과 호환되도록 기준은 그대로 남겨둔다.
+    """
     return "AM" if now.hour < 12 else "PM"
 
 
@@ -341,7 +348,18 @@ def update_index(date_str: str):
         for name, articles in day.get("news", {}).items():
             combined_news.setdefault(name, []).extend(articles)
     for name, articles in combined_news.items():
-        combined_news[name] = sort_articles(articles)
+        # AM/PM 세션을 합칠 때 같은 기사(URL 동일)가 겹칠 수 있어 총 건수/High
+        # 건수가 부풀려지지 않도록 URL 기준으로 중복을 제거한 뒤 정렬한다.
+        seen_urls = set()
+        deduped = []
+        for a in articles:
+            url = a.get("url")
+            if url and url in seen_urls:
+                continue
+            if url:
+                seen_urls.add(url)
+            deduped.append(a)
+        combined_news[name] = sort_articles(deduped)
 
     all_articles = [a for articles in combined_news.values() for a in articles]
     total = len(all_articles)

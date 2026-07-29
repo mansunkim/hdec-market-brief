@@ -227,9 +227,9 @@ def fetch_supplementary_source(query: str, max_results: int = 30) -> list[dict]:
                 press = re.sub(r"^언론사\s*선정?\s*", "", press).strip()
                 time_text = (info.get("time") or "").strip()
                 # 네이버 검색 UI는 "3시간 전"처럼 상대시각을 준다. 이 문자열을 그대로
-                # 저장하면, 하루 2회 누적 병합되며 나중에(몇 시간 뒤) 다시 정렬할 때
-                # "지금 기준 3시간 전"으로 잘못 재해석되어 정렬이 틀어진다. 수집 시점에
-                # 절대시각으로 고정해둔다 (메인소스·해외 RSS는 이미 절대시각을 준다).
+                # 저장하면, 같은 세션이 재실행되어 누적 병합되거나 몇 시간 뒤 다시
+                # 정렬할 때 "지금 기준 3시간 전"으로 잘못 재해석되어 정렬이 틀어진다.
+                # 수집 시점에 절대시각으로 고정해둔다 (메인소스·해외 RSS는 이미 절대시각을 준다).
                 time_text = _freeze_time(time_text)
 
                 articles.append({
@@ -242,34 +242,6 @@ def fetch_supplementary_source(query: str, max_results: int = 30) -> list[dict]:
                 })
         browser.close()
     return articles
-
-
-def is_published_today(time_text: str) -> bool:
-    """상대시각("3시간 전")과 절대시각("2026.07.26 09:30") 표기를 모두
-    '오늘 발행 여부' boolean으로 정규화한다. 형식을 알 수 없으면 False."""
-    if not time_text:
-        return False
-
-    text = time_text.strip()
-
-    # 상대시각: "N분 전", "N시간 전" → 오늘
-    if re.search(r"(분|시간)\s*전$", text):
-        return True
-
-    # 상대시각: "N일 전", "어제" 등 → 오늘 아님
-    if re.search(r"일\s*전$", text) or text.startswith("어제"):
-        return False
-
-    # 절대시각: "2026.07.26" 또는 "2026.07.26 09:30" 형태
-    m = re.match(r"(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})", text)
-    if m:
-        try:
-            article_date = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
-            return article_date == datetime.now().date()
-        except ValueError:
-            return False
-
-    return False
 
 
 def _parse_article_datetime(time_text: str) -> datetime:
@@ -318,9 +290,9 @@ def _parse_article_datetime(time_text: str) -> datetime:
 def _freeze_time(time_text: str) -> str:
     """상대시각("3시간 전")을 절대시각("YYYY.MM.DD HH:MM")으로 수집 시점에 고정한다.
 
-    상대시각 문자열을 그대로 저장하면, 하루 2회 누적 병합 이후 몇 시간 뒤에
-    다시 정렬할 때 "지금 기준 N시간 전"으로 잘못 재해석돼 정렬이 틀어진다.
-    이미 절대시각이거나 파싱할 수 없으면 원본 문자열을 그대로 둔다.
+    상대시각 문자열을 그대로 저장하면, 같은 세션이 재실행되어 누적 병합되거나
+    몇 시간 뒤 다시 정렬할 때 "지금 기준 N시간 전"으로 잘못 재해석돼 정렬이
+    틀어진다. 이미 절대시각이거나 파싱할 수 없으면 원본 문자열을 그대로 둔다.
     """
     if not time_text:
         return time_text
@@ -328,6 +300,31 @@ def _freeze_time(time_text: str) -> str:
     if dt == datetime.min:
         return time_text
     return dt.strftime("%Y.%m.%d %H:%M")
+
+
+# 하루 1회(06:40 KST) 실행 기준. 네이버뉴스 검색(fetch_supplementary_source)은
+# "최신순"이 아니라 "관련도순"으로 결과를 주므로, 키워드와 관련도는 높지만
+# 발행일은 훨씬 오래된 기사(예: 몇 주 전 SMR 특집기사)가 섞여 들어올 수 있다.
+# seen_urls 전역 중복 제거는 "이미 한 번이라도 결과에 포함됐던 기사"만 걸러낼 뿐
+# "이번에 처음 보이지만 사실은 오래된 기사"는 걸러내지 못하므로, 발행시각 기준
+# 최근 36시간(하루 주기 + 여유분) 이내 기사만 남긴다.
+_MAX_ARTICLE_AGE_HOURS = 36
+
+
+def filter_recent(articles: list[dict], max_age_hours: float = _MAX_ARTICLE_AGE_HOURS) -> list[dict]:
+    """발행시각이 max_age_hours 이내인 기사만 남긴다.
+
+    시각을 알 수 없는 기사(TerraPower 뉴스 목록 스크래핑처럼 애초에 시각 정보가
+    없는 소스, _parse_article_datetime이 datetime.min을 반환하는 경우)는 오래됐다고
+    단정할 수 없으므로 걸러내지 않고 그대로 통과시킨다.
+    """
+    now = datetime.now()
+    kept = []
+    for a in articles:
+        dt = _parse_article_datetime(a.get("time", ""))
+        if dt == datetime.min or (now - dt) <= timedelta(hours=max_age_hours):
+            kept.append(a)
+    return kept
 
 
 # ---------------------------------------------------------------------------
@@ -612,6 +609,44 @@ def dedup_within_source(articles: list[dict], threshold: float = 0.8) -> list[di
     return merged
 
 
+def apply_title_group_caps(
+    articles: list[dict],
+    caps: list[tuple[list[str], int]],
+) -> list[dict]:
+    """제목에 특정 키워드가 포함된 기사의 노출 건수를 제한한다.
+
+    예: 원자력 카테고리에서 "두산에너빌리티" 관련 기사가 개별 종목 뉴스량이
+    압도적으로 많아 웨스팅하우스/홀텍/테라파워/페르미 아메리카 등 현대건설이
+    실제로 관심 있는 다른 뉴스를 밀어내는 문제가 있었다. 완전히 제외하지는
+    않되(경쟁사의 해외 수주 등은 여전히 중요한 정보이므로) 한도를 넘는 기사는
+    뒤로 미룬다. articles는 최신순 정렬을 가정하므로 한도 안에 드는 것은 항상
+    최신 기사부터다.
+
+    한도로 밀려난 기사는 버리지 않고 (한도 통과 기사, 밀려난 기사) 튜플로
+    반환해, 호출부에서 전체 개수가 max_articles에 못 미치면 다시 채워 넣을 수
+    있게 한다(원자력 기사 자체가 적은 날 화면이 비지 않도록).
+    """
+    counts = [0] * len(caps)
+    kept, overflow = [], []
+    for a in articles:
+        title_lower = a["title"].lower()
+        matched_idx = next(
+            (i for i, (keywords, _) in enumerate(caps)
+             if any(kw.lower() in title_lower for kw in keywords)),
+            None,
+        )
+        if matched_idx is None:
+            kept.append(a)
+            continue
+        limit = caps[matched_idx][1]
+        if counts[matched_idx] < limit:
+            counts[matched_idx] += 1
+            kept.append(a)
+        else:
+            overflow.append(a)
+    return kept, overflow
+
+
 # ---------------------------------------------------------------------------
 # 6. LLM 태깅 (Claude API, Structured Outputs로 일괄 처리)
 # ---------------------------------------------------------------------------
@@ -810,12 +845,15 @@ def _crawl_category_impl(
     tier2_whitelist: list[str],
     max_articles: int = 7,
     foreign_sources: bool = False,
+    title_group_caps: list[tuple[list[str], int]] | None = None,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category() / crawl_category_debug()의 공통 구현.
 
     (최종 포함된 기사, relevance="low"로 제외된 기사) 튜플을 반환한다.
     foreign_sources=True면 fetch_foreign_sources()(원자력 전용 해외 RSS/스크래핑)
     결과를 보조소스에 합쳐 동일한 필터링/태깅 파이프라인을 태운다.
+    title_group_caps가 주어지면 apply_title_group_caps()로 특정 키워드 기사의
+    노출 건수를 제한한다(원자력 카테고리의 두산에너빌리티 쏠림 완화용).
     """
 
     # main_source_url 예: "https://finance.naver.com/item/news_news.naver?code=000720"
@@ -826,6 +864,13 @@ def _crawl_category_impl(
     supp_raw = fetch_supplementary_source(supplementary_query)
     if foreign_sources:
         supp_raw = supp_raw + fetch_foreign_sources()
+
+    # 네이버뉴스 검색(보조소스)은 최신순이 아니라 관련도순으로 결과를 주기 때문에
+    # 키워드와는 관련 있지만 발행일이 훨씬 오래된 기사가 섞여 들어올 수 있다.
+    # 하루 1회 실행 기준으로 최근 36시간 이내 기사만 남겨, "과거 뉴스가 누적되는"
+    # 문제를 원천 차단한다(시각을 알 수 없는 기사는 판단 불가라 통과시킴).
+    main_raw = filter_recent(main_raw)
+    supp_raw = filter_recent(supp_raw)
 
     # 1차 필터 (포함/제외 키워드). relevance가 2차 필터 역할을 하므로
     # exclude_keywords는 명백한 노이즈(스포츠단, 광고성 문구 등) 정도만 최소로 둔다.
@@ -887,6 +932,15 @@ def _crawl_category_impl(
         a["verify_needed"] = verify_needed
 
     included = sort_articles(included)
+
+    if title_group_caps:
+        capped, overflow = apply_title_group_caps(included, title_group_caps)
+        # 한도로 밀려난 기사라도 max_articles를 못 채우면 다시 채워 넣는다
+        # (원자력 기사 자체가 적은 날 화면이 비지 않도록).
+        if len(capped) < max_articles:
+            capped = capped + overflow[: max_articles - len(capped)]
+        included = capped
+
     final_articles = included[:max_articles]
 
     # 이번 실행 결과에 포함된 기사는 앞으로의 실행에서 "이미 본 기사"로
@@ -912,12 +966,13 @@ def crawl_category(
     tier2_whitelist: list[str],
     max_articles: int = 7,
     foreign_sources: bool = False,
+    title_group_caps: list[tuple[list[str], int]] | None = None,
 ) -> list[dict]:
     """카테고리별 종목뉴스를 크롤링/필터링/태깅해 최종 기사 리스트를 반환한다."""
     included, _ = _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles, foreign_sources,
+        max_articles, foreign_sources, title_group_caps,
     )
     return included
 
@@ -932,6 +987,7 @@ def crawl_category_debug(
     tier2_whitelist: list[str],
     max_articles: int = 7,
     foreign_sources: bool = False,
+    title_group_caps: list[tuple[list[str], int]] | None = None,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category()와 동일하지만 relevance="low"로 제외된 기사도 함께 반환한다.
 
@@ -940,7 +996,7 @@ def crawl_category_debug(
     return _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles, foreign_sources,
+        max_articles, foreign_sources, title_group_caps,
     )
 
 
@@ -995,9 +1051,12 @@ CATEGORY_CONFIGS = [
     dict(
         category_name="원자력",
         main_source_url="",
-        supplementary_query="원전 OR SMR OR 원자력",
+        supplementary_query=(
+            "원전 OR SMR OR 원자력 OR 미국 원전 OR 웨스팅하우스 OR 홀텍 OR 테라파워 OR 페르미 아메리카"
+        ),
         include_keywords=[
-            "SMR", "원전 수주", "원전 수출", "AP1000", "우라늄", "한수원", "웨스팅하우스",
+            "SMR", "원전 수주", "원전 수출", "원전 시장", "미국 원전", "해외 원전", "원전 정책",
+            "AP1000", "우라늄", "한수원", "웨스팅하우스", "홀텍", "테라파워", "페르미 아메리카",
             "FRMI", "CCJ", "CEG", "OKLO", "두산에너빌리티", "한전기술",
             # 해외 소스(RSS) 영문 기사용 키워드
             "Holtec", "Palisades", "Westinghouse", "Fermi", "Fermi America", "Matador",
@@ -1018,6 +1077,11 @@ CATEGORY_CONFIGS = [
         ],
         max_articles=7,
         foreign_sources=True,
+        # 두산에너빌리티는 국내 최대 원전 관련 상장사라 검색 결과량 자체가 압도적으로
+        # 많아, 그대로 두면 현대건설이 실제로 관심 있는 웨스팅하우스/홀텍/테라파워/
+        # 페르미 아메리카·미국 원전 시장 동향 기사를 밀어낸다. 완전히 빼지는 않되
+        # (해외 수주 등은 여전히 중요한 정보) 최대 2건으로 제한해 나머지 슬롯을 확보한다.
+        title_group_caps=[(["두산에너빌리티"], 2)],
     ),
     dict(
         category_name="도시정비",
