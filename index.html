@@ -827,15 +827,24 @@ function renderCategories(dateKey){
 }
 
 function renderArticle(a){
+  // "확인필요"/"미등록" 표시는 화이트리스트에 없는 언론사라는 뜻인데, 이건
+  // 관리자가 Tier1/Tier2 등록 여부를 판단할 때 참고할 내부 정보(관리자 패널의
+  // "화이트리스트 후보" 목록)이지 일반 독자에게 노출할 정보가 아니다. 메인
+  // 페이지에서는 tier==="unlisted"인 기사의 확인필요 태그/등급 배지를 숨긴다.
+  // (tier2 + "단독" 기사, Holtec/Westinghouse 등 기업 보도자료처럼 등록된
+  // 언론사인데도 verify가 필요한 경우는 여전히 노출한다.)
+  const showVerify = a.verify && a.tier !== "unlisted";
   const tags = [
     a.scope ? `<span class="tag">${a.scope}</span>` : "",
     a.subject ? `<span class="tag">${a.subject}</span>` : "",
     a.entity ? `<span class="tag entity">${a.entity}</span>` : "",
-    a.verify ? `<span class="tag verify">확인필요</span>` : ""
+    showVerify ? `<span class="tag verify">확인필요</span>` : ""
   ].join("");
   const summaryLine = a.summary_kr
     ? `<div class="art-summary-kr" style="color:var(--ink-faint);font-size:0.9em;margin-top:2px;">${a.summary_kr}</div>`
     : "";
+  const tierLabel = a.tier === "t1" ? "Tier 1" : a.tier === "t2" ? "Tier 2" : "";
+  const tierBadge = tierLabel ? `<span class="tier ${a.tier}">${tierLabel}</span>` : "";
   return `<div class="article">
     <span class="flag ${a.importance}">${a.importance.toUpperCase()}</span>
     <div class="art-body">
@@ -846,7 +855,7 @@ function renderArticle(a){
     <div class="meta-right">
       <span class="meta-time">${a.time}</span>
       <span class="meta-press">${a.press}</span>
-      <span class="tier ${a.tier}">${a.tier === "t1" ? "Tier 1" : a.tier === "t2" ? "Tier 2" : "미등록"}</span>
+      ${tierBadge}
     </div>
   </div>`;
 }
