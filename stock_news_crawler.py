@@ -830,7 +830,13 @@ def dedup_by_entity(articles: list[dict], title_threshold: float = 0.45) -> list
         placed = False
         for g in groups:
             g_entity = (g[0].get("entity") or "").strip().lower()
-            if g_entity == entity and _title_similarity(a["title"], g[0]["title"]) >= title_threshold:
+            # 그룹 대표(g[0])하고만 비교하면, 같은 사안이라도 헤드라인이 점점
+            # 달라지는 기사들이 연달아 묶이지 못하고 각자 새 그룹으로 흩어진다
+            # (A-B, B-C는 유사해도 A-C는 안 유사한 경우가 실제로 흔함). 그룹 내
+            # 아무 기사와나 유사하면 합류시켜 연쇄적으로 묶이게 한다.
+            if g_entity == entity and any(
+                _title_similarity(a["title"], m["title"]) >= title_threshold for m in g
+            ):
                 g.append(a)
                 placed = True
                 break
@@ -887,6 +893,7 @@ def _crawl_category_impl(
     max_articles: int = 7,
     foreign_sources: bool = False,
     title_group_caps: list[tuple[list[str], int]] | None = None,
+    entity_merge_threshold: float = 0.45,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category() / crawl_category_debug()의 공통 구현.
 
@@ -895,6 +902,10 @@ def _crawl_category_impl(
     결과를 보조소스에 합쳐 동일한 필터링/태깅 파이프라인을 태운다.
     title_group_caps가 주어지면 apply_title_group_caps()로 특정 키워드 기사의
     노출 건수를 제한한다(원자력 카테고리의 두산에너빌리티 쏠림 완화용).
+    entity_merge_threshold는 dedup_by_entity()에 그대로 전달된다. 자본시장처럼
+    entity가 회사/프로젝트가 아니라 "코스피"·"연준"류 거시 지표인 카테고리는
+    같은 날 같은 지표를 다루면 사실상 항상 같은 마감 시황이라 0.0(제목 유사도
+    안 보고 entity만 일치해도 병합)으로 낮춰 쓴다.
     """
 
     # main_source_url 예: "https://finance.naver.com/item/news_news.naver?code=000720"
@@ -980,7 +991,7 @@ def _crawl_category_impl(
     # 언론사마다 다른 헤드라인으로 보도)을 LLM이 매긴 entity 기준으로 한 번 더
     # 걸러낸다. dedup_by_entity는 시간순을 그대로 보존하지 않으므로(entity 없는
     # 기사를 뒤로 몰아둠) 다시 정렬한다.
-    included = sort_articles(dedup_by_entity(included))
+    included = sort_articles(dedup_by_entity(included, title_threshold=entity_merge_threshold))
 
     if title_group_caps:
         capped, overflow = apply_title_group_caps(included, title_group_caps)
@@ -1016,12 +1027,13 @@ def crawl_category(
     max_articles: int = 7,
     foreign_sources: bool = False,
     title_group_caps: list[tuple[list[str], int]] | None = None,
+    entity_merge_threshold: float = 0.45,
 ) -> list[dict]:
     """카테고리별 종목뉴스를 크롤링/필터링/태깅해 최종 기사 리스트를 반환한다."""
     included, _ = _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles, foreign_sources, title_group_caps,
+        max_articles, foreign_sources, title_group_caps, entity_merge_threshold,
     )
     return included
 
@@ -1037,6 +1049,7 @@ def crawl_category_debug(
     max_articles: int = 7,
     foreign_sources: bool = False,
     title_group_caps: list[tuple[list[str], int]] | None = None,
+    entity_merge_threshold: float = 0.45,
 ) -> tuple[list[dict], list[dict]]:
     """crawl_category()와 동일하지만 relevance="low"로 제외된 기사도 함께 반환한다.
 
@@ -1045,7 +1058,7 @@ def crawl_category_debug(
     return _crawl_category_impl(
         category_name, main_source_url, supplementary_query,
         include_keywords, exclude_keywords, tier1_whitelist, tier2_whitelist,
-        max_articles, foreign_sources, title_group_caps,
+        max_articles, foreign_sources, title_group_caps, entity_merge_threshold,
     )
 
 
@@ -1159,6 +1172,14 @@ CATEGORY_CONFIGS = [
         tier1_whitelist=["한국경제", "매일경제", "서울경제", "연합인포맥스"],
         tier2_whitelist=["이데일리", "뉴스핌", "한국투자증권 리서치"],
         max_articles=7,
+        # 이 카테고리의 entity는 "코스피"/"연준"처럼 회사·프로젝트가 아니라 거시
+        # 지표라, 같은 날 같은 지표를 다루면 사실상 항상 같은 마감 시황이다(반면
+        # "두산에너빌리티"처럼 회사 entity는 하루에도 실적/수주 등 서로 다른
+        # 사안이 여러 건 나올 수 있어 제목 유사도 확인이 필요함). 실제로 코스피
+        # 마감 기사 6~7건이 언론사마다 표현만 달라 제목 유사도 0.45 기준으로는
+        # 다 따로 남는 문제가 있어, 이 카테고리만 제목 유사도를 안 보고 entity
+        # 일치만으로 병합한다.
+        entity_merge_threshold=0.0,
     ),
 ]
 
