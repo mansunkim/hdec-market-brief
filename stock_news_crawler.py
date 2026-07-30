@@ -805,6 +805,47 @@ def sort_articles(articles: list[dict]) -> list[dict]:
     return sorted(articles, key=lambda a: _parse_article_datetime(a.get("time", "")), reverse=True)
 
 
+def dedup_by_entity(articles: list[dict], title_threshold: float = 0.45) -> list[dict]:
+    """같은 사안(같은 프로젝트/기관/기업)을 다루는 기사가 언론사마다 제목을
+    전혀 다르게 써서 dedup_within_source(제목 유사도만 보는, 임계값 0.8)로는
+    못 걸러지는 중복을 잡는다. 예: "힐스테이트 회룡역파크뷰 1순위 청약 흥행"과
+    "현대건설, 회룡역파크뷰 정당계약 돌입"은 제목 유사도는 낮지만 LLM이 매긴
+    entity(프로젝트명/기관명/기업명)는 둘 다 "힐스테이트 회룡역파크뷰"로 같다.
+
+    LLM 태깅(tag_articles_with_llm) 이후에만 호출 가능하다(entity가 그 전엔
+    없음). articles는 최신순 정렬되어 있다고 가정 — 그룹의 첫 기사(최신)만
+    남기고 나머지는 "외 N건"으로 병합한다. entity가 없는(null/빈 문자열)
+    기사는 과도한 병합을 막기 위해 대상에서 제외하고 그대로 통과시킨다.
+    entity만으로는 같은 회사/기관이 등장하는 서로 다른 사안까지 묶어버릴 수
+    있어(예: "두산에너빌리티 3분기 실적" vs "두산에너빌리티 체코 원전 수주"),
+    제목도 어느 정도(title_threshold) 겹칠 때만 같은 사안으로 판단한다.
+    """
+    groups: list[list[dict]] = []
+    passthrough: list[dict] = []
+    for a in articles:
+        entity = (a.get("entity") or "").strip().lower()
+        if not entity:
+            passthrough.append(a)
+            continue
+        placed = False
+        for g in groups:
+            g_entity = (g[0].get("entity") or "").strip().lower()
+            if g_entity == entity and _title_similarity(a["title"], g[0]["title"]) >= title_threshold:
+                g.append(a)
+                placed = True
+                break
+        if not placed:
+            groups.append([a])
+
+    merged = []
+    for g in groups:
+        kept = dict(g[0])  # 최신순 정렬 입력이므로 그룹의 첫 기사 = 최신 기사
+        if len(g) > 1:
+            kept["title"] = f"{kept['title']} 외 {len(g) - 1}건"
+        merged.append(kept)
+    return merged + passthrough
+
+
 def _tier_label(a: dict) -> str:
     if a.get("source") == "main" or a.get("source_tier") == "tier1":
         return "t1"
@@ -884,9 +925,11 @@ def _crawl_category_impl(
     # 메인소스와 제목 유사도 70% 이상 → 중복으로 간주해 보조소스에서 제외
     supp_deduped = dedup_cross_source(main_filtered, supp_whitelisted, threshold=0.7)
 
-    # 동일 소스 내 제목 유사도 80% 이상 → 최신 1건만 남기고 병합
-    main_merged = dedup_within_source(main_filtered, threshold=0.8)
-    supp_merged = dedup_within_source(supp_deduped, threshold=0.8)
+    # 동일 소스 내 제목 유사도 72% 이상 → 최신 1건만 남기고 병합. 언론사마다
+    # 헤드라인을 조금씩 다르게 써서 기존 0.8 기준으로는 놓치는 중복이 있어
+    # 낮췄다(마지막 안전망은 LLM 태깅 이후 dedup_by_entity가 담당).
+    main_merged = dedup_within_source(main_filtered, threshold=0.72)
+    supp_merged = dedup_within_source(supp_deduped, threshold=0.72)
 
     all_articles = main_merged + supp_merged
 
@@ -932,6 +975,12 @@ def _crawl_category_impl(
         a["verify_needed"] = verify_needed
 
     included = sort_articles(included)
+
+    # 제목만으로는 못 잡는 "같은 사안, 다른 표현" 중복(예: 같은 분양 단지를
+    # 언론사마다 다른 헤드라인으로 보도)을 LLM이 매긴 entity 기준으로 한 번 더
+    # 걸러낸다. dedup_by_entity는 시간순을 그대로 보존하지 않으므로(entity 없는
+    # 기사를 뒤로 몰아둠) 다시 정렬한다.
+    included = sort_articles(dedup_by_entity(included))
 
     if title_group_caps:
         capped, overflow = apply_title_group_caps(included, title_group_caps)
