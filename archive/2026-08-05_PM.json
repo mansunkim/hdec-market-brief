@@ -1,6 +1,6 @@
 {
   "date": "2026-08-05",
-  "generated_at": "2026-08-05T16:49:09.315524+09:00",
+  "generated_at": "2026-08-05T20:16:42.882233+09:00",
   "indicators": {
     "kospi": [
       "6,598.26",
@@ -53,12 +53,12 @@
       "rise"
     ],
     "wti": [
-      "76.13",
-      "+0.48%",
+      "76.30",
+      "+0.70%",
       "rise"
     ],
     "fx": [
-      "1,425.5",
+      "1,424.8",
       "+nan",
       "flat"
     ],
@@ -1116,7 +1116,7 @@
       ],
       [
         "2026-08-05",
-        76.13
+        76.3
       ]
     ],
     "fx": [
@@ -1206,7 +1206,7 @@
       ],
       [
         "2026-08-05",
-        1425.5
+        1424.8
       ]
     ],
     "cidx1": [
@@ -2390,6 +2390,54 @@
   "news": {
     "건설업": [
       {
+        "title": "'시공권 엎치락뒤치락' 상대원2구역…DL이앤씨 vs GS건설 최종 승자는?",
+        "press": "데일리한국",
+        "time": "2026.08.05 10:17",
+        "url": "https://daily.hankooki.com/news/articleView.html?idxno=1393152",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "상대원2구역",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "법원 결정에 멈춘 시공사 교체···상대원2구역, DL이앤씨와 '협상 2라...",
+        "press": "스마트비즈",
+        "time": "2026.08.05 08:17",
+        "url": "https://www.smartbizn.com/news/articleView.html?idxno=150359",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "상대원2구역",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "[Biz&Law] 삼성E&A 참여 바레인 정유공장 4.8억달러 분쟁… 法, 중단신청...",
+        "press": "THE Biz(더비즈)",
+        "time": "2026.08.05 08:17",
+        "url": "http://www.the-biz.co.kr/news/articleView.html?idxno=725655",
+        "domain": "건설업",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "[건설오늘] 현대건설, 목동10단지 수주전 출사표 外 삼성물산·HDC현대산...",
         "press": "천지일보",
         "time": "2026.08.05 07:48",
@@ -2486,6 +2534,22 @@
         "verify_needed": true
       },
       {
+        "title": "삼성E&A 태국 컨소시엄, 타이오일 중재서 17억달러 청구",
+        "press": "프레스나인",
+        "time": "2026.08.05 06:17",
+        "url": "http://www.press9.kr/news/articleView.html?idxno=80667",
+        "domain": "건설업",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "대형 건설사 실적 호조 속 왜 GS건설만 영업이익 감소?",
         "press": "금융소비자뉴스",
         "time": "2026.08.05 05:50",
@@ -2500,9 +2564,121 @@
         "source": "supplementary",
         "tier": "unlisted",
         "verify_needed": true
+      },
+      {
+        "title": "시공권 되찾은 DL이앤씨…상대원2구역, 봉합 vs 2차전 '새 국면'",
+        "press": "땅집고",
+        "time": "2026.08.05 05:17",
+        "url": "https://realty.chosun.com/site/data/html_dir/2026/08/05/2026080501721.html",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "상대원2구역",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "삼성·현대·DL·삼성E&A, 내실경영으로 실적 방어…미래 먹거리 경쟁 본...",
+        "press": "한국금융신문",
+        "time": "2026.08.05 03:17",
+        "url": "https://www.fntimes.com/html/view.php?ud=202608051017144616b372994c95_18",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "[클릭 e종목]\"수주 모멘텀은 돌아온다\"…저평가받는 건설주는",
+        "press": "아시아경제",
+        "time": "2026.08.04 11:17",
+        "url": "https://view.asiae.co.kr/article/2026080315290036862",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ],
     "원자력": [
+      {
+        "title": "새울원자력본부, 2027년도 한수원 지원사업 공모 외 1건",
+        "press": "CNB뉴스",
+        "time": "2026.08.05 09:18",
+        "url": "https://www.cnbnews.com/news/articleView.html?idxno=1010532",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "새울원자력본부",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "한수원, 필리핀 원전 시장 공략 속도… 아보이티즈 파워와 협력 체결 외 1건",
+        "press": "Korea IT Times",
+        "time": "2026.08.05 09:18",
+        "url": "https://www.koreaittimes.com/news/articleView.html?idxno=155821",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "아보이티즈파워",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "한수원, 필리핀 에너지 기업과 원전 사업 협력 MOU 외 2건",
+        "press": "한국일보",
+        "time": "2026.08.05 08:18",
+        "url": "https://www.hankookilbo.com/news/article/A2026080515260000624?did=NA",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "필리핀 원전",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "현대건설, 홀텍·엔터지와 미국 남부 연안 지역서 SMR 사업 진출 검토",
+        "press": "비즈니스포스트",
+        "time": "2026.08.05 08:18",
+        "url": "https://www.businesspost.co.kr/BP?command=article_view&num=444051",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "홀텍·엔터지 SMR",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
       {
         "title": "한수원, 필리핀 아보이티즈 파워와 원전사업 협력 외 2개 언론사 보도 외 2건",
         "press": "연합뉴스",
@@ -2552,6 +2728,22 @@
         "verify_needed": true
       },
       {
+        "title": "GS건설, AI 데이터센터·해외 원전 모멘텀 기대 -BNK證",
+        "press": "파이낸셜뉴스",
+        "time": "2026.08.05 00:17",
+        "url": "http://www.fnnews.com/news/202608050903142176",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "GS건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
         "title": "GS건설 18%·대우건설 14%↑…SMR 세제 지원·빌 게이츠 방한 ‘겹호재’...",
         "press": "서울경제",
         "time": "2026.08.04 22:51",
@@ -2568,6 +2760,22 @@
         "verify_needed": false
       },
       {
+        "title": "[단독]현대건설, 홀텍·엔터지와 美 걸프만에 'SMR-300' 프로젝트 추진",
+        "press": "더트래커",
+        "time": "2026.08.04 22:18",
+        "url": "https://thetracker.co.kr/View.aspx?No=4174463",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "자사",
+        "entity": "SMR-300",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "원안위, 고리 3·4호기 계속운전 연내 결론…SMR 규제도 속도",
         "press": "전기신문",
         "time": "2026.08.04 13:51",
@@ -2581,6 +2789,22 @@
         "summary_kr": null,
         "source": "supplementary",
         "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "정부, SMR 국가전략기술로 지정…원전업계 “과감한 결단 환영”",
+        "press": "조선비즈",
+        "time": "2026.08.04 11:18",
+        "url": "https://biz.chosun.com/industry/company/2026/08/04/QCEUSPISZFDBHBISZDWW7AJORY/?utm_source=naver&utm_medium=original&utm_campaign=biz",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "SMR",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
         "verify_needed": false
       },
       {
@@ -2650,6 +2874,54 @@
         "verify_needed": true
       },
       {
+        "title": "LH, 영등포 도림1구역 공공재개발 약정…연내 시공자 입찰",
+        "press": "한국경제",
+        "time": "2026.08.05 07:18",
+        "url": "https://www.hankyung.com/article/202608056616i",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "영등포 도림1구역",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "[기획] 재건축 덮친 ‘실거주’… 압구정 호가 10억 ‘뚝’",
+        "press": "디지털타임스",
+        "time": "2026.08.05 07:18",
+        "url": "https://www.dt.co.kr/article/12076737?ref=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "압구정",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "성남시, 미래 교통정책 새판 짠다…재건축 교통기준도 마련 외 4건",
+        "press": "디스커버리뉴스",
+        "time": "2026.08.05 07:18",
+        "url": "https://www.discoverynews.kr/news/articleView.html?idxno=1097918",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "성남시",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "현대건설, ‘공사비 2.6조원’ 목동 10단지 재건축 출사표 외 4건",
         "press": "헤럴드경제",
         "time": "2026.08.05 06:51",
@@ -2659,6 +2931,70 @@
         "subject": "자사",
         "entity": "현대건설",
         "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "분당 재건축·백현마이스 앞둔 성남시…‘미래 교통 대수술’ 착수 외 1건",
+        "press": "베타뉴스",
+        "time": "2026.08.05 05:18",
+        "url": "https://www.betanews.net/article/view/beta202608050053",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "성남시",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "현대건설, 해외 설계사 손잡고 목동 재건축 수주전 가세 외 2건",
+        "press": "아시아경제",
+        "time": "2026.08.05 03:18",
+        "url": "https://view.asiae.co.kr/article/2026080511254182913",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "현대건설, 목동10단지 재건축 출사표…글로벌 설계사와 협업 외 4개 언론사 보도",
+        "press": "연합뉴스",
+        "time": "2026.08.05 02:18",
+        "url": "https://www.yna.co.kr/view/AKR20260805070700003?input=1195m",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "관악구, '정비사업 신속지원단' 출범…재개발·재건축 추진 속도 높인다",
+        "press": "잡포스트",
+        "time": "2026.08.04 11:18",
+        "url": "https://www.job-post.co.kr/news/articleView.html?idxno=222942",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "관악구",
+        "importance": "Normal",
         "relevance": "high",
         "summary_kr": null,
         "source": "supplementary",
@@ -2699,6 +3035,22 @@
       }
     ],
     "자본시장": [
+      {
+        "title": "[단독] 삼전닉스서 지수형 레버리지로 환승…코스피 변동성 더 커지나 외 1건",
+        "press": "한국경제",
+        "time": "2026.08.05 09:19",
+        "url": "https://www.hankyung.com/article/2026080570671",
+        "domain": "자본시장",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "코스피",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
       {
         "title": "코스피 3%대 상승 마감...코스닥 나흘째 상승 외 27건",
         "press": "YTN",
@@ -2814,6 +3166,22 @@
     ],
     "현대건설": [
       {
+        "title": "현대건설 세계적 건축설계사 모포시스와 협력, 목동10단지 수주전 나..... 외 2건",
+        "press": "노컷뉴스",
+        "time": "2026.08.05 18:46",
+        "url": "https://n.news.naver.com/mnews/article/079/0004175902",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
         "title": "현대건설, 목동10단지 수주 출사표…글로벌 업체 2곳과 원팀 구성 외 4건",
         "press": "서울경제",
         "time": "2026.08.05 13:57",
@@ -2834,6 +3202,22 @@
         "press": "아시아경제",
         "time": "2026.08.05 11:25",
         "url": "https://n.news.naver.com/mnews/article/277/0005799190",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "현대건설, '2.6조' 목동10단지 수주 출사표…글로벌 설계진 꾸렸다 외 1개 언론사 보도 외 2건",
+        "press": "머니투데이",
+        "time": "2026.08.05 11:01",
+        "url": "https://n.news.naver.com/mnews/article/008/0005395901",
         "domain": "현대건설",
         "scope": "국내",
         "subject": "자사",
