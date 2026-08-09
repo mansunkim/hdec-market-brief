@@ -1,6 +1,6 @@
 {
   "date": "2026-08-10",
-  "generated_at": "2026-08-10T07:20:02.558388+09:00",
+  "generated_at": "2026-08-10T08:03:32.652655+09:00",
   "indicators": {
     "kospi": [
       "6,258.77",
@@ -53,13 +53,13 @@
       "rise"
     ],
     "wti": [
-      "79.25",
-      "+1.37%",
+      "78.86",
+      "+0.87%",
       "rise"
     ],
     "fx": [
-      "1,407.3",
-      "-15.0",
+      "1,409.7",
+      "-12.6",
       "fall"
     ],
     "cidx1": [
@@ -1116,7 +1116,7 @@
       ],
       [
         "2026-08-09",
-        79.25
+        78.86
       ]
     ],
     "fx": [
@@ -1206,7 +1206,7 @@
       ],
       [
         "2026-08-09",
-        1407.3
+        1409.7
       ]
     ],
     "cidx1": [
@@ -2436,9 +2436,89 @@
         "source": "supplementary",
         "tier": "unlisted",
         "verify_needed": true
+      },
+      {
+        "title": "GS건설, 스노우플레이크 손잡고 전사 데이터 통합·표준화",
+        "press": "전자신문",
+        "time": "1주 전",
+        "url": "https://www.etnews.com/20260731000092",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "“현장 데이터를 AI로 활용”…GS건설, 데이터 플랫폼 ‘스노우플레이크...",
+        "press": "동아일보",
+        "time": "1주 전",
+        "url": "https://www.donga.com/news/Economy/article/all/20260731/134400289/1",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "공정 지연·안전 위험 미리 잡는다…GS건설, 건설 AI 본격화",
+        "press": "데일리안",
+        "time": "1주 전",
+        "url": "https://www.dailian.co.kr/news/view/1673064/?sc=Naver",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "DL이앤씨 '1조' 상대원2구역 시공권 되찾았다…법원 가처분 인용 외 1건",
+        "press": "뉴스1",
+        "time": "1주 전",
+        "url": "https://www.news1.kr/realestate/general/6245666",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "DL이앤씨",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ],
     "원자력": [
+      {
+        "title": "한전기술, 한미 원전 협력에 APR1400 수주까지…'매수'-NH",
+        "press": "이데일리",
+        "time": "2026.08.09 22:59",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=01977846645546008",
+        "domain": "원자력",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "한전기술",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
       {
         "title": "구리 다음은 우라늄?··· AI 전력 수요에 원전株 다시 뛴다",
         "press": "그린포스트코리아",
@@ -2489,6 +2569,22 @@
       }
     ],
     "도시정비": [
+      {
+        "title": "\"재건축 이주비 숨통 트이나\"…정부, 추가 대출 공적보증 검토",
+        "press": "한국경제",
+        "time": "2026.08.09 22:40",
+        "url": "https://www.hankyung.com/article/2026081031557",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
       {
         "title": "재건축·재개발 이주비 대출 숨통…정부, HF 보증 신설 추진",
         "press": "이투데이",
@@ -2554,6 +2650,22 @@
         "verify_needed": true
       },
       {
+        "title": "[사설] 공급 대책에 재건축·재개발 촉진 방안도 포함돼야",
+        "press": "파이낸셜뉴스",
+        "time": "2026.08.09 11:05",
+        "url": "http://www.fnnews.com/news/202608091907150002",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "IPARK현대산업개발, 4년만에 매탄주공 4·5단지 재건축 시공권 움직임…...",
         "press": "경인일보",
         "time": "2026.08.09 10:22",
@@ -2568,9 +2680,41 @@
         "source": "supplementary",
         "tier": "unlisted",
         "verify_needed": true
+      },
+      {
+        "title": "분당·평촌 오를 때 일산만 내렸다…재건축 기대감도 ‘무색’",
+        "press": "이투데이",
+        "time": "2026.08.09 08:05",
+        "url": "https://www.etoday.co.kr/news/view/2612198",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "일산",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ],
     "자본시장": [
+      {
+        "title": "[오늘의 증시]美금리인상 우려 완화…코스피 6300선 회복 시도 외 5건",
+        "press": "뉴시스",
+        "time": "2026.08.09 22:25",
+        "url": "https://www.newsis.com/view/NISX20260810_0003742025",
+        "domain": "자본시장",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "코스피",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
       {
         "title": "美 증시, '고용쇼크'에 금리인상 전망 제동...S&P500 사상 최고치-[글로...",
         "press": "한국경제TV",
