@@ -1,6 +1,6 @@
 {
   "date": "2026-08-11",
-  "generated_at": "2026-08-11T07:09:43.644215+09:00",
+  "generated_at": "2026-08-11T08:21:02.449562+09:00",
   "indicators": {
     "kospi": [
       "6,299.66",
@@ -53,13 +53,13 @@
       "fall"
     ],
     "wti": [
-      "82.30",
-      "+5.27%",
+      "82.09",
+      "+5.00%",
       "rise"
     ],
     "fx": [
-      "1,417.7",
-      "+10.7",
+      "1,418.1",
+      "+11.1",
       "rise"
     ],
     "cidx1": [
@@ -1096,7 +1096,7 @@
       ],
       [
         "2026-08-10",
-        82.3
+        82.09
       ]
     ],
     "fx": [
@@ -1186,7 +1186,7 @@
       ],
       [
         "2026-08-10",
-        1417.7
+        1418.1
       ]
     ],
     "cidx1": [
@@ -2354,6 +2354,22 @@
   "news": {
     "건설업": [
       {
+        "title": "삼성E&A, 밥코에 '6000억 규모 정유플랜트 손해배상' 가처분 패소",
+        "press": "더트래커",
+        "time": "2026.08.10 22:23",
+        "url": "https://thetracker.co.kr/View.aspx?No=4181467",
+        "domain": "건설업",
+        "scope": "해외",
+        "subject": "경쟁사",
+        "entity": "삼성E&A",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": "삼성E&A가 밥코를 상대로 제기한 6000억원 규모 정유플랜트 손해배상 관련 가처분 소송에서 패소했다. 이는 해외 프로젝트 관련 법적 분쟁 결과로 재무적 영향이 예상된다.",
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "[더벨][Company Watch] 삼성물산, 철강·화학 성과냈지만 3분기 보릿고개...",
         "press": "더벨",
         "time": "2026.08.10 22:02",
@@ -2434,6 +2450,22 @@
         "verify_needed": false
       },
       {
+        "title": "현대산업개발 아이파크, 천안서 '토지 무단사용 공방'...토지주의 분노...",
+        "press": "뉴스프리존",
+        "time": "2026.08.10 10:22",
+        "url": "https://www.newsfreezone.co.kr/news/articleView.html?idxno=703323",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "HDC현대산업개발",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "[도시정비시장 풍향계] 삼성물산, 1.8조 '성수3지구' 무혈입성 유력 외 1건",
         "press": "대한경제",
         "time": "2026.08.10 10:10",
@@ -2450,6 +2482,38 @@
         "verify_needed": false
       },
       {
+        "title": "\"AI용 직류배전 키우자\" LS일렉·GS건설 맞손",
+        "press": "매일경제",
+        "time": "2026.08.10 09:22",
+        "url": "https://www.mk.co.kr/article/12123077",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "HDC현대산업개발, 3533억 규모 대전 대동 재개발 수주 [공시pick]",
+        "press": "조세일보",
+        "time": "2026.08.10 09:22",
+        "url": "http://www.joseilbo.com/news/news_read.php?uid=573561&class=17&grp=",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "HDC현대산업개발",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "LS일렉-GS건설, 직류 배전 개발 협력",
         "press": "한국경제",
         "time": "2026.08.10 09:10",
@@ -2464,9 +2528,41 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "코스피 순환매에 '실적 모멘텀' 건설주 뜬다, 데이터센터 수혜 더해진 ...",
+        "press": "비즈니스포스트",
+        "time": "2026.08.10 08:21",
+        "url": "https://www.businesspost.co.kr/BP?command=article_view&num=444360",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ],
     "원자력": [
+      {
+        "title": "한전KPS, 대외 매출 급감에 2Q 부진…원전 수주 모멘텀은 유효-삼성",
+        "press": "이데일리",
+        "time": "2026.08.10 22:46",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=03352166645546336",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "한전KPS",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
       {
         "title": "빌게이츠·정기선 다시 만나나⋯HD현대 'SMR 빅딜' 탄력받나 외 1건",
         "press": "아이뉴스24",
@@ -2500,6 +2596,38 @@
         "verify_needed": true
       },
       {
+        "title": "호실적 안주 안한다…미래 먹거리 FDC·SMR 띄우는 K조선",
+        "press": "이데일리",
+        "time": "2026.08.10 10:22",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=04749446645546008",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "K조선",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "원자력 추진선 '규제 안개' 걷힌다…SMR 상용화 '청신호'",
+        "press": "이데일리",
+        "time": "2026.08.10 07:22",
+        "url": "https://www.edaily.co.kr/news/newspath.asp?newsid=03683446645546008",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "SMR",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
         "title": "美 원전 투자 재시동·국내 전력수요 급증…건설사 원전 수주 기대감↑",
         "press": "오피니언뉴스",
         "time": "2026.08.10 07:11",
@@ -2525,6 +2653,38 @@
         "subject": "자사",
         "entity": "우리기술",
         "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "우리기술, 한수원과 원전 공급자 재고관리 협약 외 1개 언론사 보도 외 1건",
+        "press": "뉴시스",
+        "time": "2026.08.10 02:22",
+        "url": "https://www.newsis.com/view/NISX20260810_0003742602",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "우리기술/한수원",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "빌 게이츠 방한 앞둔 정기선...HD현대, 테라파워와 'SMR 판' 키운다",
+        "press": "뉴스톱",
+        "time": "2026.08.10 02:22",
+        "url": "https://www.newstopkorea.com/news/articleView.html?idxno=46879",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "HD현대/테라파워",
+        "importance": "Normal",
         "relevance": "high",
         "summary_kr": null,
         "source": "supplementary",
@@ -2662,6 +2822,22 @@
         "verify_needed": false
       },
       {
+        "title": "'1조 클럽' 목동 재건축 활활…건설사, 기술 앞세워 수주전 경쟁",
+        "press": "폴리뉴스",
+        "time": "2026.08.10 08:23",
+        "url": "https://www.polinews.co.kr/news/articleView.html?idxno=739665",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "목동 재건축",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "재건축·재개발 조합원 이주비 대출 공공 지원…정부, HF 보증 검토 외 1개 언론사 보도 외 1건",
         "press": "동행미디어 시대",
         "time": "2026.08.10 08:12",
@@ -2670,6 +2846,102 @@
         "scope": "국내",
         "subject": "정책",
         "entity": "HF",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "재건축·재개발 걸림돌 치운다…정부, 이주비 대출 공적보증 검토",
+        "press": "세계비즈",
+        "time": "2026.08.10 07:23",
+        "url": "http://www.segyebiz.com/newsView/20260810515491?OutUrl=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "주택금융공사",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "목동10단지 재건축 현대건설 단독 응찰…수의계약 전망",
+        "press": "브릿지경제",
+        "time": "2026.08.10 07:23",
+        "url": "https://www.viva100.com/article/20260810500874",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "현대건설",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": true
+      },
+      {
+        "title": "정부, 재건축·재개발 이주비 대출에 HF 보증 추가 검토",
+        "press": "한국농어촌방송",
+        "time": "2026.08.10 02:23",
+        "url": "http://www.newskr.kr/news/articleView.html?idxno=105482",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "HF",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "대우건설, 목동8단지 재건축에 ARUP과 협업…구조 안전성 강화 외 2개 언론사 보도 외 2건",
+        "press": "로이슈",
+        "time": "2026.08.10 02:23",
+        "url": "http://www.lawissue.co.kr/view.php?ud=20260810104721680567191f6c6e_12",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "대우건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "“이주비 막히면 재건축 올스톱”…정부, 주금공 보증 붙여 숨통 틔울까",
+        "press": "매일경제",
+        "time": "2026.08.10 00:23",
+        "url": "https://www.mk.co.kr/article/12122449",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "주택금융공사",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "“이주비 없어 재건축 멈출라” 정부, 공적보증 검토[부동산360]",
+        "press": "헤럴드경제",
+        "time": "2026.08.10 00:23",
+        "url": "https://biz.heraldcorp.com/article/10835457?ref=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
         "importance": "Normal",
         "relevance": "high",
         "summary_kr": null,
@@ -2792,6 +3064,38 @@
         "source": "main",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "목동 10단지, 현대건설 단독 입찰…수의계약 유력 외 2개 언론사 보도",
+        "press": "한국경제TV",
+        "time": "2026.08.10 17:38",
+        "url": "https://n.news.naver.com/mnews/article/215/0001261837",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동 10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "main",
+        "tier": "t1",
+        "verify_needed": false
+      },
+      {
+        "title": "성수3지구 삼성물산 수주 유력⋯목동10단지는 현대건설 단독 응찰",
+        "press": "이투데이",
+        "time": "2026.08.10 09:21",
+        "url": "https://www.etoday.co.kr/news/view/2612896",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "목동 10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       },
       {
         "title": "현대건설, 목동 10단지 재건축 수주 '유력'",
