@@ -1,6 +1,6 @@
 {
   "date": "2026-08-12",
-  "generated_at": "2026-08-12T07:06:11.996096+09:00",
+  "generated_at": "2026-08-12T08:27:58.058045+09:00",
   "indicators": {
     "kospi": [
       "6,345.53",
@@ -53,8 +53,8 @@
       "rise"
     ],
     "wti": [
-      "83.23",
-      "+1.34%",
+      "83.45",
+      "+1.61%",
       "rise"
     ],
     "fx": [
@@ -1116,7 +1116,7 @@
       ],
       [
         "2026-08-11",
-        83.23
+        83.45
       ]
     ],
     "fx": [
@@ -2390,6 +2390,22 @@
   "news": {
     "건설업": [
       {
+        "title": "도시정비 8조 눈앞…GS건설, 1.8조 목동12단지 본입찰 채비",
+        "press": "월요신문",
+        "time": "2026.08.11 22:29",
+        "url": "https://www.wolyo.co.kr/news/articleView.html?idxno=316317",
+        "domain": "건설업",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "GS건설",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "성수·여의도·목동 10조 수주전…대형 건설사들은 왜 안 붙나 외 1개 언론사 보도",
         "press": "머니투데이",
         "time": "2026.08.11 16:52",
@@ -2520,6 +2536,38 @@
         "verify_needed": true
       },
       {
+        "title": "이 대통령, ‘미래 성장동력 육성’ 정책간담회…양자컴·SMR 등 전략 투...",
+        "press": "KBS",
+        "time": "2026.08.11 16:29",
+        "url": "https://news.kbs.co.kr/news/pc/view/view.do?ncd=8634581&ref=A",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "빌 게이츠 14일 방한…SMR 협력 논의 전망 외 1개 언론사 보도 외 1건",
+        "press": "주간한국",
+        "time": "2026.08.11 09:29",
+        "url": "https://weekly.hankooki.com/news/articleView.html?idxno=7178512",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "빌 게이츠",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "정기선 HD현대 회장, 빌 게이츠와 만난다…SMR 협력 논의",
         "press": "뉴스1",
         "time": "2026.08.11 09:07",
@@ -2552,6 +2600,38 @@
         "verify_needed": true
       },
       {
+        "title": "李 “임기 내 세종집무실 시대 개막…SMR·양자컴 등 ‘3대 메가’ 수준...",
+        "press": "국민일보",
+        "time": "2026.08.11 07:29",
+        "url": "https://www.kmib.co.kr/article/view.asp?arcid=9000002194&cp=nv",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "세종집무실",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "李 “SMR·우주항공, 메가프로젝트 수준으로 집중해야”",
+        "press": "경남신문",
+        "time": "2026.08.11 07:29",
+        "url": "https://www.knnews.co.kr/news/articleView.php?idxno=1548450",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "DL이앤씨 '수주 반환점' 미달…하반기 정비사업·원전·DL건설 승부수",
         "press": "아시아투데이",
         "time": "2026.08.11 07:07",
@@ -2566,9 +2646,121 @@
         "source": "supplementary",
         "tier": "t2",
         "verify_needed": false
+      },
+      {
+        "title": "李 \"SMR·양자컴·첨단바이오에도 메가프로젝트급 투자\"",
+        "press": "노컷뉴스",
+        "time": "2026.08.11 06:29",
+        "url": "https://www.nocutnews.co.kr/news/6561305?utm_source=naver&utm_medium=article&utm_campaign=20260811031253",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "“SMR·양자컴·우주항공… 메가프로젝트만큼 투자”",
+        "press": "문화일보",
+        "time": "2026.08.11 03:29",
+        "url": "https://www.munhwa.com/article/11608769?ref=naver",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "李대통령 \"SMR·양자·우주항공 등 메가프로젝트 버금 투자\" 외 1개 언론사 보도",
+        "press": "파이낸셜뉴스",
+        "time": "2026.08.11 02:29",
+        "url": "http://www.fnnews.com/news/202608111032258995",
+        "domain": "원자력",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
       }
     ],
     "도시정비": [
+      {
+        "title": "강남구, 병원·학원 입점 늦던 재건축 상가…용도변경 앞당겨 주기로",
+        "press": "아시아경제",
+        "time": "2026.08.11 23:11",
+        "url": "https://view.asiae.co.kr/article/2026081208114423271",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "강남구",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t2",
+        "verify_needed": false
+      },
+      {
+        "title": "강남구, 재건축 상가 '영업 공백' 없앤다, 이전고시 전 용도변경 허용",
+        "press": "이뉴스투데이",
+        "time": "2026.08.11 23:05",
+        "url": "http://www.enewstoday.co.kr/news/articleView.html?idxno=2458372",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "강남구",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "“재건축 아파트 공실 상가 없앤다”...김현기 강남구청장‘실사 구시 ...",
+        "press": "헤럴드경제",
+        "time": "2026.08.11 22:45",
+        "url": "https://biz.heraldcorp.com/article/10838120?ref=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "강남구청",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "강남구, 재건축상가 용도변경절차 개선…\"병원 입점 지연 해결\"",
+        "press": "연합뉴스",
+        "time": "2026.08.11 22:36",
+        "url": "https://www.yna.co.kr/view/AKR20260812017300004?input=1195m",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "강남구",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "t1",
+        "verify_needed": false
+      },
       {
         "title": "우리자산신탁·부천시, 금강마을 재건축 인허가 절차 본격 지원 외 2건",
         "press": "국제뉴스",
@@ -2634,10 +2826,58 @@
         "verify_needed": true
       },
       {
+        "title": "우리자산신탁, 부천 중동 재건축 사업 참여 본격화 외 1건",
+        "press": "CNB뉴스",
+        "time": "2026.08.11 06:30",
+        "url": "https://www.cnbnews.com/news/articleView.html?idxno=1011117",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "경쟁사",
+        "entity": "우리자산신탁",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
         "title": "오세훈 “서울 부동산 공급 해법은 재개발·재건축”",
         "press": "국민일보",
         "time": "2026.08.11 06:08",
         "url": "https://www.kmib.co.kr/article/view.asp?arcid=9000002146&cp=nv",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": "오세훈",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "재건축·재개발, 주택수 순증효과?",
+        "press": "내일신문",
+        "time": "2026.08.11 04:30",
+        "url": "https://www.naeil.com/news/read/598385?ref=naver",
+        "domain": "도시정비",
+        "scope": "국내",
+        "subject": "정책",
+        "entity": null,
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "오세훈, 재개발·재건축 공급 효과 강조...정부에 규제 완화 건의 외 1건",
+        "press": "PPSS",
+        "time": "2026.08.11 03:30",
+        "url": "https://www.ppss.kr/news/articleView.html?idxno=304949",
         "domain": "도시정비",
         "scope": "국내",
         "subject": "정책",
@@ -2683,6 +2923,22 @@
       }
     ],
     "자본시장": [
+      {
+        "title": "호르무즈 다시 먹구름…뉴욕증시 이틀째 하락, 나스닥 0.6%↓",
+        "press": "경북매일신문",
+        "time": "2026.08.11 21:30",
+        "url": "https://www.kbmaeil.com/article/20260812500012",
+        "domain": "자본시장",
+        "scope": "해외",
+        "subject": "시장전반",
+        "entity": "나스닥",
+        "importance": "Normal",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
       {
         "title": "호르무즈 불확실성에 꺾인 뉴욕증시, 나스닥 0.6% 하락 외 3건",
         "press": "한국경제",
@@ -2730,6 +2986,38 @@
         "source": "supplementary",
         "tier": "t1",
         "verify_needed": false
+      },
+      {
+        "title": "[마켓뷰] 삼성전자 4% 올라 코스피 6340선 사수…반도체가 살렸다 외 4건",
+        "press": "조선비즈",
+        "time": "2026.08.11 07:30",
+        "url": "https://biz.chosun.com/stock/stock_general/2026/08/11/53TCCH6FK5DY7EEK5ND3EEYLRU/?utm_source=naver&utm_medium=original&utm_campaign=biz",
+        "domain": "자본시장",
+        "scope": "국내",
+        "subject": "시장전반",
+        "entity": "코스피",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "호르무즈 언제 열리나…이란 밀당에 유가 ‘쑥’ 증시 ‘뚝’ [뉴욕증시...",
+        "press": "매경이코노미",
+        "time": "2026.08.11 00:30",
+        "url": "https://www.mk.co.kr/article/12123694",
+        "domain": "자본시장",
+        "scope": "해외",
+        "subject": "시장전반",
+        "entity": "호르무즈 해협 리스크·유가",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
       }
     ],
     "현대건설": [
@@ -2758,6 +3046,22 @@
         "scope": "국내",
         "subject": "자사",
         "entity": "목동10단지",
+        "importance": "High",
+        "relevance": "high",
+        "summary_kr": null,
+        "source": "supplementary",
+        "tier": "unlisted",
+        "verify_needed": true
+      },
+      {
+        "title": "현대건설, 신반포2차 재건축 도급계약 보도 관련 해명",
+        "press": "톱스타뉴스",
+        "time": "2026.08.11 07:29",
+        "url": "https://www.topstarnews.net/news/articleView.html?idxno=16160630",
+        "domain": "현대건설",
+        "scope": "국내",
+        "subject": "자사",
+        "entity": "신반포2차",
         "importance": "High",
         "relevance": "high",
         "summary_kr": null,
